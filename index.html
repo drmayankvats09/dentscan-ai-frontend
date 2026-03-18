@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Daantun AI – Free AI Dental Consultation</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0a9e8f;--teal-l:#0cbfae;--teal-d:#077a6e;
+  --cream:#f7f5f0;--dark:#151c2b;--gray:#6b7280;--lgray:#e5e9ef;
+  --white:#fff;--chat-bg:#f0faf9;
+  --red:#e53e3e;--orange:#dd6b20;--green:#2f855a;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;display:flex;flex-direction:column}
+nav{background:var(--white);border-bottom:1px solid rgba(0,0,0,.07);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 14px rgba(0,0,0,.05)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),var(--teal-l));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--dark)}
+.logo-text span{color:var(--teal)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.lang-toggle{display:flex;background:var(--lgray);border-radius:20px;padding:3px;gap:2px}
+.lang-btn{padding:5px 14px;border-radius:16px;border:none;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--gray);font-family:'DM Sans',sans-serif}
+.lang-btn.active{background:var(--teal);color:white}
+.nav-cta{background:var(--teal);color:white;padding:8px 18px;border-radius:20px;font-size:.85rem;font-weight:500;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:var(--teal-d)}
+.hero{background:linear-gradient(160deg,#e4f7f5 0%,#f7f5f0 65%);padding:3.5rem 2rem 2.5rem;text-align:center;border-bottom:1px solid rgba(10,158,143,.1)}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(10,158,143,.12);color:var(--teal-d);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:600;margin-bottom:1.1rem;letter-spacing:.05em;text-transform:uppercase}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4.5vw,3rem);font-weight:700;line-height:1.2;margin-bottom:.9rem;max-width:680px;margin-left:auto;margin-right:auto}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero p{color:var(--gray);font-size:1rem;max-width:500px;margin:0 auto 1.5rem;line-height:1.7}
+.hero-stats{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap}
+.stat-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--teal)}
+.stat-label{font-size:.72rem;color:var(--gray);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
+.main-container{display:flex;flex:1;max-width:1200px;margin:0 auto;width:100%;padding:2rem 1.5rem;gap:2rem}
+.sidebar{width:270px;flex-shrink:0}
+.sidebar-card{background:var(--white);border-radius:16px;padding:1.3rem;margin-bottom:1.1rem;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.sidebar-card h3{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:.9rem}
+.topic-btn{width:100%;background:var(--chat-bg);border:1px solid rgba(10,158,143,.15);border-radius:10px;padding:9px 12px;font-size:.83rem;color:var(--dark);cursor:pointer;text-align:left;transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.topic-btn:hover{background:rgba(10,158,143,.12);border-color:var(--teal);color:var(--teal-d)}
+.disclaimer-box{background:#fff8e8;border:1px solid #f0d080;border-radius:12px;padding:1rem;font-size:.76rem;color:#7a6010;line-height:1.5}
+.disclaimer-box strong{display:block;margin-bottom:4px}
+.how-card{background:linear-gradient(135deg,rgba(10,158,143,.07),rgba(10,158,143,.02));border:1px solid rgba(10,158,143,.15);border-radius:16px;padding:1.3rem}
+.how-card h3{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:.9rem}
+.step{display:flex;gap:10px;margin-bottom:.8rem;align-items:flex-start}
+.step-num{width:22px;height:22px;background:var(--teal);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.step-text{font-size:.82rem;color:var(--dark);line-height:1.4}
+.chat-wrapper{flex:1;display:flex;flex-direction:column}
+.chat-box{background:var(--white);border-radius:20px;border:1px solid rgba(0,0,0,.07);box-shadow:0 4px 28px rgba(0,0,0,.07);display:flex;flex-direction:column;height:620px;overflow:hidden}
+.chat-header{background:linear-gradient(135deg,var(--teal),var(--teal-l));padding:.95rem 1.4rem;display:flex;align-items:center;gap:12px;color:white}
+.ai-avatar{width:44px;height:44px;background:rgba(255,255,255,.22);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ai-info h4{font-weight:600;font-size:.95rem}
+.ai-info p{font-size:.76rem;opacity:.85;margin-top:2px;display:flex;align-items:center;gap:5px}
+.online-dot{width:7px;height:7px;background:#7effd4;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.messages{flex:1;overflow-y:auto;padding:1.3rem;display:flex;flex-direction:column;gap:.9rem;background:var(--chat-bg);scroll-behavior:smooth}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:rgba(10,158,143,.2);border-radius:3px}
+.msg{display:flex;gap:10px;animation:fadeUp .32s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:2px}
+.bot .msg-avatar{background:linear-gradient(135deg,var(--teal),var(--teal-l));color:white}
+.user .msg-avatar{background:var(--dark);color:white;font-size:12px;font-weight:600}
+.msg-bubble{max-width:80%;padding:11px 14px;border-radius:16px;font-size:.88rem;line-height:1.58}
+.bot .msg-bubble{background:var(--white);border:1px solid rgba(0,0,0,.07);border-top-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.user .msg-bubble{background:var(--teal);color:white;border-top-right-radius:4px}
+.msg-time{font-size:.68rem;color:var(--gray);margin-top:3px;display:block}
+.bot .msg-time{margin-left:42px}
+.user .msg-time{text-align:right;margin-right:42px}
+.typing-dots{background:var(--white);border:1px solid rgba(0,0,0,.07);border-radius:16px;border-top-left-radius:4px;padding:12px 15px;display:flex;gap:5px;align-items:center}
+.dot{width:7px;height:7px;background:var(--teal);border-radius:50%;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* INPUT AREA */
+.chat-input-area{padding:.9rem 1.2rem;border-top:1px solid rgba(0,0,0,.06);background:var(--white)}
+.input-row{display:flex;gap:9px;align-items:flex-end}
+.chat-input{flex:1;border:1.5px solid var(--lgray);border-radius:14px;padding:10px 14px;font-size:.88rem;font-family:'DM Sans',sans-serif;resize:none;outline:none;transition:border-color .2s;line-height:1.5;min-height:44px;max-height:110px;overflow-y:auto;color:var(--dark)}
+.chat-input:focus{border-color:var(--teal)}
+.chat-input::placeholder{color:#b0b8c4}
+.input-actions{display:flex;gap:7px;align-items:center}
+.send-btn{width:44px;height:44px;background:var(--teal);border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0}
+.send-btn:hover{background:var(--teal-d)}
+.send-btn:active{transform:scale(.93)}
+.send-btn svg{width:17px;height:17px;fill:white}
+.photo-btn{width:44px;height:44px;background:var(--lgray);border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;font-size:20px;position:relative}
+.photo-btn:hover{background:#d0e8e5}
+.photo-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-btn.pulse-anim{animation:photoPulse 1.5s ease infinite;background:rgba(10,158,143,.15);border:2px solid var(--teal)}
+@keyframes photoPulse{0%,100%{box-shadow:0 0 0 0 rgba(10,158,143,.4)}50%{box-shadow:0 0 0 8px rgba(10,158,143,0)}}
+.input-hint{font-size:.69rem;color:#b0b8c4;margin-top:5px;text-align:center}
+
+/* PHOTO PREVIEW IN CHAT */
+.photo-preview-bubble{max-width:260px;border-radius:14px;overflow:hidden;border:2px solid rgba(10,158,143,.25);margin-top:4px}
+.photo-preview-bubble img{width:100%;display:block}
+.photo-label{font-size:.72rem;color:var(--teal-d);background:rgba(10,158,143,.08);padding:5px 10px;display:block;font-weight:600}
+
+/* PHOTO REPORT CARD */
+.photo-report{max-width:94%;margin-top:10px;background:white;border-radius:16px;overflow:hidden;border:1.5px solid rgba(10,158,143,.25);box-shadow:0 4px 20px rgba(10,158,143,.1)}
+.photo-report-header{background:linear-gradient(135deg,var(--teal),var(--teal-l));padding:12px 16px;display:flex;align-items:center;gap:10px}
+.photo-report-header .rh-icon{font-size:22px}
+.photo-report-header h4{color:white;font-size:.92rem;font-weight:700}
+.photo-report-header p{color:rgba(255,255,255,.8);font-size:.72rem;margin-top:1px}
+.photo-thumb-row{display:flex;gap:12px;padding:14px 16px;background:#f8fffe;border-bottom:1px solid rgba(10,158,143,.1);align-items:flex-start}
+.photo-thumb{width:90px;height:90px;border-radius:10px;object-fit:cover;border:2px solid rgba(10,158,143,.2);flex-shrink:0}
+.photo-summary{font-size:.83rem;color:var(--dark);line-height:1.55}
+.photo-summary strong{color:var(--teal-d)}
+.findings-grid{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.finding-card{display:flex;gap:12px;align-items:flex-start;background:#f8f9fa;border-radius:12px;padding:11px 13px;border-left:4px solid}
+.finding-card.severity-mild{border-color:#f59e0b;background:#fffbeb}
+.finding-card.severity-moderate{border-color:#f97316;background:#fff7ed}
+.finding-card.severity-severe{border-color:#ef4444;background:#fef2f2}
+.finding-card.severity-noted{border-color:var(--teal);background:#f0fdf9}
+.finding-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.finding-body{}
+.finding-name{font-size:.88rem;font-weight:700;color:var(--dark);margin-bottom:2px}
+.finding-location{font-size:.75rem;color:var(--gray);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.finding-note{font-size:.8rem;color:var(--dark);line-height:1.45}
+.severity-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-left:6px}
+.sev-mild{background:#fef3c7;color:#92400e}
+.sev-moderate{background:#ffedd5;color:#9a3412}
+.sev-severe{background:#fee2e2;color:#991b1b}
+.sev-noted{background:rgba(10,158,143,.12);color:var(--teal-d)}
+
+/* RX CARD */
+.rx-card{background:white;border:1.5px solid rgba(10,158,143,.3);border-radius:16px;overflow:hidden;max-width:94%;margin-top:10px;box-shadow:0 4px 20px rgba(10,158,143,.12)}
+.rx-header{background:linear-gradient(135deg,var(--teal),var(--teal-l));padding:12px 16px;display:flex;align-items:center;gap:10px}
+.rx-header-text h4{color:white;font-size:.92rem;font-weight:700}
+.rx-header-text p{color:rgba(255,255,255,.8);font-size:.73rem;margin-top:1px}
+.rx-body{padding:14px 16px;display:flex;flex-direction:column;gap:11px}
+.rx-section-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:5px}
+.diagnosis-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(10,158,143,.1);color:var(--teal-d);padding:5px 12px;border-radius:20px;font-size:.83rem;font-weight:600}
+.urgency-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:.83rem;font-weight:700}
+.u-emergency{background:#fff0f0;color:var(--red);border:1px solid rgba(229,62,62,.3)}
+.u-urgent{background:#fff4f0;color:#c2410c;border:1px solid rgba(194,65,12,.3)}
+.u-routine{background:#f0fff4;color:var(--green);border:1px solid rgba(47,133,90,.3)}
+.u-monitor{background:#fffaf0;color:var(--orange);border:1px solid rgba(221,107,32,.3)}
+.otc-unsafe-box{background:#fff8e8;border:1px solid #f0c040;border-radius:8px;padding:9px 12px;font-size:.8rem;line-height:1.5;color:#7a4f00}
+.otc-unsafe-box strong{display:block;margin-bottom:3px;color:#c05000}
+.otc-unsafe-box span{font-size:.72rem;color:#7a6010;display:block;margin-top:4px}
+.rx-legal{font-size:.68rem;color:#9ca3af;background:#f9fafb;border-radius:7px;padding:7px 10px;line-height:1.5;border:1px solid #e5e7eb}
+.care-list{list-style:none;display:flex;flex-direction:column;gap:4px}
+.care-list li{font-size:.82rem;display:flex;gap:7px;align-items:flex-start;line-height:1.45;color:var(--dark)}
+.med-item{display:flex;align-items:flex-start;gap:8px;background:#f8f9fa;padding:8px 10px;border-radius:8px;font-size:.82rem}
+.med-name{font-weight:600;color:var(--dark)}
+.rx-note{font-size:.72rem;color:var(--gray);background:#f8f9fa;padding:8px 10px;border-radius:8px;line-height:1.5;border-left:3px solid var(--teal)}
+
+/* CONNECT */
+.connect-card{background:linear-gradient(135deg,#e8f9f7,#f0fff8);border:1.5px solid rgba(10,158,143,.25);border-radius:14px;padding:14px;max-width:90%;margin-top:8px}
+.connect-card h5{font-size:.88rem;font-weight:700;color:var(--teal-d);margin-bottom:10px}
+.connect-actions{display:flex;flex-direction:column;gap:7px}
+.connect-btn{display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:10px;border:none;cursor:pointer;font-size:.83rem;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s}
+.connect-btn:hover{transform:translateX(3px);opacity:.9}
+.btn-wa{background:#25d366;color:white}
+.btn-call{background:var(--teal);color:white}
+.btn-book{background:var(--dark);color:white}
+
+.features{background:var(--white);border-top:1px solid rgba(0,0,0,.06);padding:2.5rem 2rem}
+.features-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem}
+.feature-item{text-align:center;padding:1.1rem .8rem}
+.feature-icon{font-size:1.9rem;margin-bottom:.6rem;display:block}
+.feature-item h4{font-size:.92rem;font-weight:600;margin-bottom:.35rem}
+.feature-item p{font-size:.79rem;color:var(--gray);line-height:1.5}
+footer{background:var(--dark);color:rgba(255,255,255,.55);text-align:center;padding:1.4rem;font-size:.77rem}
+footer a{color:var(--teal-l);text-decoration:none}
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main-container{padding:1rem}
+  .hero{padding:2.2rem 1rem 1.8rem}
+  .nav-right .nav-cta{display:none}
+  .chat-box{height:calc(100vh - 240px)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-icon">🦷</div>
+    <span class="logo-text">Daantun <span>AI</span></span>
+  </a>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btn-hi" onclick="setLang('hi')">हिंदी</button>
+    </div>
+    <a href="#" class="nav-cta">Book Appointment</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="badge">🤖 AI-Powered Dental Care</div>
+  <h1 id="hero-title">Your <em>AI Dental Expert</em>,<br/>Available 24/7 — Free</h1>
+  <p id="hero-sub">Describe your dental problem. Our AI asks the right clinical questions, then gives you a proper assessment — in Hindi or English.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Always On</div></div>
+    <div class="stat"><div class="stat-num">Free</div><div class="stat-label">No Cost Ever</div></div>
+    <div class="stat"><div class="stat-num">Hindi</div><div class="stat-label">& English</div></div>
+    <div class="stat"><div class="stat-num">BDS</div><div class="stat-label">Expert Backed</div></div>
+  </div>
+</section>
+
+<div class="main-container">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <h3 id="sidebar-topics-title">Common Problems</h3>
+      <div id="topic-list"></div>
+    </div>
+    <div class="how-card">
+      <h3>How It Works</h3>
+      <div class="step"><div class="step-num">1</div><div class="step-text" id="step1">Tell us your problem in your own words</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text" id="step2">AI asks you clinical questions one by one</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text" id="step3">Upload a photo for visual AI evaluation</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text" id="step4">Get assessment + connect with a real dentist</div></div>
+    </div>
+    <div class="disclaimer-box" style="margin-top:1.1rem">
+      <strong>⚠️ Important Notice</strong>
+      <span id="disclaimer-text">Daantun AI provides general dental information only. It is not a substitute for professional clinical examination. Always see a qualified dentist for diagnosis and treatment.</span>
+    </div>
+  </aside>
+
+  <div class="chat-wrapper">
+    <div class="chat-box">
+      <div class="chat-header">
+        <div class="ai-avatar">🦷</div>
+        <div class="ai-info">
+          <h4>Daantun AI — Dental Assistant</h4>
+          <p><span class="online-dot"></span> Online · Free · Photo Analysis Enabled</p>
+        </div>
+      </div>
+      <div class="messages" id="messages"></div>
+      <div class="chat-input-area">
+        <div class="input-row">
+          <textarea id="chatInput" class="chat-input" rows="1"
+            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <div class="input-actions">
+            <button class="photo-btn" id="photoBtn" title="Upload dental photo">
+              📷
+              <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)"/>
+            </button>
+            <button class="send-btn" onclick="sendMessage()">
+              <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="input-hint" id="input-hint">📷 Upload photo anytime · Enter to send · Shift+Enter for new line</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="features">
+  <div class="features-inner">
+    <div class="feature-item"><span class="feature-icon">🧠</span><h4>Clinical Questioning</h4><p>AI asks targeted questions before any assessment — no half-answers, ever.</p></div>
+    <div class="feature-item"><span class="feature-icon">📷</span><h4>Photo Analysis</h4><p>Upload your dental photo. AI visually evaluates cavities, gum issues, calculus, fractures & more.</p></div>
+    <div class="feature-item"><span class="feature-icon">📊</span><h4>Finding Cards</h4><p>Each detected issue shown as a clear card — name, location, severity & clinical detail.</p></div>
+    <div class="feature-item"><span class="feature-icon">📋</span><h4>Assessment Card</h4><p>Likely diagnosis, urgency level, home care tips & safe OTC suggestions.</p></div>
+    <div class="feature-item"><span class="feature-icon">🌐</span><h4>Hindi & English</h4><p>Switch languages freely. AI matches your exact language and tone.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Daantun AI · Made for India's dental health · <a href="#">Privacy Policy</a> · <a href="#">Terms</a></p>
+  <p style="margin-top:5px">Daantun AI is for informational purposes only and does not constitute medical advice.</p>
+</footer>
+
+<script>
+// ── STATE ──
+let lang = 'en';
+let conversation = [];
+let userMsgCount = 0;
+let rxShown = false;
+let connectShown = false;
+let photoRequestShown = false;
+let pendingPhotoBase64 = null;
+let pendingPhotoMime = null;
+
+const WHATSAPP = '919953135340';
+
+// ── UI TEXT ──
+const UI = {
+  en: {
+    placeholder: "Describe your dental problem...",
+    hint: "📷 Upload photo anytime · Enter to send · Shift+Enter for new line",
+    topicsTitle: "Common Problems",
+    disclaimer: "Daantun AI provides general dental information only. It is not a substitute for professional clinical examination. Always see a qualified dentist for diagnosis and treatment.",
+    greeting: "Hello! 👋 I'm Daantun AI — your free dental assistant, built by a BDS-qualified dentist.\n\nI won't give you random information. First, I need to understand your problem properly.\n\n**What is bothering you today?** Describe it in your own words — any language is fine.",
+    connectTitle: "📅 Time to get proper treatment",
+    photoPrompt: "Thank you for sharing those details! Now, to give you a much more accurate assessment, **could you please upload a clear photo of the affected area?** 📷\n\nTips for a good photo:\n• Use good lighting (near a window or bright light)\n• Open your mouth wide and use front camera\n• Try to capture the specific tooth/area that's bothering you\n\nClick the 📷 camera button below to upload.",
+    photoAnalyzing: "📷 Photo received! Analyzing your dental image now...",
+  },
+  hi: {
+    placeholder: "Apni dant ki samasya batayein...",
+    hint: "📷 Photo upload karein · Enter bhejne ke liye · Shift+Enter nayi line",
+    topicsTitle: "Aam Samasyaein",
+    disclaimer: "Daantun AI sirf general dental jaankari deta hai. Yeh professional clinical jaanch ka vikalp nahin hai. Hamesha ek qualified dentist se milein.",
+    greeting: "Namaste! 👋 Main Daantun AI hoon — aapka muft dental assistant, ek BDS dentist dwara banaya gaya.\n\nMain seedha koi bhi jaankari nahi dunga. Pehle mujhe aapki samasya samjhni hai.\n\n**Aaj kya pareshani ho rahi hai?** Apne shabdon mein batayein — koi bhi bhasha chalegi.",
+    connectTitle: "📅 Ab sahi ilaaj karwane ka waqt hai",
+    photoPrompt: "Shukriya! Aapne jo jaankari di uske liye dhanyawaad. Ab aur accurate assessment ke liye, **kya aap affected area ki ek clear photo upload kar sakte hain?** 📷\n\nAchi photo ke tips:\n• Achi roshni mein lijiye (khidki ke paas)\n• Muh achhi tarah khol ke front camera use karein\n• Jis dant/jagah mein takleef hai usse clearly capture karein\n\nNeeche 📷 camera button click karke upload karein.",
+    photoAnalyzing: "📷 Photo mil gayi! Ab aapki dental image analyze kar raha hoon...",
+  }
+};
+
+const TOPICS = {
+  en: [
+    {e:"🦷",t:"Tooth Pain",q:"I have severe tooth pain"},
+    {e:"🩸",t:"Bleeding Gums",q:"My gums are bleeding"},
+    {e:"🌡️",t:"Sensitivity",q:"I have sensitivity to hot and cold"},
+    {e:"🕳️",t:"Cavity",q:"I think I have a cavity"},
+    {e:"😣",t:"Wisdom Tooth",q:"My wisdom tooth is hurting"},
+    {e:"💨",t:"Bad Breath",q:"I have bad breath that won't go away"},
+    {e:"💥",t:"Broken Tooth",q:"My tooth is broken or chipped"},
+    {e:"🤕",t:"Swelling",q:"I have swelling in my jaw or face"},
+  ],
+  hi: [
+    {e:"🦷",t:"Dant Dard",q:"Mujhe bahut dant dard hai"},
+    {e:"🩸",t:"Madi se Khoon",q:"Mere madi se khoon aa raha hai"},
+    {e:"🌡️",t:"Sensitivity",q:"Thanda ya garam lagta hai dant mein"},
+    {e:"🕳️",t:"Cavity",q:"Lagta hai mujhe cavity hai"},
+    {e:"😣",t:"Akkal Daad",q:"Mera akkal daad dard kar raha hai"},
+    {e:"💨",t:"Badboo",q:"Muh se badboo aati hai"},
+    {e:"💥",t:"Toota Dant",q:"Mera dant toot gaya hai"},
+    {e:"🤕",t:"Sujan",q:"Muh ya jaw mein sujan hai"},
+  ]
+};
+
+// ── SYSTEM PROMPTS ──
+function buildSystemPrompt() {
+  return `You are Daantun AI — a sharp, witty, caring dental AI assistant built by a BDS-qualified dentist in India. Think of yourself as that cool doctor friend who is clinically rigorous but never boring.
+
+════════════════════════════════
+LANGUAGE RULE
+════════════════════════════════
+Always mirror the patient's exact language. Hindi/Hinglish → Hinglish. English → English. Never switch. Match their energy — if they're casual, be casual. If scared, be warm.
+
+════════════════════════════════
+MANDATORY HISTORY — COLLECT ALL BEFORE ASSESSMENT
+════════════════════════════════
+Ask ONE question at a time, conversationally. Make it feel like a friendly chat, not a hospital form. Use light humour where appropriate. You MUST collect ALL of the following before generating any assessment:
+
+BLOCK A — Patient Profile (ask these first, creatively):
+□ A1. Name (call them by name after they share it)
+□ A2. Age — ask it with personality, e.g. "Kitne saal ke ho — and be honest, I won't judge 😄" or "How many candles on your last birthday cake? 🎂"
+□ A3. Gender — ask naturally, e.g. "Are you a sir or ma'am? (or however you identify 😊)"
+□ A4. Any known medical conditions? (diabetes, BP, heart issues, blood thinners, thyroid — these directly affect dental treatment and OTC safety)
+□ A5. Any drug allergies? (especially NSAIDs like ibuprofen/aspirin, penicillin — life-critical before any OTC suggestion)
+□ A6. Are you pregnant or breastfeeding? (ask only if applicable based on gender — if male skip)
+□ A7. Current medications? (some interact with dental drugs)
+
+BLOCK B — Dental Complaint:
+□ B1. Exact location (which tooth? upper/lower, left/right, front/back?)
+□ B2. Duration (since how long? hours, days, weeks?)
+□ B3. Pain character (throbbing, sharp, dull, constant, comes and goes?)
+□ B4. Cold sensitivity — does cold make it worse?
+□ B5. Hot sensitivity — does hot make it worse?
+□ B6. Does pain LINGER after the trigger is removed, or stops quickly? (critical for pulp diagnosis)
+□ B7. Biting/pressure pain?
+□ B8. Does pain spread to ear, jaw, or temple?
+□ B9. Any swelling — intraoral or facial?
+□ B10. Fever? (if yes, >101°F/38.5°C = likely abscess = EMERGENCY)
+□ B11. Previous dental work on that tooth? (filling, RCT, crown?)
+□ B12. Pain wakes you at night? (severe pulpitis sign)
+
+════════════════════════════════
+FLOW RULES
+════════════════════════════════
+1. Start with Block A (patient profile) — all 7 items. Be fun about it.
+2. Then move to Block B — one question at a time.
+3. After ALL blocks complete → request photo: output [REQUEST_PHOTO] naturally in your message.
+4. After photo received OR if patient refuses photo → generate assessment.
+5. MINIMUM data needed before assessment: A1-A5 + B1-B8 at minimum. Never skip A4/A5 — these are life-critical.
+
+════════════════════════════════
+EMERGENCY OVERRIDE
+════════════════════════════════
+If at ANY point patient mentions: facial swelling + fever, difficulty swallowing/breathing, trismus (can't open mouth), rapidly spreading swelling, uncontrolled bleeding → STOP history, immediately flag as 🚨 DENTAL EMERGENCY, tell them to go to a hospital/dental emergency NOW. Do not continue chatting.
+
+════════════════════════════════
+OTC MEDICINE — STRICT PRESCRIBING RULES
+════════════════════════════════
+⚠️ CRITICAL: Wrong OTC can kill. Follow these rules with zero exceptions:
+
+NEVER suggest OTC if:
+- Patient has NSAID/aspirin allergy → NEVER suggest ibuprofen/aspirin/diclofenac
+- Patient has peptic ulcer or gastritis → NEVER suggest NSAIDs without strong PPI caveat
+- Patient is pregnant → NEVER suggest ibuprofen (teratogenic in 3rd trimester). Only paracetamol 500mg is relatively safe, and only with "consult your OB-GYN first"
+- Patient is breastfeeding → Only paracetamol, with caveat
+- Patient is a CHILD under 12 → NEVER suggest adult doses. NEVER suggest aspirin (Reye's syndrome risk). If child, suggest paracetamol ONLY with weight-based dosing caveat AND "consult pediatrician/dentist immediately"
+- Patient is a CHILD under 6 → Do NOT suggest any OTC at all. Say "please see a dentist immediately, no home medicine for this age group"
+- Patient on blood thinners (warfarin, clopidogrel) → NEVER suggest NSAIDs or aspirin
+- Patient has kidney/liver disease → NEVER suggest NSAIDs; paracetamol with caution and lower dose caveat
+- Patient has heart disease/hypertension → NEVER suggest ibuprofen without cardiologist clearance caveat
+- Unknown allergy status → DO NOT suggest any OTC. Say "I need to know your allergies before I can suggest anything safely"
+- Diagnosis unclear → DO NOT suggest OTC. Home care only.
+
+ONLY suggest OTC when:
+✓ Allergy status is confirmed clear
+✓ Patient is adult (18+)
+✓ Not pregnant/breastfeeding
+✓ No contraindicated medical conditions
+✓ Diagnosis is clinically clear enough (e.g. clear acute pulpitis, dry socket, pericoronitis)
+✓ Always add: "Yeh sirf temporary relief ke liye hai. Isko dentist ki jagah mat samjho. Side effects ho toh band karo."
+
+Safe OTC options (only when all above criteria met):
+- Mild-moderate pain, no contraindications: Paracetamol 500-1000mg every 6-8 hours after food
+- Moderate-severe pain, no NSAID contraindications: Ibuprofen 400mg every 8 hours after food (max 3 days)
+- Infection suspected + dentist not immediately available: Mention that antibiotics need a prescription — do NOT suggest specific antibiotics OTC
+- Topical: Clove oil (eugenol) — generally safe for adults, apply with cotton on affected area
+- Saltwater rinse — always safe, always recommend
+
+════════════════════════════════
+ASSESSMENT FORMAT
+════════════════════════════════
+Output ONLY after full history + photo (or photo refused):
+
+[RX_START]
+DIAGNOSIS: (clear patient-friendly name, e.g. "Irreversible Pulpitis — Tooth Nerve badly inflamed")
+URGENCY: (exactly one of: EMERGENCY / URGENT / ROUTINE / MONITOR)
+CARE_DO:
+✅ (specific do — based on actual patient profile)
+✅ (do 2)
+✅ (do 3)
+CARE_DONT:
+❌ (specific dont)
+❌ (dont 2)
+❌ (dont 3)
+MEDICINE: (follow strict OTC rules above. If cannot prescribe safely, write "OTC_UNSAFE: [reason]")
+NOTE: (one critical closing note — personalised to this patient's age/condition/gender)
+[RX_END]
+
+After [RX_END]: warm 2-3 line message, remind them this is AI triage not treatment, real dentist visit is essential. End with exactly: [SHOW_CONNECT]`;
+}
+
+function buildPhotoSystemPrompt() {
+  return `You are Daantun AI, a clinical dental AI assistant built by a BDS-qualified dentist in India.
+
+The patient has uploaded a dental photo. Analyze it carefully and thoroughly.
+
+Examine for ALL of the following:
+- Caries/Cavity: location, severity, which tooth/surface (mesial/distal/occlusal/buccal/lingual)
+- Abscess or periapical infection signs
+- Gum inflammation, gingivitis, periodontitis, recession
+- Calculus/tartar buildup (supra or subgingival)
+- Broken, fractured, or chipped teeth
+- Discoloration, staining, fluorosis
+- Swelling (intraoral or visible facial)
+- Missing teeth, spacing issues
+- Any other visible pathology
+
+LANGUAGE: Respond in the same language the user has been using. If Hindi/Hinglish, use that. If English, use that.
+
+OUTPUT FORMAT — you must output findings in this EXACT structure:
+
+[PHOTO_FINDINGS_START]
+SUMMARY: (1-2 sentence overall summary of what you see)
+FINDINGS:
+FINDING_1: label="{short name}" | location="{describe where on image, e.g. lower left molar, upper right gum}" | severity="{mild/moderate/severe}" | color="{use one of: #FF4444 for caries/cavity, #FF8C00 for gum issues, #FFD700 for calculus, #9B59B6 for fracture/break, #E74C3C for abscess/swelling, #3498DB for other}" | x="{0-100 percentage from left}" | y="{0-100 percentage from top}" | note="{brief clinical note}"
+FINDING_2: label="..." | location="..." | severity="..." | color="..." | x="..." | y="..." | note="..."
+(add as many findings as relevant, minimum 1)
+[PHOTO_FINDINGS_END]
+
+After [PHOTO_FINDINGS_END], write a warm, detailed explanation of what you found, what it means for the patient, and what they should do. Be empathetic and clear.
+
+Then output the full assessment card:
+
+[RX_START]
+DIAGNOSIS: (based on visual + symptom history)
+URGENCY: (EMERGENCY / ROUTINE / MONITOR)
+CARE_DO:
+✅ (do 1)
+✅ (do 2)
+✅ (do 3)
+CARE_DONT:
+❌ (dont 1)
+❌ (dont 2)
+❌ (dont 3)
+MEDICINE: (OTC suggestions with note "consult before taking")
+NOTE: (important closing note)
+[RX_END]
+
+End your full message with exactly: [SHOW_CONNECT]`;
+}
+
+// ── HELPERS ──
+function getTime() { return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function scrollBottom() { const m=document.getElementById('messages'); setTimeout(()=>m.scrollTop=m.scrollHeight,80); }
+function fmt(t) {
+  return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g,'<em>$1</em>')
+          .replace(/\n/g,'<br/>');
+}
+
+// ── MESSAGE BUILDERS ──
+function addBotMsg(text, extras) {
+  const m = document.getElementById('messages');
+  const wrap = document.createElement('div'); wrap.className = 'msg bot';
+  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = '🦷';
+  const cont = document.createElement('div');
+  const bub = document.createElement('div'); bub.className = 'msg-bubble';
+  if(text) bub.innerHTML = fmt(text);
+  const tm = document.createElement('span'); tm.className = 'msg-time'; tm.textContent = getTime();
+  cont.appendChild(bub); cont.appendChild(tm);
+  if(extras && extras.findings) cont.appendChild(buildPhotoReportCard(extras.findings, extras.imgSrc));
+  if(extras && extras.rx) cont.appendChild(buildRxCard(extras.rx));
+  if(extras && extras.connect) cont.appendChild(buildConnectCard());
+  wrap.appendChild(av); wrap.appendChild(cont);
+  m.appendChild(wrap); scrollBottom();
+}
+
+function addUserMsg(text) {
+  const m = document.getElementById('messages');
+  const wrap = document.createElement('div'); wrap.className = 'msg user';
+  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'U';
+  const cont = document.createElement('div');
+  const bub = document.createElement('div'); bub.className = 'msg-bubble'; bub.innerHTML = fmt(text);
+  const tm = document.createElement('span'); tm.className = 'msg-time'; tm.textContent = getTime();
+  cont.appendChild(bub); cont.appendChild(tm);
+  wrap.appendChild(av); wrap.appendChild(cont);
+  m.appendChild(wrap); scrollBottom();
+}
+
+function addUserPhoto(src) {
+  const m = document.getElementById('messages');
+  const wrap = document.createElement('div'); wrap.className = 'msg user';
+  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'U';
+  const cont = document.createElement('div');
+  const pb = document.createElement('div'); pb.className = 'photo-preview-bubble';
+  const img = document.createElement('img'); img.src = src;
+  const lbl = document.createElement('span'); lbl.className = 'photo-label'; lbl.textContent = '📷 Dental Photo Uploaded';
+  pb.appendChild(img); pb.appendChild(lbl);
+  const tm = document.createElement('span'); tm.className = 'msg-time'; tm.textContent = getTime();
+  cont.appendChild(pb); cont.appendChild(tm);
+  wrap.appendChild(av); wrap.appendChild(cont);
+  m.appendChild(wrap); scrollBottom();
+}
+
+function showTyping() {
+  const m = document.getElementById('messages');
+  const w = document.createElement('div'); w.className = 'msg bot'; w.id = 'typing';
+  w.innerHTML = '<div class="msg-avatar">🦷</div><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  m.appendChild(w); scrollBottom();
+}
+function removeTyping() { const t=document.getElementById('typing'); if(t)t.remove(); }
+
+// ── PHOTO UPLOAD HANDLER ──
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    const base64 = dataUrl.split(',')[1];
+    const mime = file.type || 'image/jpeg';
+    pendingPhotoBase64 = base64;
+    pendingPhotoMime = mime;
+    addUserPhoto(dataUrl);
+    sendPhotoToAI(base64, mime, dataUrl);
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function buildPhotoSystemPrompt() {
+  return `You are Daantun AI, a clinical dental AI assistant built by a BDS-qualified dentist in India.
+
+The patient has shared a dental photo. Analyze it carefully as a clinician would.
+
+Look for ALL of the following and report only what you can actually see:
+- Caries/Cavity: which tooth, which surface (occlusal/buccal/lingual/mesial/distal), colour change, cavitation depth visible
+- Gingival/periodontal issues: redness, swelling, recession, BOP signs, interdental papilla loss
+- Calculus/tartar: location, extent (supra/subgingival)
+- Fractures or chips: which tooth, extent
+- Abscess or swelling: location, size approximate
+- Discolouration, staining, fluorosis
+- Missing teeth, spacing, crowding
+- Soft tissue anomalies (ulcers, white patches, swelling)
+- Anything else clinically relevant
+
+LANGUAGE: Respond in the same language the patient is using. Hindi/Hinglish → Hinglish. English → English.
+
+IMPORTANT: Only report findings you can actually see. Do not fabricate findings. If image quality is poor, say so honestly and ask for a clearer photo.
+
+OUTPUT — use EXACTLY this structure:
+
+[FINDINGS_START]
+OVERALL_QUALITY: (good / fair / poor — describe briefly)
+SUMMARY: (1-2 sentence overall clinical impression)
+FINDING_1: name="(condition name)" | location="(specific tooth/region, e.g. lower left molar, upper right gingiva)" | severity="(mild/moderate/severe/noted)" | icon="(one emoji that best fits: 🕳️ cavity, 🩸 gum, 🧱 calculus, 💥 fracture, 🤕 abscess, 🔍 other)" | detail="(clinical description of what you see, 1-2 sentences)"
+FINDING_2: name="..." | location="..." | severity="..." | icon="..." | detail="..."
+(add more findings only if genuinely present)
+[FINDINGS_END]
+
+After [FINDINGS_END], write a warm, empathetic explanation in plain language — what you found, why it matters, and what the patient should do right now at home.
+
+Then output the assessment card:
+
+[RX_START]
+DIAGNOSIS: (based on photo + symptom history combined)
+URGENCY: (EMERGENCY / ROUTINE / MONITOR)
+CARE_DO:
+✅ (do 1)
+✅ (do 2)
+✅ (do 3)
+CARE_DONT:
+❌ (dont 1)
+❌ (dont 2)
+❌ (dont 3)
+MEDICINE: (safe OTC options — always add "consult before taking")
+NOTE: (one important closing note)
+[RX_END]
+
+End your full response with exactly: [SHOW_CONNECT]`;
+}
+
+async function sendPhotoToAI(base64, mime, dataUrl) {
+  addBotMsg(UI[lang].photoAnalyzing);
+  showTyping();
+
+  const userText = lang==='hi'
+    ? 'Yeh meri teeth/mouth ki photo hai. Please ise dhyan se evaluate karein aur jo bhi dental problems dikh rahein hain unhe clearly batayein.'
+    : 'This is a photo of my teeth/mouth. Please carefully evaluate it and identify all dental findings you can see.';
+
+  const imgMsg = {
+    role: 'user',
+    content: [
+      {type:'image', source:{type:'base64', media_type:mime, data:base64}},
+      {type:'text', text: userText}
+    ]
+  };
+
+  try {
+    const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system: buildPhotoSystemPrompt(),
+        messages: [...conversation, imgMsg]
+      })
+    });
+    const data = await res.json();
+    removeTyping();
+
+    let reply = data.content?.map(b=>b.text||'').join('') || "Could not analyze the photo. Please try again.";
+    conversation.push(imgMsg);
+    conversation.push({role:'assistant', content: reply});
+
+    let findingsData = null, rxData = null, showConnect = false, display = reply;
+
+    // Parse findings block
+    if(reply.includes('[FINDINGS_START]') && reply.includes('[FINDINGS_END]')) {
+      const block = reply.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
+      if(block) findingsData = parseFindings(block[1]);
+      display = display.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/, '').trim();
+    }
+
+    // Parse RX
+    if(reply.includes('[RX_START]') && reply.includes('[RX_END]') && !rxShown) {
+      rxShown = true;
+      const m = reply.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
+      if(m) rxData = parseRx(m[1]);
+      display = display.replace(/\[RX_START\][\s\S]*?\[RX_END\]/, '').trim();
+    }
+
+    if(reply.includes('[SHOW_CONNECT]') && !connectShown) {
+      showConnect = true; connectShown = true;
+      display = display.replace('[SHOW_CONNECT]', '').trim();
+    }
+
+    addBotMsg(display, {findings: findingsData, imgSrc: dataUrl, rx: rxData, connect: showConnect});
+
+  } catch(e) {
+    removeTyping();
+    addBotMsg("Sorry, photo analysis failed. Please try again with a clearer photo.");
+  }
+}
+
+// ── PARSE FINDINGS ──
+function parseFindings(block) {
+  const lines = block.split('\n').map(l=>l.trim()).filter(Boolean);
+  let summary='', quality='', findings=[];
+  for(const line of lines) {
+    if(line.startsWith('OVERALL_QUALITY:')) quality = line.replace('OVERALL_QUALITY:','').trim();
+    else if(line.startsWith('SUMMARY:')) summary = line.replace('SUMMARY:','').trim();
+    else if(/^FINDING_\d+:/.test(line)) {
+      const parts = line.replace(/^FINDING_\d+:\s*/,'');
+      const obj = {};
+      parts.split('|').forEach(part => {
+        const eq = part.indexOf('=');
+        if(eq>-1) {
+          const k = part.slice(0,eq).trim();
+          const v = part.slice(eq+1).trim().replace(/^"|"$/g,'');
+          obj[k] = v;
+        }
+      });
+      if(obj.name) findings.push(obj);
+    }
+  }
+  return {summary, quality, findings};
+}
+
+// ── BUILD PHOTO REPORT CARD ──
+function buildPhotoReportCard(findingsData, imgSrc) {
+  const sevClass = {mild:'severity-mild',moderate:'severity-moderate',severe:'severity-severe',noted:'severity-noted'};
+  const sevBadge = {mild:'sev-mild',moderate:'sev-moderate',severe:'sev-severe',noted:'sev-noted'};
+  const sevLabel = {mild:'Mild',moderate:'Moderate',severe:'Severe',noted:'Noted'};
+
+  const card = document.createElement('div'); card.className = 'photo-report';
+
+  // Header
+  card.innerHTML = `
+    <div class="photo-report-header">
+      <div class="rh-icon">🔬</div>
+      <div><h4>Visual Dental Analysis — Daantun AI</h4><p>AI-Powered Photo Evaluation · ${getTime()}</p></div>
+    </div>`;
+
+  // Thumb + summary
+  const thumbRow = document.createElement('div'); thumbRow.className = 'photo-thumb-row';
+  thumbRow.innerHTML = `
+    <img class="photo-thumb" src="${imgSrc}" alt="Uploaded dental photo"/>
+    <div class="photo-summary">
+      ${findingsData.quality ? `<div style="font-size:.72rem;color:var(--gray);margin-bottom:4px">📸 Image Quality: <strong>${findingsData.quality}</strong></div>` : ''}
+      <strong>Clinical Impression:</strong><br/>${findingsData.summary || 'Analysis complete. See findings below.'}
+    </div>`;
+  card.appendChild(thumbRow);
+
+  // Findings
+  if(findingsData.findings.length > 0) {
+    const grid = document.createElement('div'); grid.className = 'findings-grid';
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);padding:0 2px 4px';
+    title.textContent = `${findingsData.findings.length} Finding${findingsData.findings.length>1?'s':''} Detected`;
+    grid.appendChild(title);
+
+    findingsData.findings.forEach((f, i) => {
+      const sev = (f.severity||'noted').toLowerCase();
+      const fc = document.createElement('div');
+      fc.className = `finding-card ${sevClass[sev]||'severity-noted'}`;
+      fc.innerHTML = `
+        <div class="finding-icon">${f.icon||'🔍'}</div>
+        <div class="finding-body">
+          <div class="finding-name">
+            ${i+1}. ${f.name||'Finding'}
+            <span class="severity-badge ${sevBadge[sev]||'sev-noted'}">${sevLabel[sev]||sev}</span>
+          </div>
+          <div class="finding-location">📍 ${f.location||'See description'}</div>
+          <div class="finding-note">${f.detail||''}</div>
+        </div>`;
+      grid.appendChild(fc);
+    });
+    card.appendChild(grid);
+  } else {
+    const noFind = document.createElement('div');
+    noFind.style.cssText = 'padding:14px 16px;font-size:.84rem;color:var(--gray);text-align:center';
+    noFind.textContent = 'No specific findings detected. Please upload a clearer photo for better analysis.';
+    card.appendChild(noFind);
+  }
+  return card;
+}
+
+// ── PARSE RX ──
+function parseRx(block) {
+  const get=(key)=>{
+    const re = new RegExp(key+':\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|\\[RX_END\\]|$)');
+    const m = block.match(re); return m ? m[1].trim() : '';
+  };
+  return {diagnosis:get('DIAGNOSIS'),urgency:get('URGENCY'),care_do:get('CARE_DO'),care_dont:get('CARE_DONT'),medicine:get('MEDICINE'),note:get('NOTE')};
+}
+
+// ── BUILD RX CARD ──
+function buildRxCard(rx) {
+  const urgMap = {
+    'EMERGENCY': {cls:'u-emergency', icon:'🚨'},
+    'URGENT':    {cls:'u-urgent',    icon:'🔴'},
+    'ROUTINE':   {cls:'u-routine',   icon:'✅'},
+    'MONITOR':   {cls:'u-monitor',   icon:'⚠️'},
+  };
+  const urg = urgMap[rx.urgency] || urgMap['MONITOR'];
+  const doLines = rx.care_do.split('\n').filter(l=>l.trim()).map(l=>`<li>${l.trim()}</li>`).join('');
+  const dontLines = rx.care_dont.split('\n').filter(l=>l.trim()).map(l=>`<li>${l.trim()}</li>`).join('');
+
+  // Handle OTC_UNSAFE
+  let medHtml = '';
+  if(rx.medicine.startsWith('OTC_UNSAFE:')) {
+    const reason = rx.medicine.replace('OTC_UNSAFE:','').trim();
+    medHtml = `<div class="otc-unsafe-box">⚠️ <strong>OTC Not Recommended</strong><br/>${reason}<br/><span>Please consult a dentist or physician before taking any medicine.</span></div>`;
+  } else {
+    medHtml = rx.medicine.split('·').filter(l=>l.trim()).map(l=>`<div class="med-item">💊 <div class="med-name">${l.trim()}</div></div>`).join('');
+  }
+
+  const card = document.createElement('div'); card.className = 'rx-card';
+  card.innerHTML = `
+    <div class="rx-header">
+      <div style="font-size:24px">📋</div>
+      <div class="rx-header-text"><h4>Dental Assessment — Daantun AI</h4><p>Generated · ${getTime()} · AI Triage Only</p></div>
+    </div>
+    <div class="rx-body">
+      <div><div class="rx-section-title">Likely Diagnosis</div><div class="diagnosis-chip">🦷 ${rx.diagnosis}</div></div>
+      <div><div class="rx-section-title">Urgency Level</div><div class="urgency-chip ${urg.cls}">${urg.icon} ${rx.urgency}</div></div>
+      <div><div class="rx-section-title">Home Care — Do's</div><ul class="care-list">${doLines}</ul></div>
+      <div><div class="rx-section-title">Home Care — Don'ts</div><ul class="care-list">${dontLines}</ul></div>
+      <div><div class="rx-section-title">Medicine Guidance</div>${medHtml}</div>
+      ${rx.note?`<div class="rx-note">📌 ${rx.note}</div>`:''}
+      <div class="rx-legal">⚖️ This is an AI-generated triage report, not a prescription. Daantun AI is not liable for any decisions made based on this report. Always consult a licensed dentist.</div>
+    </div>`;
+  return card;
+}
+
+// ── BUILD CONNECT CARD ──
+function buildConnectCard() {
+  const card = document.createElement('div'); card.className = 'connect-card';
+  const waText = encodeURIComponent(lang==='hi'
+    ? 'Namaste! Maine Daantun AI se consult kiya hai aur appointment lena chahta/chahti hoon.'
+    : 'Hello! I consulted Daantun AI and would like to book an appointment.');
+  card.innerHTML = `
+    <h5>${UI[lang].connectTitle}</h5>
+    <div class="connect-actions">
+      <a href="https://wa.me/${WHATSAPP}?text=${waText}" target="_blank" class="connect-btn btn-wa">💬 WhatsApp Us</a>
+      <a href="tel:+${WHATSAPP}" class="connect-btn btn-call">📞 Call Now</a>
+      <a href="#" class="connect-btn btn-book">📋 Book Appointment</a>
+    </div>`;
+  return card;
+}
+
+// ── SEND MESSAGE ──
+async function sendMessage(override) {
+  const input = document.getElementById('chatInput');
+  const text = (override || input.value).trim();
+  if(!text) return;
+  if(!override) { input.value=''; input.style.height='auto'; }
+
+  userMsgCount++;
+  addUserMsg(text);
+  conversation.push({role:'user', content:text});
+  showTyping();
+
+  try {
+    const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system: buildSystemPrompt(),
+        messages: conversation
+      })
+    });
+    const data = await res.json();
+    removeTyping();
+
+    let reply = data.content?.map(b=>b.text||'').join('') || "Something went wrong. Please try again.";
+    conversation.push({role:'assistant', content:reply});
+
+    let rxData=null, showConnect=false, display=reply;
+
+    // Check if AI wants a photo
+    if(reply.includes('[REQUEST_PHOTO]') && !photoRequestShown) {
+      photoRequestShown = true;
+      display = display.replace('[REQUEST_PHOTO]','').trim();
+      // Pulse the photo button
+      document.getElementById('photoBtn').classList.add('pulse-anim');
+      setTimeout(()=>document.getElementById('photoBtn').classList.remove('pulse-anim'), 8000);
+    }
+
+    if(reply.includes('[RX_START]') && reply.includes('[RX_END]') && !rxShown) {
+      rxShown = true;
+      const m = reply.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
+      if(m) rxData = parseRx(m[1]);
+      display = display.replace(/\[RX_START\][\s\S]*?\[RX_END\]/, '').trim();
+    }
+
+    if(reply.includes('[SHOW_CONNECT]') && !connectShown) {
+      showConnect=true; connectShown=true;
+      display = display.replace('[SHOW_CONNECT]','').trim();
+    }
+
+    addBotMsg(display, {rx:rxData, connect:showConnect});
+
+  } catch(e) {
+    removeTyping();
+    addBotMsg("Oops! Something went wrong. Please try again.");
+  }
+}
+
+function startTopic(q) { sendMessage(q); }
+
+// ── LANGUAGE ──
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-en').className = 'lang-btn'+(l==='en'?' active':'');
+  document.getElementById('btn-hi').className = 'lang-btn'+(l==='hi'?' active':'');
+  document.getElementById('chatInput').placeholder = UI[l].placeholder;
+  document.getElementById('input-hint').textContent = UI[l].hint;
+  document.getElementById('sidebar-topics-title').textContent = UI[l].topicsTitle;
+  document.getElementById('disclaimer-text').textContent = UI[l].disclaimer;
+  renderTopics();
+  resetChat();
+}
+
+function renderTopics() {
+  document.getElementById('topic-list').innerHTML = TOPICS[lang].map(t =>
+    `<button class="topic-btn" onclick="startTopic('${t.q}')">${t.e} ${t.t}</button>`
+  ).join('');
+}
+
+function resetChat() {
+  document.getElementById('messages').innerHTML = '';
+  conversation=[]; userMsgCount=0; rxShown=false; connectShown=false; photoRequestShown=false;
+  addBotMsg(UI[lang].greeting);
+}
+
+window.onload = () => {
+  document.getElementById('chatInput').placeholder = UI[lang].placeholder;
+  renderTopics();
+  resetChat();
+};
+</script>
+</body>
+</html>
