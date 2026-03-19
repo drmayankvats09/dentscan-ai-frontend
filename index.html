@@ -2,920 +2,1359 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Daantun AI – Free AI Dental Consultation</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Aayu AI — India's AI Dental Expert. Free. 24/7.</title>
+<meta name="description" content="India's most advanced free AI dental assistant. Clinical guidance, photo analysis and personalised assessment in Hindi & English. 24/7. No appointments."/>
+<meta name="theme-color" content="#0a0f1a"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --teal:#0a9e8f;--teal-l:#0cbfae;--teal-d:#077a6e;
-  --cream:#f7f5f0;--dark:#151c2b;--gray:#6b7280;--lgray:#e5e9ef;
-  --white:#fff;--chat-bg:#f0faf9;
-  --red:#e53e3e;--orange:#dd6b20;--green:#2f855a;
+  --g:#0a9e8f;--gl:#12c4b2;--gd:#077a6e;--gp:#e8f9f7;--gp2:#f0fdf9;
+  --dark:#0a0f1a;--dark2:#111827;--dark3:#1e2a3a;
+  --cream:#faf8f5;--light:#f8f9fc;--white:#fff;
+  --muted:#64748b;--border:#e2e8f0;--border2:#cbd5e1;
+  --fd:'DM Serif Display',Georgia,serif;
+  --fb:'DM Sans',system-ui,sans-serif;
+  --nav-h:60px;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;display:flex;flex-direction:column}
-nav{background:var(--white);border-bottom:1px solid rgba(0,0,0,.07);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 14px rgba(0,0,0,.05)}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),var(--teal-l));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.logo-text{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--dark)}
-.logo-text span{color:var(--teal)}
-.nav-right{display:flex;align-items:center;gap:1rem}
-.lang-toggle{display:flex;background:var(--lgray);border-radius:20px;padding:3px;gap:2px}
-.lang-btn{padding:5px 14px;border-radius:16px;border:none;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--gray);font-family:'DM Sans',sans-serif}
-.lang-btn.active{background:var(--teal);color:white}
-.nav-cta{background:var(--teal);color:white;padding:8px 18px;border-radius:20px;font-size:.85rem;font-weight:500;text-decoration:none;transition:background .2s}
-.nav-cta:hover{background:var(--teal-d)}
-.hero{background:linear-gradient(160deg,#e4f7f5 0%,#f7f5f0 65%);padding:3.5rem 2rem 2.5rem;text-align:center;border-bottom:1px solid rgba(10,158,143,.1)}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(10,158,143,.12);color:var(--teal-d);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:600;margin-bottom:1.1rem;letter-spacing:.05em;text-transform:uppercase}
-.hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4.5vw,3rem);font-weight:700;line-height:1.2;margin-bottom:.9rem;max-width:680px;margin-left:auto;margin-right:auto}
-.hero h1 em{font-style:normal;color:var(--teal)}
-.hero p{color:var(--gray);font-size:1rem;max-width:500px;margin:0 auto 1.5rem;line-height:1.7}
-.hero-stats{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap}
-.stat-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--teal)}
-.stat-label{font-size:.72rem;color:var(--gray);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
-.main-container{display:flex;flex:1;max-width:1200px;margin:0 auto;width:100%;padding:2rem 1.5rem;gap:2rem}
-.sidebar{width:270px;flex-shrink:0}
-.sidebar-card{background:var(--white);border-radius:16px;padding:1.3rem;margin-bottom:1.1rem;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 12px rgba(0,0,0,.04)}
-.sidebar-card h3{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:.9rem}
-.topic-btn{width:100%;background:var(--chat-bg);border:1px solid rgba(10,158,143,.15);border-radius:10px;padding:9px 12px;font-size:.83rem;color:var(--dark);cursor:pointer;text-align:left;transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.topic-btn:hover{background:rgba(10,158,143,.12);border-color:var(--teal);color:var(--teal-d)}
-.disclaimer-box{background:#fff8e8;border:1px solid #f0d080;border-radius:12px;padding:1rem;font-size:.76rem;color:#7a6010;line-height:1.5}
-.disclaimer-box strong{display:block;margin-bottom:4px}
-.how-card{background:linear-gradient(135deg,rgba(10,158,143,.07),rgba(10,158,143,.02));border:1px solid rgba(10,158,143,.15);border-radius:16px;padding:1.3rem}
-.how-card h3{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:.9rem}
-.step{display:flex;gap:10px;margin-bottom:.8rem;align-items:flex-start}
-.step-num{width:22px;height:22px;background:var(--teal);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:1px}
-.step-text{font-size:.82rem;color:var(--dark);line-height:1.4}
-.chat-wrapper{flex:1;display:flex;flex-direction:column}
-.chat-box{background:var(--white);border-radius:20px;border:1px solid rgba(0,0,0,.07);box-shadow:0 4px 28px rgba(0,0,0,.07);display:flex;flex-direction:column;height:620px;overflow:hidden}
-.chat-header{background:linear-gradient(135deg,var(--teal),var(--teal-l));padding:.95rem 1.4rem;display:flex;align-items:center;gap:12px;color:white}
-.ai-avatar{width:44px;height:44px;background:rgba(255,255,255,.22);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.ai-info h4{font-weight:600;font-size:.95rem}
-.ai-info p{font-size:.76rem;opacity:.85;margin-top:2px;display:flex;align-items:center;gap:5px}
-.online-dot{width:7px;height:7px;background:#7effd4;border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.messages{flex:1;overflow-y:auto;padding:1.3rem;display:flex;flex-direction:column;gap:.9rem;background:var(--chat-bg);scroll-behavior:smooth}
-.messages::-webkit-scrollbar{width:4px}
-.messages::-webkit-scrollbar-thumb{background:rgba(10,158,143,.2);border-radius:3px}
-.msg{display:flex;gap:10px;animation:fadeUp .32s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.msg.user{flex-direction:row-reverse}
-.msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:2px}
-.bot .msg-avatar{background:linear-gradient(135deg,var(--teal),var(--teal-l));color:white}
-.user .msg-avatar{background:var(--dark);color:white;font-size:12px;font-weight:600}
-.msg-bubble{max-width:80%;padding:11px 14px;border-radius:16px;font-size:.88rem;line-height:1.58}
-.bot .msg-bubble{background:var(--white);border:1px solid rgba(0,0,0,.07);border-top-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.user .msg-bubble{background:var(--teal);color:white;border-top-right-radius:4px}
-.msg-time{font-size:.68rem;color:var(--gray);margin-top:3px;display:block}
-.bot .msg-time{margin-left:42px}
-.user .msg-time{text-align:right;margin-right:42px}
-.typing-dots{background:var(--white);border:1px solid rgba(0,0,0,.07);border-radius:16px;border-top-left-radius:4px;padding:12px 15px;display:flex;gap:5px;align-items:center}
-.dot{width:7px;height:7px;background:var(--teal);border-radius:50%;animation:bounce 1.2s infinite}
-.dot:nth-child(2){animation-delay:.2s}
-.dot:nth-child(3){animation-delay:.4s}
-@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--fb);background:var(--cream);color:var(--dark2);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+::selection{background:rgba(10,158,143,.15)}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--g)}
 
-/* INPUT AREA */
-.chat-input-area{padding:.9rem 1.2rem;border-top:1px solid rgba(0,0,0,.06);background:var(--white)}
-.input-row{display:flex;gap:9px;align-items:flex-end}
-.chat-input{flex:1;border:1.5px solid var(--lgray);border-radius:14px;padding:10px 14px;font-size:.88rem;font-family:'DM Sans',sans-serif;resize:none;outline:none;transition:border-color .2s;line-height:1.5;min-height:44px;max-height:110px;overflow-y:auto;color:var(--dark)}
-.chat-input:focus{border-color:var(--teal)}
-.chat-input::placeholder{color:#b0b8c4}
-.input-actions{display:flex;gap:7px;align-items:center}
-.send-btn{width:44px;height:44px;background:var(--teal);border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0}
-.send-btn:hover{background:var(--teal-d)}
-.send-btn:active{transform:scale(.93)}
-.send-btn svg{width:17px;height:17px;fill:white}
-.photo-btn{width:44px;height:44px;background:var(--lgray);border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;font-size:20px;position:relative}
-.photo-btn:hover{background:#d0e8e5}
-.photo-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.photo-btn.pulse-anim{animation:photoPulse 1.5s ease infinite;background:rgba(10,158,143,.15);border:2px solid var(--teal)}
-@keyframes photoPulse{0%,100%{box-shadow:0 0 0 0 rgba(10,158,143,.4)}50%{box-shadow:0 0 0 8px rgba(10,158,143,0)}}
-.input-hint{font-size:.69rem;color:#b0b8c4;margin-top:5px;text-align:center}
+/* ── PAGE SYSTEM ── */
+.pg{display:none!important}.pg.on{display:block!important}
 
-/* PHOTO PREVIEW IN CHAT */
-.photo-preview-bubble{max-width:260px;border-radius:14px;overflow:hidden;border:2px solid rgba(10,158,143,.25);margin-top:4px}
-.photo-preview-bubble img{width:100%;display:block}
-.photo-label{font-size:.72rem;color:var(--teal-d);background:rgba(10,158,143,.08);padding:5px 10px;display:block;font-weight:600}
+/* ── CURSOR GLOW (desktop only) ── */
+#cglow{position:fixed;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(10,158,143,.05),transparent 70%);filter:blur(40px);pointer-events:none;z-index:0;transform:translate(-50%,-50%);transition:left .2s,top .2s;will-change:left,top}
+@media(max-width:768px){#cglow{display:none}}
 
-/* PHOTO REPORT CARD */
-.photo-report{max-width:94%;margin-top:10px;background:white;border-radius:16px;overflow:hidden;border:1.5px solid rgba(10,158,143,.25);box-shadow:0 4px 20px rgba(10,158,143,.1)}
-.photo-report-header{background:linear-gradient(135deg,var(--teal),var(--teal-l));padding:12px 16px;display:flex;align-items:center;gap:10px}
-.photo-report-header .rh-icon{font-size:22px}
-.photo-report-header h4{color:white;font-size:.92rem;font-weight:700}
-.photo-report-header p{color:rgba(255,255,255,.8);font-size:.72rem;margin-top:1px}
-.photo-thumb-row{display:flex;gap:12px;padding:14px 16px;background:#f8fffe;border-bottom:1px solid rgba(10,158,143,.1);align-items:flex-start}
-.photo-thumb{width:90px;height:90px;border-radius:10px;object-fit:cover;border:2px solid rgba(10,158,143,.2);flex-shrink:0}
-.photo-summary{font-size:.83rem;color:var(--dark);line-height:1.55}
-.photo-summary strong{color:var(--teal-d)}
-.findings-grid{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.finding-card{display:flex;gap:12px;align-items:flex-start;background:#f8f9fa;border-radius:12px;padding:11px 13px;border-left:4px solid}
-.finding-card.severity-mild{border-color:#f59e0b;background:#fffbeb}
-.finding-card.severity-moderate{border-color:#f97316;background:#fff7ed}
-.finding-card.severity-severe{border-color:#ef4444;background:#fef2f2}
-.finding-card.severity-noted{border-color:var(--teal);background:#f0fdf9}
-.finding-icon{font-size:22px;flex-shrink:0;margin-top:1px}
-.finding-body{}
-.finding-name{font-size:.88rem;font-weight:700;color:var(--dark);margin-bottom:2px}
-.finding-location{font-size:.75rem;color:var(--gray);margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.finding-note{font-size:.8rem;color:var(--dark);line-height:1.45}
-.severity-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-left:6px}
-.sev-mild{background:#fef3c7;color:#92400e}
-.sev-moderate{background:#ffedd5;color:#9a3412}
-.sev-severe{background:#fee2e2;color:#991b1b}
-.sev-noted{background:rgba(10,158,143,.12);color:var(--teal-d)}
-
-/* RX CARD */
-.rx-card{background:white;border:1.5px solid rgba(10,158,143,.3);border-radius:16px;overflow:hidden;max-width:94%;margin-top:10px;box-shadow:0 4px 20px rgba(10,158,143,.12)}
-.rx-header{background:linear-gradient(135deg,var(--teal),var(--teal-l));padding:12px 16px;display:flex;align-items:center;gap:10px}
-.rx-header-text h4{color:white;font-size:.92rem;font-weight:700}
-.rx-header-text p{color:rgba(255,255,255,.8);font-size:.73rem;margin-top:1px}
-.rx-body{padding:14px 16px;display:flex;flex-direction:column;gap:11px}
-.rx-section-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:5px}
-.diagnosis-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(10,158,143,.1);color:var(--teal-d);padding:5px 12px;border-radius:20px;font-size:.83rem;font-weight:600}
-.urgency-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:.83rem;font-weight:700}
-.u-emergency{background:#fff0f0;color:var(--red);border:1px solid rgba(229,62,62,.3)}
-.u-urgent{background:#fff4f0;color:#c2410c;border:1px solid rgba(194,65,12,.3)}
-.u-routine{background:#f0fff4;color:var(--green);border:1px solid rgba(47,133,90,.3)}
-.u-monitor{background:#fffaf0;color:var(--orange);border:1px solid rgba(221,107,32,.3)}
-.otc-unsafe-box{background:#fff8e8;border:1px solid #f0c040;border-radius:8px;padding:9px 12px;font-size:.8rem;line-height:1.5;color:#7a4f00}
-.otc-unsafe-box strong{display:block;margin-bottom:3px;color:#c05000}
-.otc-unsafe-box span{font-size:.72rem;color:#7a6010;display:block;margin-top:4px}
-.rx-legal{font-size:.68rem;color:#9ca3af;background:#f9fafb;border-radius:7px;padding:7px 10px;line-height:1.5;border:1px solid #e5e7eb}
-.care-list{list-style:none;display:flex;flex-direction:column;gap:4px}
-.care-list li{font-size:.82rem;display:flex;gap:7px;align-items:flex-start;line-height:1.45;color:var(--dark)}
-.med-item{display:flex;align-items:flex-start;gap:8px;background:#f8f9fa;padding:8px 10px;border-radius:8px;font-size:.82rem}
-.med-name{font-weight:600;color:var(--dark)}
-.rx-note{font-size:.72rem;color:var(--gray);background:#f8f9fa;padding:8px 10px;border-radius:8px;line-height:1.5;border-left:3px solid var(--teal)}
-
-/* CONNECT */
-.connect-card{background:linear-gradient(135deg,#e8f9f7,#f0fff8);border:1.5px solid rgba(10,158,143,.25);border-radius:14px;padding:14px;max-width:90%;margin-top:8px}
-.connect-card h5{font-size:.88rem;font-weight:700;color:var(--teal-d);margin-bottom:10px}
-.connect-actions{display:flex;flex-direction:column;gap:7px}
-.connect-btn{display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:10px;border:none;cursor:pointer;font-size:.83rem;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s}
-.connect-btn:hover{transform:translateX(3px);opacity:.9}
-.btn-wa{background:#25d366;color:white}
-.btn-call{background:var(--teal);color:white}
-.btn-book{background:var(--dark);color:white}
-
-.features{background:var(--white);border-top:1px solid rgba(0,0,0,.06);padding:2.5rem 2rem}
-.features-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem}
-.feature-item{text-align:center;padding:1.1rem .8rem}
-.feature-icon{font-size:1.9rem;margin-bottom:.6rem;display:block}
-.feature-item h4{font-size:.92rem;font-weight:600;margin-bottom:.35rem}
-.feature-item p{font-size:.79rem;color:var(--gray);line-height:1.5}
-footer{background:var(--dark);color:rgba(255,255,255,.55);text-align:center;padding:1.4rem;font-size:.77rem}
-footer a{color:var(--teal-l);text-decoration:none}
-@media(max-width:768px){
-  .sidebar{display:none}
-  .main-container{padding:1rem}
-  .hero{padding:2.2rem 1rem 1.8rem}
-  .nav-right .nav-cta{display:none}
-  .chat-box{height:calc(100vh - 240px)}
+/* ════════════════════════
+   NAV
+════════════════════════ */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:9999;
+  height:var(--nav-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5%;
+  transition:background .3s,box-shadow .3s;
 }
+#nav.scrolled{
+  background:rgba(250,248,245,.96);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 1px 0 rgba(0,0,0,.08);
+}
+/* Logo */
+.nlogo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer;flex-shrink:0}
+.nlogo-icon{width:34px;height:34px;flex-shrink:0}
+.nlogo-text{display:flex;flex-direction:column;line-height:1}
+.nlogo-name{font-family:var(--fd);font-size:1.15rem;color:var(--dark2);letter-spacing:.05em}
+.nlogo-sub{font-size:.5rem;font-weight:700;letter-spacing:.2em;color:var(--g);text-transform:uppercase;margin-top:1px}
+/* Desktop links */
+.nlinks{display:flex;align-items:center;gap:1.8rem;list-style:none}
+.nlinks a{font-size:.83rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s;white-space:nowrap}
+.nlinks a:hover{color:var(--dark2)}
+.nlinks .ncta{background:var(--dark2);color:white;padding:8px 18px;border-radius:22px;font-weight:600;font-size:.8rem;transition:all .25s;box-shadow:0 2px 8px rgba(10,15,26,.2)}
+.nlinks .ncta:hover{background:var(--g);color:white;transform:translateY(-1px)}
+/* Hamburger */
+.nham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border-radius:8px;background:none;border:none;z-index:10001}
+.nham span{width:20px;height:1.5px;background:var(--dark2);border-radius:2px;display:block;transition:all .3s}
+/* Mobile drawer */
+.nmob-drawer{
+  display:none;
+  position:fixed;top:var(--nav-h);left:0;right:0;
+  background:rgba(250,248,245,.98);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  padding:1rem 5% 1.5rem;
+  box-shadow:0 8px 30px rgba(0,0,0,.1);
+  z-index:9998;
+  flex-direction:column;gap:.2rem;
+}
+.nmob-drawer.open{display:flex}
+.nmob-drawer a{font-size:.92rem;font-weight:500;color:var(--dark2);text-decoration:none;padding:.7rem 0;border-bottom:1px solid var(--border);display:block}
+.nmob-drawer a:last-child{border-bottom:none}
+.nmob-drawer .nmob-cta{background:var(--g);color:white;text-align:center;border-radius:12px;padding:.85rem;font-weight:600;border-bottom:none;margin-top:.5rem}
+
+/* ════════════════════════
+   HOME PAGE
+════════════════════════ */
+
+/* ── HERO ── */
+.hero{
+  min-height:100svh;
+  background:var(--dark);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:calc(var(--nav-h) + 2rem) 5% 0;
+  position:relative;overflow:hidden;
+}
+.hbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hbg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(10,158,143,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(10,158,143,.04) 1px,transparent 1px);background-size:44px 44px}
+.hbg-o1{position:absolute;width:min(600px,120vw);height:min(600px,120vw);border-radius:50%;background:radial-gradient(circle,rgba(10,158,143,.07),transparent);top:-20%;left:50%;transform:translateX(-50%);filter:blur(70px);animation:orbf 10s ease-in-out infinite}
+.hbg-o2{position:absolute;width:min(350px,80vw);height:min(350px,80vw);border-radius:50%;background:radial-gradient(circle,rgba(18,196,178,.05),transparent);bottom:-5%;right:-5%;filter:blur(60px);animation:orbf 14s 3s ease-in-out infinite}
+@keyframes orbf{0%,100%{transform:translateX(-50%) translate(0,0)}50%{transform:translateX(-50%) translate(15px,-20px)}}
+.hbg-noise{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");opacity:.6}
+
+.hero-inner{max-width:780px;margin:0 auto;position:relative;z-index:2;width:100%}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(10,158,143,.3);
+  border-radius:24px;padding:5px 14px;
+  font-size:.7rem;font-weight:600;color:var(--gl);
+  text-transform:uppercase;letter-spacing:.07em;
+  margin-bottom:1.6rem;
+}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gl);animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{box-shadow:0 0 0 0 rgba(18,196,178,.5)}70%{box-shadow:0 0 0 6px rgba(18,196,178,0)}}
+
+.hero-h1{
+  font-family:var(--fd);
+  font-size:clamp(2.6rem,8vw,5.4rem);
+  line-height:1.1;
+  color:white;
+  margin-bottom:1.3rem;
+  letter-spacing:-.01em;
+  padding-bottom:.1em;
+}
+.hero-h1 .ital{font-style:italic;color:var(--gl)}
+
+.hero-p{
+  font-size:clamp(.95rem,2.5vw,1.1rem);
+  color:rgba(255,255,255,.5);
+  line-height:1.75;
+  max-width:520px;margin:0 auto 2.2rem;
+  font-weight:300;
+}
+.hero-p strong{color:rgba(255,255,255,.85);font-weight:500}
+
+.hero-btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem}
+.btn-glow{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--g);color:white;
+  padding:13px 26px;border-radius:28px;
+  text-decoration:none;font-weight:600;font-size:.9rem;
+  transition:all .3s;
+  box-shadow:0 4px 20px rgba(10,158,143,.4);
+}
+.btn-glow:hover{background:var(--gl);transform:translateY(-2px);box-shadow:0 8px 30px rgba(10,158,143,.5)}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.8);
+  padding:13px 24px;border-radius:28px;
+  text-decoration:none;font-weight:500;font-size:.9rem;
+  border:1px solid rgba(255,255,255,.12);
+  transition:all .3s;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.12);border-color:rgba(10,158,143,.4);transform:translateY(-2px)}
+
+/* Social proof */
+.hero-proof{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.proof-avs{display:flex}
+.proof-av{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.15);background:rgba(10,158,143,.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:var(--gl);margin-left:-8px}
+.proof-av:first-child{margin-left:0}
+.proof-txt{text-align:left}
+.proof-txt strong{color:white;font-weight:600;font-size:.82rem;display:block}
+.proof-stars{color:var(--g);letter-spacing:1.5px;font-size:.72rem}
+.proof-sub{font-size:.72rem;color:rgba(255,255,255,.35)}
+
+/* Hero chat card — hidden on small mobile, shown tablet+ */
+.hero-card-wrap{
+  position:relative;max-width:360px;margin:0 auto;
+  opacity:0;transform:translateY(20px);
+}
+@media(max-width:480px){.hero-card-wrap{display:none}}
+.hcard{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;overflow:hidden;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.hcard-hd{background:linear-gradient(135deg,var(--g),var(--gl));padding:11px 14px;display:flex;align-items:center;gap:10px}
+.hcard-av{width:34px;height:34px;background:rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hcard-inf h4{font-weight:600;font-size:.84rem;color:white;font-family:var(--fd)}
+.hcard-inf p{font-size:.68rem;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:4px;margin-top:1px}
+.hcard-live{width:5px;height:5px;background:#5effc8;border-radius:50%;animation:blink 2s infinite}
+.hcard-time{margin-left:auto;font-size:.75rem;color:rgba(255,255,255,.45);font-family:var(--fd)}
+.hcard-body{padding:12px;background:rgba(0,0,0,.15);display:flex;flex-direction:column;gap:7px}
+.hcb{display:flex;gap:6px;align-items:flex-end}
+.hcb.u{flex-direction:row-reverse}
+.hcb-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:700}
+.hcb-av.b{background:rgba(10,158,143,.3);color:var(--gl)}
+.hcb-av.u{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
+.hcb-msg{padding:7px 10px;border-radius:11px;font-size:.7rem;line-height:1.5;max-width:80%}
+.hcb-msg.b{background:rgba(255,255,255,.08);color:rgba(255,255,255,.82);border-top-left-radius:3px}
+.hcb-msg.u{background:var(--g);color:white;border-top-right-radius:3px}
+.hcard-rx{background:rgba(10,158,143,.1);border:1px solid rgba(10,158,143,.2);border-radius:10px;padding:8px 10px;margin-top:2px}
+.hrx-badge{display:inline-block;background:var(--g);color:white;border-radius:20px;padding:2px 8px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.hrx-pills{display:flex;gap:4px;flex-wrap:wrap}
+.hrx-pill{background:rgba(255,255,255,.07);border-radius:20px;padding:2px 7px;font-size:.58rem;color:rgba(255,255,255,.5)}
+/* Floating chips */
+.hchip{position:absolute;background:white;border-radius:50px;padding:6px 12px;box-shadow:0 6px 20px rgba(0,0,0,.15);display:flex;align-items:center;gap:6px;font-size:.68rem;font-weight:600;color:var(--dark2);white-space:nowrap;z-index:10}
+.hchip-ic{width:22px;height:22px;border-radius:7px;background:var(--gp);display:flex;align-items:center;justify-content:center}
+.hchip.c1{top:-14px;right:-10px;animation:chipf 4s ease-in-out infinite}
+.hchip.c2{bottom:20px;left:-24px;animation:chipf 4s 1.5s ease-in-out infinite}
+@keyframes chipf{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+/* Hero stats */
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);max-width:780px;margin:0 auto;border-top:1px solid rgba(255,255,255,.07);position:relative;z-index:2;width:100%}
+.hstat{padding:1.5rem .8rem;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+.hstat:last-child{border-right:none}
+.hstat-n{font-family:var(--fd);font-size:clamp(1.6rem,4vw,2.2rem);color:white;line-height:1}
+.hstat-n em{font-style:normal;color:var(--gl)}
+.hstat-l{font-size:.62rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.07em;margin-top:3px}
+@media(max-width:480px){
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .hstat:nth-child(2){border-right:none}
+  .hstat:nth-child(3){border-top:1px solid rgba(255,255,255,.07)}
+}
+
+/* ── MARQUEE ── */
+.mq{background:rgba(4,7,13,1);padding:12px 0;overflow:hidden}
+.mq-track{display:flex;animation:mqscroll 28s linear infinite;width:max-content}
+.mq-item{display:flex;align-items:center;gap:2.2rem;padding:0 2.2rem;font-size:.67rem;font-weight:500;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
+.mq-dot{width:3px;height:3px;border-radius:50%;background:var(--g);flex-shrink:0}
+@keyframes mqscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── TRUST BAR ── */
+.trust-bar{background:white;padding:22px 5%;border-bottom:1px solid var(--border)}
+.trust-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:1.8rem;flex-wrap:wrap}
+.trust-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.trust-sep{width:1px;height:16px;background:var(--border);flex-shrink:0}
+.trust-item{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:500;color:#94a3b8}
+.trust-item svg{width:13px;height:13px;stroke:var(--g);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+@media(max-width:600px){.trust-sep{display:none}.trust-in{gap:1rem}}
+
+/* ── SECTIONS ── */
+.sec{padding:72px 5%}
+.si{max-width:1100px;margin:0 auto}
+.kicker{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--g);margin-bottom:.9rem;display:flex;align-items:center;gap:9px;justify-content:center}
+.kicker::before,.kicker::after{content:'';height:2px;background:linear-gradient(90deg,var(--g),var(--gl));border-radius:2px;flex:0 0 20px}
+.sh{font-family:var(--fd);color:var(--dark2);line-height:1.1;font-weight:400;letter-spacing:-.01em;text-align:center}
+.sh .it{font-style:italic;color:var(--g)}
+.sp{font-size:.95rem;color:var(--muted);line-height:1.75;font-weight:300;text-align:center}
+
+/* ── DENTAL FEATURES ── */
+.feat-sec{background:var(--dark2);padding:72px 5%;position:relative;overflow:hidden}
+.feat-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(10,158,143,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(10,158,143,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.feat-bg-glow{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(10,158,143,.06),transparent);pointer-events:none}
+.feat-in{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.feat-header{text-align:center;margin-bottom:3rem}
+.feat-header .sh{color:white;font-size:clamp(2rem,5vw,3.2rem)}
+.feat-header .sp{color:rgba(255,255,255,.38);max-width:520px;margin:.8rem auto 0}
+/* Grid */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:rgba(255,255,255,.04);border-radius:20px;overflow:hidden}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.feat-grid{grid-template-columns:1fr}}
+.fc{background:var(--dark2);padding:2rem 1.8rem 3.5rem;position:relative;overflow:hidden;transition:background .35s;cursor:default}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--gl));transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.fc:hover{background:var(--dark3)}.fc:hover::before{transform:scaleX(1)}
+.fc:hover h3{color:white}.fc:hover p{color:rgba(255,255,255,.42)}
+.fc:hover .fc-ic{background:rgba(10,158,143,.22);border-color:rgba(10,158,143,.3)}
+.fc:hover .fc-ic svg{stroke:var(--gl)}
+.fc-num{font-family:var(--fd);font-size:3.5rem;color:rgba(255,255,255,.03);position:absolute;bottom:.8rem;right:1.2rem;line-height:1;pointer-events:none;user-select:none}
+.fc-ic{width:46px;height:46px;border-radius:13px;background:rgba(10,158,143,.1);border:1px solid rgba(10,158,143,.14);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;transition:all .35s}
+.fc-ic svg{width:20px;height:20px;stroke:var(--g);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke .35s}
+.fc h3{font-family:var(--fd);font-size:.92rem;color:rgba(255,255,255,.88);margin-bottom:.4rem;line-height:1.3;transition:color .35s;font-weight:400}
+.fc p{font-size:.8rem;color:rgba(255,255,255,.34);line-height:1.6;font-weight:300;transition:color .35s}
+
+/* ── HOW IT WORKS ── */
+.how-sec{background:white;padding:72px 5%}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5px;border:1px solid var(--border);border-radius:20px;overflow:hidden;background:var(--border);margin-top:3rem}
+@media(max-width:900px){.how-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.how-grid{grid-template-columns:1fr}}
+.hw{background:white;padding:2rem 1.8rem 3.5rem;position:relative;overflow:hidden;transition:background .4s;cursor:default}
+.hw:hover{background:var(--dark2)}.hw:hover .hw-num{color:rgba(255,255,255,.04)}
+.hw:hover h3{color:white}.hw:hover p{color:rgba(255,255,255,.38)}
+.hw:hover .hw-ic{background:var(--g);border-color:var(--g)}.hw:hover .hw-ic svg{stroke:white}
+.hw-num{font-family:var(--fd);font-size:3.5rem;color:rgba(0,0,0,.04);position:absolute;bottom:.8rem;right:1.2rem;line-height:1;transition:color .4s;pointer-events:none;user-select:none}
+.hw-ic{width:44px;height:44px;border-radius:12px;background:var(--gp);border:1px solid rgba(10,158,143,.15);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;transition:all .4s;position:relative;z-index:1}
+.hw-ic svg{width:19px;height:19px;stroke:var(--g);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .4s}
+.hw h3{font-family:var(--fd);font-size:.9rem;color:var(--dark2);margin-bottom:.4rem;transition:color .4s;font-weight:400;position:relative;z-index:1}
+.hw p{font-size:.78rem;color:var(--muted);line-height:1.6;font-weight:300;transition:color .4s;position:relative;z-index:1}
+
+/* ── VISION ── */
+.vis-sec{background:var(--dark);padding:72px 5%;position:relative;overflow:hidden}
+.vis-bg-g{position:absolute;inset:0;background-image:linear-gradient(rgba(10,158,143,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(10,158,143,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.vis-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(10,158,143,.07),transparent);filter:blur(20px);pointer-events:none}
+.vis-in{max-width:800px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.vis-tag{display:inline-flex;align-items:center;gap:9px;font-size:.67rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--gl);margin-bottom:1.4rem}
+.vis-tl{width:20px;height:1px;background:var(--gl)}
+.vis-q{font-family:var(--fd);font-size:clamp(1.7rem,4vw,2.8rem);color:white;line-height:1.22;margin-bottom:1rem;font-weight:400}
+.vis-q .it{font-style:italic;color:var(--gl)}
+.vis-sub{font-size:.95rem;color:rgba(255,255,255,.38);font-weight:300;line-height:1.75;max-width:520px;margin:0 auto 2.5rem}
+.vis-stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden}
+@media(max-width:480px){.vis-stats{grid-template-columns:1fr}}
+.vst{padding:1.8rem 1rem;text-align:center;border-right:1px solid rgba(255,255,255,.07);transition:background .3s}
+.vst:last-child{border-right:none}
+@media(max-width:480px){.vst{border-right:none;border-bottom:1px solid rgba(255,255,255,.07)}.vst:last-child{border-bottom:none}}
+.vst:hover{background:rgba(10,158,143,.05)}
+.vst-n{font-family:var(--fd);font-size:2.4rem;color:white;line-height:1}
+.vst-l{font-size:.67rem;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.09em;margin-top:.3rem}
+
+/* ── TESTIMONIALS ── */
+.test-sec{background:var(--cream);padding:72px 5%}
+.test-hd{text-align:center;margin-bottom:3rem}
+.test-hd .sh{font-size:clamp(1.8rem,4vw,2.8rem)}
+.rating-row{display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-top:1rem;flex-wrap:wrap}
+.rat-n{font-family:var(--fd);font-size:3.2rem;color:var(--dark2);line-height:1}
+.rat-stars{display:flex;gap:3px;justify-content:center;margin-bottom:3px}
+.rat-star{width:14px;height:14px;background:var(--g);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.rat-sub{font-size:.72rem;color:var(--muted);text-align:center}
+/* Featured */
+.feat-q{background:var(--dark2);border-radius:18px;padding:2.2rem;margin-bottom:1.5rem;text-align:center;position:relative;overflow:hidden}
+.fq-gl1{position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(10,158,143,.1),transparent);pointer-events:none}
+.fq-gl2{position:absolute;bottom:-50px;left:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(18,196,178,.07),transparent);pointer-events:none}
+.fq-t{font-family:var(--fd);font-size:clamp(1rem,2.5vw,1.55rem);font-style:italic;color:white;line-height:1.55;margin-bottom:1.4rem;position:relative;z-index:1;font-weight:400}
+.fq-auth{display:flex;align-items:center;justify-content:center;gap:10px;position:relative;z-index:1;flex-wrap:wrap}
+.fq-av{width:38px;height:38px;border-radius:50%;background:rgba(10,158,143,.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--gl);flex-shrink:0}
+.fq-nm{font-weight:600;font-size:.85rem;color:white}
+.fq-lc{font-size:.72rem;color:rgba(255,255,255,.35)}
+.fq-stars{display:flex;gap:3px;justify-content:center;margin-bottom:2px}
+.fq-star{width:9px;height:9px;background:var(--g);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+/* Cards */
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:1.8rem}
+@media(max-width:900px){.test-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:540px){.test-grid{grid-template-columns:1fr}}
+.tc{background:white;border-radius:16px;padding:1.6rem;border:1px solid var(--border);transition:all .35s;position:relative;overflow:hidden}
+.tc::after{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--g),var(--gl));transform:scaleX(0);transform-origin:left;transition:transform .38s}
+.tc:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(0,0,0,.07);border-color:rgba(10,158,143,.2)}.tc:hover::after{transform:scaleX(1)}
+.tc-stars{display:flex;gap:3px;margin-bottom:.9rem}
+.tc-star{width:11px;height:11px;background:var(--g);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.tc-tx{font-size:.85rem;color:#334155;line-height:1.7;font-style:italic;font-weight:300;margin-bottom:1.1rem}
+.tc-auth{display:flex;align-items:center;gap:9px;border-top:1px solid var(--border);padding-top:.9rem}
+.tc-av{width:34px;height:34px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:var(--gd);flex-shrink:0}
+.tc-nm{font-size:.8rem;font-weight:600;color:var(--dark2)}
+.tc-lc{font-size:.7rem;color:var(--muted)}
+/* Platforms */
+.platforms{display:flex;gap:.9rem;flex-wrap:wrap;justify-content:center}
+.plat{display:flex;align-items:center;gap:7px;background:white;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:.76rem;font-weight:500;color:#334155;transition:all .25s;flex-shrink:0}
+.plat:hover{border-color:var(--g);transform:translateY(-2px)}
+.plat-s{color:var(--g);font-size:.68rem;letter-spacing:1px;margin-left:2px}
+
+/* ── FOUNDER ── */
+.founder-sec{background:white;padding:72px 5%}
+.founder-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:4rem;align-items:start;max-width:1100px;margin:0 auto}
+@media(max-width:900px){.founder-grid{grid-template-columns:1fr;gap:2.5rem}}
+.founder-card{background:linear-gradient(135deg,var(--dark2),var(--dark));border-radius:20px;padding:2.2rem;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;min-height:420px}
+.fc-bg1{position:absolute;top:-80px;right:-80px;width:250px;height:250px;background:radial-gradient(circle,rgba(10,158,143,.1),transparent);pointer-events:none}
+.fc-bg2{position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(18,196,178,.07),transparent);pointer-events:none}
+.fc-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(10,158,143,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(10,158,143,.04) 1px,transparent 1px);background-size:30px 30px}
+.fc-top{position:relative;z-index:1}
+.fc-lm{width:48px;height:48px;background:rgba(10,158,143,.15);border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:1.3rem;border:1px solid rgba(10,158,143,.25)}
+.fc-quote{font-family:var(--fd);font-size:1.35rem;font-style:italic;color:white;line-height:1.45;font-weight:400}
+.fc-quote strong{font-style:normal;color:var(--gl)}
+.fc-bot{position:relative;z-index:1}
+.fc-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.3rem}
+.fc-tag{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 11px;font-size:.67rem;color:rgba(255,255,255,.6)}
+.fc-name-block{border-top:1px solid rgba(255,255,255,.1);padding-top:1.1rem}
+.fc-name{font-family:var(--fd);font-size:1.05rem;color:white}
+.fc-role{font-size:.73rem;color:rgba(255,255,255,.4);font-weight:300;margin-top:2px}
+/* Founder text */
+.founder-txt .kicker{justify-content:flex-start}
+.founder-txt .kicker::before{display:none}
+.founder-txt .sh{text-align:left;font-size:clamp(1.8rem,3.5vw,2.6rem);margin-bottom:1.1rem}
+.fr-bq{border-left:2.5px solid var(--g);padding-left:1.2rem;margin-bottom:1.3rem}
+.fr-bq p{font-family:var(--fd);font-size:1rem;font-style:italic;color:#334155;line-height:1.75;font-weight:400}
+.fr-body{font-size:.9rem;color:var(--muted);line-height:1.82;font-weight:300;margin-bottom:.8rem}
+.fr-sig{font-family:var(--fd);font-size:1.35rem;font-style:italic;color:var(--dark2);margin-top:1.3rem}
+
+/* ── BLOG ── */
+.blog-sec{background:var(--light);padding:72px 5%}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:3rem;max-width:1100px;margin-left:auto;margin-right:auto}
+@media(max-width:900px){.blog-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:540px){.blog-grid{grid-template-columns:1fr}}
+.bc{border-radius:18px;overflow:hidden;border:1px solid var(--border);background:white;transition:all .35s;display:flex;flex-direction:column}
+.bc:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.08);border-color:rgba(10,158,143,.2)}
+.bc-thumb{height:175px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0}
+.bc-thumb svg{width:56px;height:56px;opacity:.15;position:absolute}
+.bc-tag{position:absolute;top:11px;left:11px;background:var(--g);color:white;border-radius:20px;padding:3px 9px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;z-index:1}
+.bc-body{padding:1.3rem;flex:1;display:flex;flex-direction:column}
+.bc-date{font-size:.67rem;color:var(--muted);margin-bottom:.4rem}
+.bc-title{font-family:var(--fd);font-size:1rem;color:var(--dark2);line-height:1.3;margin-bottom:.55rem;font-weight:400}
+.bc-exc{font-size:.78rem;color:var(--muted);line-height:1.62;font-weight:300;margin-bottom:.9rem;flex:1}
+.bc-rd{font-size:.76rem;font-weight:600;color:var(--g);text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:gap .2s;margin-top:auto}
+.bc-rd:hover{gap:9px}
+
+/* ── LANGUAGES ── */
+.lang-sec{background:var(--dark2);padding:64px 5%}
+.lang-in{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 2fr;gap:3.5rem;align-items:center}
+@media(max-width:768px){.lang-in{grid-template-columns:1fr;gap:2rem;text-align:center}}
+.lang-l .sh{text-align:left;color:white;font-size:clamp(1.8rem,4vw,2.2rem)}
+@media(max-width:768px){.lang-l .sh{text-align:center}}
+.lang-l .sp{text-align:left;color:rgba(255,255,255,.3);font-size:.86rem;margin-top:.5rem}
+@media(max-width:768px){.lang-l .sp{text-align:center}}
+.lang-l .kicker{justify-content:flex-start;color:var(--gl)}
+.lang-l .kicker::before{display:none}
+@media(max-width:768px){.lang-l .kicker{justify-content:center}}
+.lchips{display:flex;flex-wrap:wrap;gap:.65rem;justify-content:flex-start}
+@media(max-width:768px){.lchips{justify-content:center}}
+.lchip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:22px;padding:7px 16px;font-size:.8rem;color:rgba(255,255,255,.45);transition:all .25s;cursor:default}
+.lchip:hover{background:var(--g);border-color:var(--g);color:white;transform:translateY(-2px)}
+
+/* ── CTA ── */
+.cta-sec{padding:72px 5%;text-align:center;position:relative;overflow:hidden;background:var(--gp2)}
+.cta-dots{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(10,158,143,.1) 1px,transparent 1px);background-size:20px 20px;pointer-events:none}
+.cta-in{max-width:680px;margin:0 auto;position:relative;z-index:1}
+.cta-in .sh{font-size:clamp(2rem,5vw,3rem)}
+.cta-in .sp{max-width:460px;margin:0 auto 2rem}
+.cta-btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.cta-note{font-size:.72rem;color:var(--muted);margin-top:1rem}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);padding:56px 5% 28px}
+.ft{max-width:1100px;margin:0 auto}
+.ft-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,.06)}
+@media(max-width:768px){.ft-top{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.ft-top{grid-template-columns:1fr}}
+.ft-brand-p{font-size:.8rem;color:rgba(255,255,255,.28);line-height:1.72;margin-top:.7rem;font-weight:300;max-width:240px}
+.ft-col h5{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.22);margin-bottom:.9rem}
+.ft-col a{display:block;font-size:.8rem;color:rgba(255,255,255,.28);text-decoration:none;margin-bottom:.5rem;transition:color .2s;font-weight:300}
+.ft-col a:hover{color:var(--gl)}
+.ft-bot{display:flex;justify-content:space-between;align-items:center;padding-top:1.3rem;flex-wrap:wrap;gap:.8rem}
+.ft-copy{font-size:.72rem;color:rgba(255,255,255,.14);font-weight:300}
+.ft-legal{display:flex;gap:1.3rem}
+.ft-legal a{font-size:.72rem;color:rgba(255,255,255,.18);text-decoration:none;transition:color .2s}
+.ft-legal a:hover{color:var(--gl)}
+
+/* ── SCROLL REVEAL ── */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
+.rv2{opacity:0;transform:translateY(22px);transition:opacity .65s .14s ease,transform .65s .14s ease}
+.rv3{opacity:0;transform:translateY(22px);transition:opacity .65s .28s ease,transform .65s .28s ease}
+.rv.vi,.rv2.vi,.rv3.vi{opacity:1;transform:none}
+
+/* ════════════════════════
+   CHAT PAGE — FULL SCREEN
+   No nav, completely isolated
+════════════════════════ */
+#pg-chat{position:fixed!important;inset:0;z-index:99999;display:none!important}
+#pg-chat.on{display:flex!important;flex-direction:column}
+
+/* Intake screen */
+#intake-screen{
+  flex:1;background:var(--dark);
+  display:flex;align-items:center;justify-content:center;
+  padding:1.5rem;position:relative;overflow:hidden;
+}
+.intake-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(10,158,143,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(10,158,143,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.intake-bg-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:350px;background:radial-gradient(ellipse,rgba(10,158,143,.06),transparent);filter:blur(40px);pointer-events:none}
+.intake-card{
+  background:white;border-radius:22px;
+  padding:2rem 1.8rem;
+  max-width:420px;width:100%;
+  position:relative;z-index:1;
+  box-shadow:0 20px 70px rgba(0,0,0,.4);
+  max-height:90vh;overflow-y:auto;
+}
+.intake-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.3rem}
+.intake-logo{display:flex;align-items:center;gap:8px}
+.intake-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0a9e8f,#12c4b2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.intake-logo-name{font-family:var(--fd);font-size:1.05rem;color:var(--dark2)}
+.intake-back{background:none;border:1px solid var(--border);border-radius:8px;padding:5px 11px;font-size:.76rem;color:var(--muted);cursor:pointer;font-family:var(--fb);transition:all .2s;white-space:nowrap}
+.intake-back:hover{border-color:var(--g);color:var(--g)}
+.intake-h{font-family:var(--fd);font-size:1.45rem;color:var(--dark2);margin-bottom:.3rem;text-align:center}
+.intake-sub{font-size:.81rem;color:var(--muted);text-align:center;margin-bottom:1.5rem;line-height:1.55;font-weight:300}
+/* Form fields */
+.ifield{margin-bottom:.9rem}
+.ifield label{display:block;font-size:.73rem;font-weight:600;color:var(--dark2);margin-bottom:.35rem;letter-spacing:.01em}
+.ifield label span{color:var(--muted);font-weight:300}
+.ifield input,.ifield select{
+  width:100%;border:1.5px solid var(--border);border-radius:10px;
+  padding:10px 12px;font-size:.88rem;font-family:var(--fb);
+  outline:none;color:var(--dark2);background:white;
+  transition:border-color .2s;
+  -webkit-appearance:none;
+}
+.ifield input:focus,.ifield select:focus{border-color:var(--g)}
+.ifield-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.intake-err{color:#dc2626;font-size:.76rem;margin-bottom:.7rem;display:none;text-align:center;background:#fef2f2;padding:7px 10px;border-radius:8px}
+.intake-btn{
+  width:100%;background:var(--g);color:white;border:none;
+  border-radius:12px;padding:12px;font-size:.9rem;
+  font-weight:600;cursor:pointer;font-family:var(--fb);
+  transition:all .25s;letter-spacing:.01em;
+}
+.intake-btn:hover{background:var(--gd);transform:translateY(-1px);box-shadow:0 4px 14px rgba(10,158,143,.3)}
+.intake-privacy{font-size:.68rem;color:#b0bac5;margin-top:.9rem;text-align:center;line-height:1.5}
+
+/* Chat UI */
+#chat-ui{
+  flex:1;display:none;flex-direction:column;
+  background:var(--light);height:100%;overflow:hidden;
+}
+/* Chat header */
+.chat-hd{
+  background:linear-gradient(135deg,var(--dark2),var(--dark3));
+  padding:.85rem 1.1rem;
+  display:flex;align-items:center;gap:.7rem;
+  flex-shrink:0;
+}
+.chat-back{
+  background:rgba(255,255,255,.1);border:none;border-radius:8px;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:background .2s;
+}
+.chat-back:hover{background:rgba(255,255,255,.18)}
+.chat-hd-av{width:36px;height:36px;background:rgba(10,158,143,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-hd-inf h4{font-weight:600;font-size:.86rem;color:white;font-family:var(--fd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.chat-hd-inf p{font-size:.68rem;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;margin-top:1px}
+.chat-live{width:5px;height:5px;background:#4ade80;border-radius:50%;animation:blink 2s infinite}
+.chat-hd-lang{margin-left:auto;display:flex;background:rgba(255,255,255,.1);border-radius:16px;padding:2px;gap:2px;flex-shrink:0}
+.chat-hd-lang button{padding:3px 10px;border-radius:12px;border:none;font-size:.7rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .2s;white-space:nowrap}
+.lon{background:white!important;color:var(--dark2)!important}
+.loff{background:transparent!important;color:rgba(255,255,255,.55)!important}
+/* Email strip */
+#email-strip{
+  background:var(--gp);padding:5px 13px;font-size:.68rem;color:var(--gd);
+  display:flex;align-items:center;gap:5px;flex-shrink:0;
+  border-bottom:1px solid rgba(10,158,143,.12);
+}
+/* Messages */
+#msgs{
+  flex:1;overflow-y:auto;padding:1rem;
+  display:flex;flex-direction:column;gap:.8rem;
+  background:#f5faf9;
+  -webkit-overflow-scrolling:touch;
+}
+#msgs::-webkit-scrollbar{width:3px}
+#msgs::-webkit-scrollbar-thumb{background:rgba(10,158,143,.2)}
+/* Disclaimer */
+.chat-disc{
+  background:#fffbeb;border-top:1px solid #f0d060;
+  padding:5px 12px;font-size:.65rem;color:#7a5000;
+  text-align:center;flex-shrink:0;line-height:1.4;
+}
+/* Input footer */
+.chat-foot{padding:.8rem 1rem;border-top:1px solid var(--border);background:white;flex-shrink:0}
+.chat-input-row{display:flex;gap:7px;align-items:flex-end}
+.chat-ta{
+  flex:1;border:1.5px solid var(--border);border-radius:12px;
+  padding:9px 12px;font-size:.87rem;font-family:var(--fb);
+  resize:none;outline:none;transition:border-color .2s;
+  line-height:1.5;min-height:40px;max-height:96px;color:var(--dark2);
+  -webkit-appearance:none;
+}
+.chat-ta:focus{border-color:var(--g)}
+.chat-ta::placeholder{color:#b0bac5}
+.chat-btns{display:flex;gap:5px;flex-shrink:0}
+.chat-btn-voice,.chat-btn-photo,.chat-btn-send{
+  width:40px;height:40px;border:none;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:all .2s;
+}
+.chat-btn-voice{background:var(--light)}
+.chat-btn-voice:hover{background:var(--gp)}
+.chat-btn-voice svg{width:17px;height:17px;stroke:#64748b;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}
+.chat-btn-voice:hover svg{stroke:var(--g)}
+.chat-btn-photo{background:var(--light);position:relative}
+.chat-btn-photo:hover{background:var(--gp)}
+.chat-btn-photo svg{width:17px;height:17px;stroke:#64748b;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}
+.chat-btn-photo:hover svg{stroke:var(--g)}
+.chat-btn-photo input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.chat-btn-send{background:var(--g)}
+.chat-btn-send:hover{background:var(--gd)}
+.chat-btn-send svg{width:15px;height:15px;fill:white}
+.chat-hint{font-size:.63rem;color:#b0bac5;margin-top:4px;text-align:center}
+
+/* ════════════════════════
+   LEGAL PAGES
+════════════════════════ */
+.legal-pg{padding-top:var(--nav-h)}
+.legal-hd{padding:50px 5% 38px;background:linear-gradient(135deg,var(--gp),var(--cream));text-align:center}
+.legal-hd .sh{font-size:clamp(2rem,5vw,2.8rem)}
+.legal-hd p{color:var(--muted);margin-top:.4rem;font-size:.85rem}
+.legal-bd{max-width:740px;margin:0 auto;padding:44px 5% 72px}
+.legal-bd h2{font-family:var(--fd);font-size:1.25rem;font-weight:400;color:var(--dark2);margin:2rem 0 .6rem;padding-top:1.8rem;border-top:1px solid var(--border)}
+.legal-bd h2:first-child{margin-top:0;padding-top:0;border-top:none}
+.legal-bd p{font-size:.88rem;color:var(--muted);line-height:1.82;margin-bottom:.8rem;font-weight:300}
+.legal-bd ul{padding-left:1.2rem;margin-bottom:.8rem}
+.legal-bd li{font-size:.88rem;color:var(--muted);line-height:1.82;margin-bottom:.3rem;font-weight:300}
+.legal-bd a{color:var(--g);text-decoration:none}
+.warn-box{background:#fffbeb;border-left:3px solid #f0c040;padding:12px 16px;border-radius:0 10px 10px 0;margin:1.3rem 0;font-size:.86rem;color:#7a5000;line-height:1.62}
 </style>
 </head>
 <body>
 
-<nav>
-  <a href="#" class="nav-logo">
-    <div class="logo-icon">🦷</div>
-    <span class="logo-text">Daantun <span>AI</span></span>
-  </a>
-  <div class="nav-right">
-    <div class="lang-toggle">
-      <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" id="btn-hi" onclick="setLang('hi')">हिंदी</button>
-    </div>
-    <a href="#" class="nav-cta">Book Appointment</a>
-  </div>
-</nav>
+<div id="cglow"></div>
 
+<!-- ════ NAV ════ -->
+<nav id="nav">
+  <div class="nlogo" onclick="goHome()">
+    <svg class="nlogo-icon" viewBox="0 0 34 34" fill="none">
+      <rect width="34" height="34" rx="10" fill="#0a0f1a"/>
+      <path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="#0a9e8f"/>
+      <path d="M17 26C13.5 22.5 13 16 17 11C19 15 19.5 21.5 17 26Z" fill="#12c4b2" opacity=".3"/>
+      <polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="24.5" cy="18.5" r="1.8" fill="white"/>
+    </svg>
+    <div class="nlogo-text">
+      <span class="nlogo-name">AAYU</span>
+      <span class="nlogo-sub">AI · Dental</span>
+    </div>
+  </div>
+  <ul class="nlinks" id="nlinks">
+    <li><a href="#dental">Dental AI</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#founder">About</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#" onclick="goPage('privacy');return false">Privacy</a></li>
+    <li><a href="#" onclick="goPage('chat');return false" class="ncta">Consult Now →</a></li>
+  </ul>
+  <button class="nham" id="nham" onclick="toggleMob()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<!-- Mobile drawer -->
+<div class="nmob-drawer" id="nmob">
+  <a href="#dental" onclick="closeMob()">Dental AI</a>
+  <a href="#how" onclick="closeMob()">How It Works</a>
+  <a href="#founder" onclick="closeMob()">About</a>
+  <a href="#blog" onclick="closeMob()">Blog</a>
+  <a href="#" onclick="goPage('privacy');closeMob();return false">Privacy Policy</a>
+  <a href="#" onclick="goPage('terms');closeMob();return false">Terms of Service</a>
+  <a href="#" onclick="goPage('chat');closeMob();return false" class="nmob-cta">Start Free Consultation →</a>
+</div>
+
+<!-- ════ HOME ════ -->
+<div id="pg-home" class="pg on">
+
+<!-- HERO -->
 <section class="hero">
-  <div class="badge">🤖 AI-Powered Dental Care</div>
-  <h1 id="hero-title">Your <em>AI Dental Expert</em>,<br/>Available 24/7 — Free</h1>
-  <p id="hero-sub">Describe your dental problem. Our AI asks the right clinical questions, then gives you a proper assessment — in Hindi or English.</p>
-  <div class="hero-stats">
-    <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Always On</div></div>
-    <div class="stat"><div class="stat-num">Free</div><div class="stat-label">No Cost Ever</div></div>
-    <div class="stat"><div class="stat-num">Hindi</div><div class="stat-label">& English</div></div>
-    <div class="stat"><div class="stat-num">BDS</div><div class="stat-label">Expert Backed</div></div>
+  <div class="hbg">
+    <div class="hbg-grid"></div>
+    <div class="hbg-o1"></div><div class="hbg-o2"></div>
+    <div class="hbg-noise"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="badge-dot"></span>India's AI Dental Assistant · Free Consultation</div>
+    <h1 class="hero-h1" id="heroH">
+      Healthcare is a Right,<br/><span class="it">Not a Privilege.</span>
+    </h1>
+    <p class="hero-p" id="heroP">At <strong>2am when pain strikes</strong> and no doctor is available — Aayu AI is there. Instant dental guidance, clinical assessment, photo analysis. Hindi or English.</p>
+    <div class="hero-btns" id="heroBtns">
+      <a href="#" onclick="goPage('chat');return false" class="btn-glow">Start Free Consultation →</a>
+      <a href="#how" class="btn-ghost">How It Works</a>
+    </div>
+    <div class="hero-proof" id="heroProof">
+      <div class="proof-avs">
+        <div class="proof-av">R</div><div class="proof-av">P</div>
+        <div class="proof-av">S</div><div class="proof-av">M</div><div class="proof-av">+</div>
+      </div>
+      <div class="proof-txt">
+        <strong>500+ patients helped this month</strong>
+        <div class="proof-stars">★★★★★</div>
+        <span class="proof-sub">Rated 4.9 · No app download needed</span>
+      </div>
+    </div>
+    <!-- Card -->
+    <div class="hero-card-wrap" id="heroCard">
+      <div class="hchip c1"><div class="hchip-ic"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a9e8f" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>100% Private</div>
+      <div class="hchip c2"><div class="hchip-ic"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0a9e8f" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>Instant Answers</div>
+      <div class="hcard">
+        <div class="hcard-hd">
+          <div class="hcard-av"><svg width="18" height="18" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="hcard-inf"><h4>Aayu AI · Dental</h4><p><span class="hcard-live"></span>Online · Free</p></div>
+          <div class="hcard-time" id="hclock">2:14 AM</div>
+        </div>
+        <div class="hcard-body">
+          <div class="hcb" style="animation:fadeUp .5s .3s ease both"><div class="hcb-av b"><svg width="9" height="9" viewBox="0 0 34 34"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/></svg></div><div class="hcb-msg b">Namaste! Kya problem hai? 🌿</div></div>
+          <div class="hcb u" style="animation:fadeUp .5s .8s ease both"><div class="hcb-av u">U</div><div class="hcb-msg u">Dant mein raat se dard hai</div></div>
+          <div class="hcb" style="animation:fadeUp .5s 1.3s ease both"><div class="hcb-av b"><svg width="9" height="9" viewBox="0 0 34 34"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/></svg></div><div class="hcb-msg b">Thanda lagta hai? 🦷</div></div>
+          <div class="hcb u" style="animation:fadeUp .5s 1.8s ease both"><div class="hcb-av u">U</div><div class="hcb-msg u">Haan, thanda aur garam dono</div></div>
+          <div class="hcard-rx" style="animation:fadeUp .5s 2.3s ease both">
+            <div class="hrx-badge">Assessment Ready</div>
+            <div class="hrx-pills"><div class="hrx-pill">🩺 Pulpitis</div><div class="hrx-pill">⚠️ Urgent</div><div class="hrx-pill">📋 Home Care</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats" id="heroStats">
+    <div class="hstat"><div class="hstat-n">24/<em>7</em></div><div class="hstat-l">Available</div></div>
+    <div class="hstat"><div class="hstat-n"><em>Free</em></div><div class="hstat-l">Consultation</div></div>
+    <div class="hstat"><div class="hstat-n"><em>10+</em></div><div class="hstat-l">Languages</div></div>
+    <div class="hstat"><div class="hstat-n"><em>500+</em></div><div class="hstat-l">Helped</div></div>
   </div>
 </section>
 
-<div class="main-container">
-  <aside class="sidebar">
-    <div class="sidebar-card">
-      <h3 id="sidebar-topics-title">Common Problems</h3>
-      <div id="topic-list"></div>
-    </div>
-    <div class="how-card">
-      <h3>How It Works</h3>
-      <div class="step"><div class="step-num">1</div><div class="step-text" id="step1">Tell us your problem in your own words</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-text" id="step2">AI asks you clinical questions one by one</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-text" id="step3">Upload a photo for visual AI evaluation</div></div>
-      <div class="step"><div class="step-num">4</div><div class="step-text" id="step4">Get assessment + connect with a real dentist</div></div>
-    </div>
-    <div class="disclaimer-box" style="margin-top:1.1rem">
-      <strong>⚠️ Important Notice</strong>
-      <span id="disclaimer-text">Daantun AI provides general dental information only. It is not a substitute for professional clinical examination. Always see a qualified dentist for diagnosis and treatment.</span>
-    </div>
-  </aside>
+<!-- MARQUEE -->
+<div class="mq"><div class="mq-track"><div class="mq-item">AI Dental Consultation<div class="mq-dot"></div>Photo Analysis<div class="mq-dot"></div>Hindi &amp; English<div class="mq-dot"></div>Emergency Detection<div class="mq-dot"></div>Safe Clinical Guidance<div class="mq-dot"></div>No App Needed<div class="mq-dot"></div>Built by Real Doctors<div class="mq-dot"></div>Private &amp; Secure<div class="mq-dot"></div>24/7 Always On<div class="mq-dot"></div></div><div class="mq-item">AI Dental Consultation<div class="mq-dot"></div>Photo Analysis<div class="mq-dot"></div>Hindi &amp; English<div class="mq-dot"></div>Emergency Detection<div class="mq-dot"></div>Safe Clinical Guidance<div class="mq-dot"></div>No App Needed<div class="mq-dot"></div>Built by Real Doctors<div class="mq-dot"></div>Private &amp; Secure<div class="mq-dot"></div>24/7 Always On<div class="mq-dot"></div></div></div></div>
 
-  <div class="chat-wrapper">
-    <div class="chat-box">
-      <div class="chat-header">
-        <div class="ai-avatar">🦷</div>
-        <div class="ai-info">
-          <h4>Daantun AI — Dental Assistant</h4>
-          <p><span class="online-dot"></span> Online · Free · Photo Analysis Enabled</p>
-        </div>
-      </div>
-      <div class="messages" id="messages"></div>
-      <div class="chat-input-area">
-        <div class="input-row">
-          <textarea id="chatInput" class="chat-input" rows="1"
-            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-          <div class="input-actions">
-            <button class="photo-btn" id="photoBtn" title="Upload dental photo">
-              📷
-              <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)"/>
-            </button>
-            <button class="send-btn" onclick="sendMessage()">
-              <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="input-hint" id="input-hint">📷 Upload photo anytime · Enter to send · Shift+Enter for new line</div>
-      </div>
+<!-- TRUST BAR -->
+<div class="trust-bar"><div class="trust-in"><div class="trust-label">Trusted by</div><div class="trust-sep"></div><div class="trust-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Patients across India</div><div class="trust-sep"></div><div class="trust-item"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Clinically reviewed</div><div class="trust-sep"></div><div class="trust-item"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>DPDP Act compliant</div><div class="trust-sep"></div><div class="trust-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Instant, 24/7</div><div class="trust-sep"></div><div class="trust-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>10+ Languages</div></div></div>
+
+<!-- DENTAL FEATURES -->
+<section id="dental" class="feat-sec">
+  <div class="feat-bg-grid"></div><div class="feat-bg-glow"></div>
+  <div class="feat-in">
+    <div class="feat-header rv">
+      <div class="kicker">Dental AI</div>
+      <h2 class="sh" style="color:white;font-size:clamp(2rem,5vw,3.2rem)">The Dentist That <span class="it">Never Sleeps.</span></h2>
+      <p class="sp" style="color:rgba(255,255,255,.38);max-width:520px;margin:.7rem auto 0">Advanced AI that asks the right clinical questions, evaluates your photos, and delivers a real dental assessment.</p>
+    </div>
+    <div class="feat-grid rv2">
+      <div class="fc"><div class="fc-num">01</div><div class="fc-ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><h3>Clinical History Taking</h3><p>AI asks targeted questions about pain triggers, duration, radiation, sensitivity — one at a time, like a real dentist would.</p></div>
+      <div class="fc"><div class="fc-num">02</div><div class="fc-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><h3>Visual Photo Analysis</h3><p>Upload a dental photo — AI identifies cavities, gum inflammation, calculus, fractures, and abscesses with clinical accuracy.</p></div>
+      <div class="fc"><div class="fc-num">03</div><div class="fc-ic"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h3>Emergency Detection</h3><p>Fever + swelling, difficulty swallowing — AI immediately flags life-threatening conditions and directs you to emergency care.</p></div>
+      <div class="fc"><div class="fc-num">04</div><div class="fc-ic"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg></div><h3>Personalised Report</h3><p>Diagnosis, urgency, home care — all tailored to your exact age, allergies, medical conditions, and full history.</p></div>
+      <div class="fc"><div class="fc-num">05</div><div class="fc-ic"><svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div><h3>Medication Safety First</h3><p>Zero tolerance for unsafe advice. AI checks allergies, pregnancy, age, and all medical conditions before any suggestion.</p></div>
+      <div class="fc"><div class="fc-num">06</div><div class="fc-ic"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><h3>Voice + Text Input</h3><p>Speak or type in any Indian language. AI understands Hindi, Hinglish, Tamil, Bengali and more — answers in your language.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="how-sec sec">
+  <div class="si">
+    <div class="rv"><div class="kicker">Process</div><h2 class="sh" style="font-size:clamp(2rem,5vw,3rem)">From Symptoms to <span class="it">Answers</span> in Minutes.</h2></div>
+    <div class="how-grid rv2">
+      <div class="hw"><div class="hw-ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><h3>Tell Us What's Wrong</h3><p>Describe your problem in any language. No forms, no jargon. Talk to Aayu AI like a trusted doctor friend.</p><div class="hw-num">01</div></div>
+      <div class="hw"><div class="hw-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg></div><h3>AI Asks Smart Questions</h3><p>Aayu AI gathers your complete clinical history — one precise question at a time — before drawing any conclusion.</p><div class="hw-num">02</div></div>
+      <div class="hw"><div class="hw-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><h3>Upload a Photo</h3><p>For dental problems, send a photo. AI evaluates findings and generates a structured clinical report with every finding listed.</p><div class="hw-num">03</div></div>
+      <div class="hw"><div class="hw-ic"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg></div><h3>Get Your Assessment</h3><p>Diagnosis, urgency, home care, and next steps — personalised for you. Connect with a real dentist when ready.</p><div class="hw-num">04</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<div class="vis-sec">
+  <div class="vis-bg-g"></div><div class="vis-glow"></div>
+  <div class="vis-in">
+    <div class="vis-tag rv"><div class="vis-tl"></div>Our Vision<div class="vis-tl"></div></div>
+    <div class="vis-q rv">"Healthcare should be free for<br/><span class="it">everyone on this planet.</span><br/>It is a human right."</div>
+    <p class="vis-sub rv">600 million Indians have no access to a doctor when they need one. Not at 2am. Not in their village. Not in their language. We are changing that — one conversation at a time.</p>
+    <div class="vis-stats rv2">
+      <div class="vst"><div class="vst-n">600M+</div><div class="vst-l">Without healthcare access</div></div>
+      <div class="vst"><div class="vst-n">Free</div><div class="vst-l">For every patient, always</div></div>
+      <div class="vst"><div class="vst-n">24/7</div><div class="vst-l">Every hour. Every day.</div></div>
     </div>
   </div>
 </div>
 
-<section class="features">
-  <div class="features-inner">
-    <div class="feature-item"><span class="feature-icon">🧠</span><h4>Clinical Questioning</h4><p>AI asks targeted questions before any assessment — no half-answers, ever.</p></div>
-    <div class="feature-item"><span class="feature-icon">📷</span><h4>Photo Analysis</h4><p>Upload your dental photo. AI visually evaluates cavities, gum issues, calculus, fractures & more.</p></div>
-    <div class="feature-item"><span class="feature-icon">📊</span><h4>Finding Cards</h4><p>Each detected issue shown as a clear card — name, location, severity & clinical detail.</p></div>
-    <div class="feature-item"><span class="feature-icon">📋</span><h4>Assessment Card</h4><p>Likely diagnosis, urgency level, home care tips & safe OTC suggestions.</p></div>
-    <div class="feature-item"><span class="feature-icon">🌐</span><h4>Hindi & English</h4><p>Switch languages freely. AI matches your exact language and tone.</p></div>
+<!-- TESTIMONIALS -->
+<section class="test-sec sec">
+  <div class="si">
+    <div class="test-hd rv">
+      <div class="kicker">Patient Stories</div>
+      <h2 class="sh" style="font-size:clamp(1.8rem,4vw,2.8rem)">Real People. <span class="it">Real Relief.</span></h2>
+      <div class="rating-row">
+        <div class="rat-n">4.9</div>
+        <div><div class="rat-stars"><div class="rat-star"></div><div class="rat-star"></div><div class="rat-star"></div><div class="rat-star"></div><div class="rat-star"></div></div><div class="rat-sub">Based on 500+ consultations</div></div>
+      </div>
+    </div>
+    <div class="feat-q rv">
+      <div class="fq-gl1"></div><div class="fq-gl2"></div>
+      <div class="fq-t">"Raat ko 2 baje dant mein itna dard tha — nearest hospital 40km door tha. Aayu AI ne sawaal pooche, photo dekhi, aur exactly bata diya kya karna hai. Subah dentist ke paas gaya — doctor ne kaha AI ka assessment bilkul sahi tha."</div>
+      <div class="fq-auth">
+        <div class="fq-av">R</div>
+        <div><div class="fq-stars"><div class="fq-star"></div><div class="fq-star"></div><div class="fq-star"></div><div class="fq-star"></div><div class="fq-star"></div></div><div class="fq-nm">Ramesh Kumar</div><div class="fq-lc">Sitapur, Uttar Pradesh</div></div>
+      </div>
+    </div>
+    <div class="test-grid">
+      <div class="tc rv"><div class="tc-stars"><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div></div><p class="tc-tx">"Finally an AI that asks proper clinical questions before answering. It checked my allergies and medications before suggesting anything. This is responsible healthcare."</p><div class="tc-auth"><div class="tc-av">P</div><div><div class="tc-nm">Priya Sharma</div><div class="tc-lc">Bengaluru, Karnataka</div></div></div></div>
+      <div class="tc rv2"><div class="tc-stars"><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div></div><p class="tc-tx">"Mere gaon mein dentist nahi. Aayu AI ne photo dekh ke bata diya cavity hai aur urgent hai. Pehli baar laga ki koi doctor mere paas khada hai."</p><div class="tc-auth"><div class="tc-av">S</div><div><div class="tc-nm">Suresh Mahajan</div><div class="tc-lc">Amravati, Maharashtra</div></div></div></div>
+      <div class="tc rv3"><div class="tc-stars"><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div><div class="tc-star"></div></div><p class="tc-tx">"My daughter had tooth pain at midnight. Aayu AI guided us step by step and told us exactly what to do. We finally slept. This is what healthcare should be."</p><div class="tc-auth"><div class="tc-av">A</div><div><div class="tc-nm">Anita Verma</div><div class="tc-lc">Jaipur, Rajasthan</div></div></div></div>
+    </div>
+    <div class="platforms rv">
+      <div class="plat"><svg width="15" height="15" viewBox="0 0 24 24" fill="#4285f4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34a853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#fbbc05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#ea4335"/></svg>Google<span class="plat-s">★★★★★</span>4.9</div>
+      <div class="plat"><svg width="15" height="15" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp<span class="plat-s">★★★★★</span>4.8</div>
+      <div class="plat"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>Facebook<span class="plat-s">★★★★★</span>4.9</div>
+    </div>
   </div>
 </section>
 
+<!-- FOUNDER -->
+<section id="founder" class="founder-sec sec">
+  <div class="founder-grid">
+    <div class="rv">
+      <div class="founder-card">
+        <div class="fc-bg1"></div><div class="fc-bg2"></div><div class="fc-bg-grid"></div>
+        <div class="fc-top">
+          <div class="fc-lm"><svg width="22" height="22" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="#0a9e8f"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="fc-quote">"I built Aayu AI for the patient who is in pain at 2am with <strong>no one to call</strong> and no doctor nearby."</div>
+        </div>
+        <div class="fc-bot">
+          <div class="fc-tags"><span class="fc-tag">Dental Surgeon</span><span class="fc-tag">Clinical Researcher</span><span class="fc-tag">Published Author</span><span class="fc-tag">Public Health Advocate</span></div>
+          <div class="fc-name-block"><div class="fc-name">Dr. Mayank Vats</div><div class="fc-role">Founder &amp; CEO · Aayu AI · New Delhi</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="rv2">
+      <div class="founder-txt">
+        <div class="kicker">Founder's Message</div>
+        <h2 class="sh" style="text-align:left;font-size:clamp(1.8rem,3.5vw,2.6rem)">Why I Built <span class="it">Aayu AI.</span></h2>
+        <div class="fr-bq"><p>"I've sat across from patients who delayed treatment for months — not because they didn't care, but because they had no one to ask. Just pain, fear, and silence."</p></div>
+        <p class="fr-body">That silence is what Aayu AI was built to end. I've seen it in clinics, in health camps, in the faces of people who simply needed someone to say: "Here's what's happening. Here's what to do."</p>
+        <p class="fr-body">Healthcare is not a luxury. It never was. We built Aayu AI so that anyone — anywhere in India — can access a doctor-grade dental assessment, in their own language, at any hour of the day or night.</p>
+        <p class="fr-body">That's not a product. That's a promise.</p>
+        <div class="fr-sig">— Dr. Mayank Vats</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section id="blog" class="blog-sec sec">
+  <div class="si">
+    <div class="rv"><div class="kicker">Health Knowledge</div><h2 class="sh" style="font-size:clamp(1.8rem,4vw,2.8rem)">Learn. Understand. <span class="it">Take Control.</span></h2><p class="sp" style="max-width:480px;margin:.7rem auto 0">Clinical dental health articles by our team — in plain language.</p></div>
+    <div class="blog-grid">
+      <div class="bc rv"><div class="bc-thumb" style="background:linear-gradient(135deg,#0a9e8f,#077a6e)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width=".7" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg><div class="bc-tag">Tooth Pain</div></div><div class="bc-body"><div class="bc-date">March 2025 · 5 min read</div><h3 class="bc-title">Why Does My Tooth Hurt More at Night?</h3><p class="bc-exc">Raat ko dard kyon badhta hai? The science behind nocturnal dental pain — and what it tells you about your tooth nerve.</p><a href="#" class="bc-rd">Read Article <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div></div>
+      <div class="bc rv2"><div class="bc-thumb" style="background:linear-gradient(135deg,#1c2333,#2d3748)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width=".7" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><div class="bc-tag">Prevention</div></div><div class="bc-body"><div class="bc-date">February 2025 · 4 min read</div><h3 class="bc-title">5 Signs Your Gums Are Warning You</h3><p class="bc-exc">Bleeding when you brush? Swollen gums? These could be early warning signs of something serious you must address now.</p><a href="#" class="bc-rd">Read Article <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div></div>
+      <div class="bc rv3"><div class="bc-thumb" style="background:linear-gradient(135deg,#077a6e,#0a9e8f)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width=".7" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg><div class="bc-tag">AI Health</div></div><div class="bc-body"><div class="bc-date">January 2025 · 6 min read</div><h3 class="bc-title">How AI is Making Dental Care Accessible to Rural India</h3><p class="bc-exc">India has one dentist for every 10,000 rural residents. Here's how AI tools are closing that gap.</p><a href="#" class="bc-rd">Read Article <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LANGUAGES -->
+<div class="lang-sec">
+  <div class="lang-in si">
+    <div class="rv">
+      <div class="kicker lang-l" style="color:var(--gl)">Languages</div>
+      <h2 class="sh lang-l">No Language <span class="it" style="color:var(--gl)">Left Behind.</span></h2>
+      <p class="sp lang-l" style="margin-top:.5rem">Healthcare in your mother tongue — because you shouldn't need to translate pain.</p>
+    </div>
+    <div class="lchips rv2">
+      <div class="lchip">हिंदी Hindi</div><div class="lchip">English</div><div class="lchip">Hinglish</div>
+      <div class="lchip">தமிழ் Tamil</div><div class="lchip">বাংলা Bengali</div><div class="lchip">मराठी Marathi</div>
+      <div class="lchip">తెలుగు Telugu</div><div class="lchip">ಕನ್ನಡ Kannada</div><div class="lchip">ગુજરાતી Gujarati</div>
+      <div class="lchip">ਪੰਜਾਬੀ Punjabi</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-sec sec">
+  <div class="cta-dots"></div>
+  <div class="cta-in">
+    <div class="kicker rv">Start Now</div>
+    <h2 class="sh rv" style="font-size:clamp(2rem,5vw,3rem)">Your Dentist is <span class="it">One Message Away.</span></h2>
+    <p class="sp rv" style="margin:0 auto 2rem">No appointments. No waiting rooms. Just answers — whenever you need them.</p>
+    <div class="cta-btns rv">
+      <a href="#" onclick="goPage('chat');return false" class="btn-glow">Start Free Consultation →</a>
+      <a href="https://wa.me/919953135340?text=Hi+I+want+to+consult+Aayu+AI" target="_blank" class="btn-ghost" style="background:white;color:var(--dark2);border-color:var(--border2)">💬 WhatsApp Us</a>
+    </div>
+    <div class="cta-note rv2">No app download · Works on any phone · Free dental consultation</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  <p>© 2025 Daantun AI · Made for India's dental health · <a href="#">Privacy Policy</a> · <a href="#">Terms</a></p>
-  <p style="margin-top:5px">Daantun AI is for informational purposes only and does not constitute medical advice.</p>
+  <div class="ft">
+    <div class="ft-top">
+      <div>
+        <div class="nlogo" style="pointer-events:none">
+          <svg width="30" height="30" viewBox="0 0 34 34" fill="none"><rect width="34" height="34" rx="10" fill="#0a9e8f"/><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="nlogo-text"><span class="nlogo-name" style="color:white">AAYU</span><span class="nlogo-sub">AI · Dental</span></div>
+        </div>
+        <p class="ft-brand-p">Healthcare is a human right. We are making it a reality — one conversation at a time.</p>
+      </div>
+      <div class="ft-col"><h5>Product</h5><a href="#" onclick="goPage('chat');return false">AI Consultation</a><a href="#dental">Dental AI</a><a href="#how">How It Works</a><a href="#blog">Blog</a></div>
+      <div class="ft-col"><h5>Company</h5><a href="#founder">About Us</a><a href="#" onclick="goPage('privacy');return false">Privacy Policy</a><a href="#" onclick="goPage('terms');return false">Terms of Service</a></div>
+      <div class="ft-col"><h5>Contact</h5><a href="mailto:hello@aayu365.com">hello@aayu365.com</a><a href="https://wa.me/919953135340" target="_blank">WhatsApp</a><a href="tel:+919953135340">+91 99531 35340</a></div>
+    </div>
+    <div class="ft-bot">
+      <div class="ft-copy">© 2025 Aayu365 · All rights reserved · Made for India</div>
+      <div class="ft-legal"><a href="#" onclick="goPage('privacy');return false">Privacy</a><a href="#" onclick="goPage('terms');return false">Terms</a><a href="mailto:hello@aayu365.com">Contact</a></div>
+    </div>
+  </div>
 </footer>
+</div><!-- /home -->
+
+<!-- ════ CHAT PAGE — FULL SCREEN ISOLATED ════ -->
+<div id="pg-chat" class="pg">
+  <!-- INTAKE FORM -->
+  <div id="intake-screen">
+    <div class="intake-bg-grid"></div>
+    <div class="intake-bg-glow"></div>
+    <div class="intake-card">
+      <div class="intake-head">
+        <div class="intake-logo">
+          <div class="intake-logo-icon"><svg width="18" height="18" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.5)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="intake-logo-name">Aayu <em style="font-style:normal;color:var(--g)">AI</em></span>
+        </div>
+        <button class="intake-back" onclick="goHome()">← Back</button>
+      </div>
+      <h2 class="intake-h">Quick Details</h2>
+      <p class="intake-sub">So Aayu AI can skip the basic questions and get straight to your dental concern.</p>
+      <div class="ifield">
+        <label>Full Name</label>
+        <input id="p-name" type="text" placeholder="e.g. Rahul Sharma" autocomplete="name"/>
+      </div>
+      <div class="ifield-row">
+        <div class="ifield">
+          <label>Age</label>
+          <input id="p-age" type="number" min="1" max="120" placeholder="e.g. 28"/>
+        </div>
+        <div class="ifield">
+          <label>Gender</label>
+          <select id="p-gender">
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="ifield">
+        <label>Email <span>(summary will be sent here)</span></label>
+        <input id="p-email" type="email" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')startConsult()"/>
+      </div>
+      <div id="intake-err" class="intake-err"></div>
+      <button class="intake-btn" onclick="startConsult()">Start My Consultation →</button>
+      <p class="intake-privacy">🔒 Private &amp; secure · DPDP Act 2023 compliant · No spam ever</p>
+    </div>
+  </div>
+
+  <!-- CHAT UI -->
+  <div id="chat-ui">
+    <div class="chat-hd">
+      <button class="chat-back" onclick="goHome()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="chat-hd-av">
+        <svg width="18" height="18" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="chat-hd-inf">
+        <h4 id="chat-patient-name">Aayu AI · Dental</h4>
+        <p><span class="chat-live"></span>Online · Voice &amp; Photo enabled</p>
+      </div>
+      <div class="chat-hd-lang">
+        <button class="lon" id="cl-en" onclick="setLang('en')">EN</button>
+        <button class="loff" id="cl-hi" onclick="setLang('hi')">हिंदी</button>
+      </div>
+    </div>
+    <div id="email-strip">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#077a6e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Summary → <strong id="email-display" style="margin-left:2px"></strong>
+    </div>
+    <div id="msgs"></div>
+    <div class="chat-disc">⚠️ AI guidance only — not a clinical prescription. Always consult a qualified dentist.</div>
+    <div class="chat-foot">
+      <div class="chat-input-row">
+        <textarea id="cta" class="chat-ta" rows="1" placeholder="Describe your dental concern..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="chat-btns">
+          <button class="chat-btn-voice" id="voice-btn" onclick="toggleVoice()" title="Voice input">
+            <svg id="voice-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <button class="chat-btn-photo" id="pb" title="Upload photo">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <input type="file" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)"/>
+          </button>
+          <button class="chat-btn-send" onclick="sendMsg()">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chat-hint" id="voice-hint">🎤 Tap mic · 📷 Photo · Enter to send</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PRIVACY PAGE ════ -->
+<div id="pg-privacy" class="pg">
+  <div class="legal-pg">
+    <div class="legal-hd"><div class="kicker">Legal</div><h1 class="sh" style="font-size:clamp(2rem,5vw,2.8rem);margin-top:.3rem">Privacy Policy</h1><p>Last updated: March 2025 · <a href="mailto:hello@aayu365.com">hello@aayu365.com</a></p></div>
+    <div class="legal-bd">
+      <h2>1. Who We Are</h2><p>Aayu AI is a free AI-powered dental health information service operated by Aayu365. We are committed to complete transparency about how we handle your personal data. This policy explains what we collect, why, and how we protect it.</p>
+      <h2>2. What We Collect</h2><p>When you use Aayu AI, we collect only what you voluntarily share:</p><ul><li>Health information — symptoms, age, gender, medical history, medications, allergies</li><li>Dental photos you choose to upload for visual evaluation</li><li>Conversation content, used solely to generate your personalised assessment</li><li>Basic anonymous usage analytics to improve reliability</li><li>Contact information only if you reach out directly</li></ul><p>We do not collect your data silently. Everything we know about you, you told us directly.</p>
+      <h2>3. How We Use Your Data</h2><p>Your data is used exclusively to generate your personalised AI dental assessment, improve our AI system using anonymised data, respond to support requests, and comply with Indian data protection regulations. We do not use your data for advertising. We do not sell your data. We never will.</p>
+      <h2>4. DPDP Act 2023 Compliance</h2><p>We operate in full compliance with India's Digital Personal Data Protection Act (DPDP) 2023. Your health data is treated as sensitive personal data and processed only with your explicit, informed consent. You may withdraw consent at any time by contacting hello@aayu365.com.</p>
+      <h2>5. Data Processing &amp; Storage</h2><p>All conversation data is processed through our secure backend infrastructure with end-to-end encryption. We do not share your personal health data with any external service for commercial purposes. Anonymised, aggregated data may be used solely to improve our AI and contribute to public health research.</p>
+      <h2>6. Data Security</h2><p>All data is encrypted using TLS 1.3. We implement industry-standard security practices including strict access controls and regular security reviews. We will notify you promptly if a breach affecting your personal information occurs.</p>
+      <h2>7. Data Retention &amp; Deletion</h2><p>We retain conversation data for a limited period to improve AI accuracy. You may request complete deletion of all your personal data at any time by emailing hello@aayu365.com. All deletion requests are processed within 30 days.</p>
+      <h2>8. Your Rights Under DPDP 2023</h2><ul><li><strong>Right to Access</strong> — Request a copy of personal data we hold about you</li><li><strong>Right to Correction</strong> — Request correction of inaccurate information</li><li><strong>Right to Erasure</strong> — Request complete deletion of your personal data</li><li><strong>Right to Withdraw Consent</strong> — Opt out at any time</li><li><strong>Right to Grievance</strong> — File a complaint with us or India's Data Protection Board</li></ul>
+      <h2>9. Medical Disclaimer</h2><div class="warn-box">⚠️ Aayu AI provides general health information and AI-guided triage ONLY. It does not constitute medical diagnosis, prescription, or treatment advice. Aayu365 shall not be liable for any health outcomes based on AI-generated content. Always consult a licensed dental professional.</div>
+      <h2>10. Contact Us</h2><p>For all privacy concerns: <a href="mailto:hello@aayu365.com">hello@aayu365.com</a> · Aayu365 · New Delhi, India</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TERMS PAGE ════ -->
+<div id="pg-terms" class="pg">
+  <div class="legal-pg">
+    <div class="legal-hd"><div class="kicker">Legal</div><h1 class="sh" style="font-size:clamp(2rem,5vw,2.8rem);margin-top:.3rem">Terms of Service</h1><p>Last updated: March 2025 · <a href="mailto:hello@aayu365.com">hello@aayu365.com</a></p></div>
+    <div class="legal-bd">
+      <h2>1. Agreement</h2><p>By accessing or using Aayu AI at aayu365.com, you agree to be bound by these Terms and our Privacy Policy. If you do not agree, please discontinue use immediately.</p>
+      <h2>2. Nature of Service</h2><p>Aayu AI is an AI-powered dental health information and triage service. It provides general health guidance based on information you share. It is NOT a medical or dental practice, does NOT provide clinical diagnoses, and is NOT a replacement for professional dental care.</p>
+      <div class="warn-box"><strong>⚠️ Critical Medical Disclaimer:</strong> Aayu AI does not constitute medical advice, clinical diagnosis, or prescription. In case of a medical emergency, call <strong>112</strong> immediately. Do not delay seeking emergency care based on AI-generated content.</div>
+      <h2>3. User Responsibilities</h2><ul><li>Users must be 18 or older, or using under parental supervision</li><li>Users must provide accurate information to receive relevant guidance</li><li>Users must not use the service as a substitute for professional dental care</li><li>Users must not use the platform for any unlawful or harmful purpose</li></ul>
+      <h2>4. Consultation Model</h2><p>Aayu AI currently provides AI-powered dental consultations. The nature, scope, and any pricing may be updated from time to time. Changes will be communicated before taking effect.</p>
+      <h2>5. Medication Guidance</h2><p>Any over-the-counter medication suggestions do not constitute a prescription under Indian law. Always consult a licensed pharmacist or doctor before taking any medication.</p>
+      <h2>6. Limitation of Liability</h2><p>To the fullest extent permitted by law, Aayu365 shall not be liable for any damages arising from reliance on AI-generated health content, medical decisions based on the service, or technical interruptions.</p>
+      <h2>7. Intellectual Property</h2><p>All content, branding, technology, and AI systems on aayu365.com are the intellectual property of Aayu365. Unauthorised reproduction or commercial exploitation is prohibited.</p>
+      <h2>8. Governing Law</h2><p>These Terms are governed by the laws of the Republic of India. Disputes shall be subject to the jurisdiction of courts in New Delhi, India.</p>
+      <h2>9. Contact</h2><p><a href="mailto:hello@aayu365.com">hello@aayu365.com</a> · Aayu365 · New Delhi, India</p>
+    </div>
+  </div>
+</div>
 
 <script>
-// ── STATE ──
-let lang = 'en';
-let conversation = [];
-let userMsgCount = 0;
-let rxShown = false;
-let connectShown = false;
-let photoRequestShown = false;
-let pendingPhotoBase64 = null;
-let pendingPhotoMime = null;
+gsap.registerPlugin(ScrollTrigger);
 
-const WHATSAPP = '919953135340';
+// ── Cursor glow ──
+const cg = document.getElementById('cglow');
+if (cg) document.addEventListener('mousemove', e => { cg.style.left = e.clientX+'px'; cg.style.top = e.clientY+'px'; });
 
-// ── UI TEXT ──
-const UI = {
-  en: {
-    placeholder: "Describe your dental problem...",
-    hint: "📷 Upload photo anytime · Enter to send · Shift+Enter for new line",
-    topicsTitle: "Common Problems",
-    disclaimer: "Daantun AI provides general dental information only. It is not a substitute for professional clinical examination. Always see a qualified dentist for diagnosis and treatment.",
-    greeting: "Hello! 👋 I'm Daantun AI — your free dental assistant, built by a BDS-qualified dentist.\n\nI won't give you random information. First, I need to understand your problem properly.\n\n**What is bothering you today?** Describe it in your own words — any language is fine.",
-    connectTitle: "📅 Time to get proper treatment",
-    photoPrompt: "Thank you for sharing those details! Now, to give you a much more accurate assessment, **could you please upload a clear photo of the affected area?** 📷\n\nTips for a good photo:\n• Use good lighting (near a window or bright light)\n• Open your mouth wide and use front camera\n• Try to capture the specific tooth/area that's bothering you\n\nClick the 📷 camera button below to upload.",
-    photoAnalyzing: "📷 Photo received! Analyzing your dental image now...",
-  },
-  hi: {
-    placeholder: "Apni dant ki samasya batayein...",
-    hint: "📷 Photo upload karein · Enter bhejne ke liye · Shift+Enter nayi line",
-    topicsTitle: "Aam Samasyaein",
-    disclaimer: "Daantun AI sirf general dental jaankari deta hai. Yeh professional clinical jaanch ka vikalp nahin hai. Hamesha ek qualified dentist se milein.",
-    greeting: "Namaste! 👋 Main Daantun AI hoon — aapka muft dental assistant, ek BDS dentist dwara banaya gaya.\n\nMain seedha koi bhi jaankari nahi dunga. Pehle mujhe aapki samasya samjhni hai.\n\n**Aaj kya pareshani ho rahi hai?** Apne shabdon mein batayein — koi bhi bhasha chalegi.",
-    connectTitle: "📅 Ab sahi ilaaj karwane ka waqt hai",
-    photoPrompt: "Shukriya! Aapne jo jaankari di uske liye dhanyawaad. Ab aur accurate assessment ke liye, **kya aap affected area ki ek clear photo upload kar sakte hain?** 📷\n\nAchi photo ke tips:\n• Achi roshni mein lijiye (khidki ke paas)\n• Muh achhi tarah khol ke front camera use karein\n• Jis dant/jagah mein takleef hai usse clearly capture karein\n\nNeeche 📷 camera button click karke upload karein.",
-    photoAnalyzing: "📷 Photo mil gayi! Ab aapki dental image analyze kar raha hoon...",
+// ── Clock ──
+function updateClock() {
+  const d=new Date(), h=d.getHours()%12||12, m=d.getMinutes(), ap=d.getHours()>=12?'PM':'AM';
+  const el=document.getElementById('hclock');
+  if(el) el.textContent=h+':'+(m<10?'0':'')+m+' '+ap;
+}
+updateClock(); setInterval(updateClock,1000);
+
+// ── Nav ──
+window.addEventListener('scroll',()=>{ document.getElementById('nav').classList.toggle('scrolled',window.scrollY>20); });
+function toggleMob(){
+  const d=document.getElementById('nmob');
+  d.classList.toggle('open');
+}
+function closeMob(){ document.getElementById('nmob').classList.remove('open'); }
+
+// ── Page routing ──
+function goPage(name) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  const target=document.getElementById('pg-'+name);
+  if(target) target.classList.add('on');
+  if(name!=='chat') window.scrollTo({top:0,behavior:'instant'});
+  if(name==='chat') {
+    // Always show intake first
+    const intake=document.getElementById('intake-screen');
+    const chatUI=document.getElementById('chat-ui');
+    if(intake) intake.style.display='flex';
+    if(chatUI) chatUI.style.display='none';
+    // Reset form
+    ['p-name','p-age','p-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    const ps=document.getElementById('p-gender');if(ps)ps.value='';
+    const err=document.getElementById('intake-err');if(err)err.style.display='none';
+    // Reset chat state
+    conv=[]; rxShown=false; connectShown=false; photoReqShown=false;
+    patientName=''; patientAge=''; patientGender=''; patientEmail='';
   }
+}
+function goHome(){ goPage('home'); }
+
+// ── GSAP Hero animations ──
+const heroTL = gsap.timeline({delay:.15});
+heroTL
+  .from('#heroH',{y:55,opacity:0,duration:.9,ease:'power3.out'})
+  .from('#heroP',{y:35,opacity:0,duration:.7,ease:'power2.out'},'-=.5')
+  .from('#heroBtns',{y:25,opacity:0,duration:.6,ease:'power2.out'},'-=.4')
+  .from('#heroProof',{y:20,opacity:0,duration:.5,ease:'power2.out'},'-=.3')
+  .from('#heroCard',{y:30,opacity:0,duration:.7,ease:'power2.out'},'-=.3')
+  .from('#heroStats',{opacity:0,duration:.5,ease:'power2.out'},'-=.2');
+document.getElementById('heroStats').style.opacity='0';
+
+// ── Scroll reveal ──
+const ro=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vi');});
+},{threshold:.1});
+document.querySelectorAll('.rv,.rv2,.rv3').forEach(el=>ro.observe(el));
+
+// ── 3D card tilt ──
+document.querySelectorAll('.fc,.hw,.tc,.bc').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
+    card.style.transform=`perspective(900px) rotateX(${((y-.5)*7).toFixed(1)}deg) rotateY(${((.5-x)*7).toFixed(1)}deg) translateZ(3px)`;
+  });
+  card.addEventListener('mouseenter',()=>{card.style.transition='transform .1s ease';});
+  card.addEventListener('mouseleave',()=>{ card.style.transition='transform .4s ease'; card.style.transform='perspective(900px) rotateX(0) rotateY(0) translateZ(0)'; });
+});
+
+// ── CHAT STATE ──
+let lang='en', conv=[], rxShown=false, connectShown=false, photoReqShown=false;
+let patientName='', patientAge='', patientGender='', patientEmail='';
+let isListening=false, recognition=null;
+
+const UI={
+  en:{ph:'Describe your dental concern...', get greet(){return `Hello ${patientName?patientName.split(' ')[0]:''}! 👋 I'm Aayu AI — your dental assistant.\n\nWhat's your dental concern today? Tell me and I'll help right away.`;}},
+  hi:{ph:'Apni dant ki samasya batayein...', get greet(){return `Namaste ${patientName?patientName.split(' ')[0]:''}! 👋 Main Aayu AI hoon.\n\nAaj kya dant ki pareshani ho rahi hai? Seedha batayein.`;}}
 };
 
-const TOPICS = {
-  en: [
-    {e:"🦷",t:"Tooth Pain",q:"I have severe tooth pain"},
-    {e:"🩸",t:"Bleeding Gums",q:"My gums are bleeding"},
-    {e:"🌡️",t:"Sensitivity",q:"I have sensitivity to hot and cold"},
-    {e:"🕳️",t:"Cavity",q:"I think I have a cavity"},
-    {e:"😣",t:"Wisdom Tooth",q:"My wisdom tooth is hurting"},
-    {e:"💨",t:"Bad Breath",q:"I have bad breath that won't go away"},
-    {e:"💥",t:"Broken Tooth",q:"My tooth is broken or chipped"},
-    {e:"🤕",t:"Swelling",q:"I have swelling in my jaw or face"},
-  ],
-  hi: [
-    {e:"🦷",t:"Dant Dard",q:"Mujhe bahut dant dard hai"},
-    {e:"🩸",t:"Madi se Khoon",q:"Mere madi se khoon aa raha hai"},
-    {e:"🌡️",t:"Sensitivity",q:"Thanda ya garam lagta hai dant mein"},
-    {e:"🕳️",t:"Cavity",q:"Lagta hai mujhe cavity hai"},
-    {e:"😣",t:"Akkal Daad",q:"Mera akkal daad dard kar raha hai"},
-    {e:"💨",t:"Badboo",q:"Muh se badboo aati hai"},
-    {e:"💥",t:"Toota Dant",q:"Mera dant toot gaya hai"},
-    {e:"🤕",t:"Sujan",q:"Muh ya jaw mein sujan hai"},
-  ]
-};
-
-// ── SYSTEM PROMPTS ──
-function buildSystemPrompt() {
-  return `You are Daantun AI — a sharp, witty, caring dental AI assistant built by a BDS-qualified dentist in India. Think of yourself as that cool doctor friend who is clinically rigorous but never boring.
-
-════════════════════════════════
-LANGUAGE RULE
-════════════════════════════════
-Always mirror the patient's exact language. Hindi/Hinglish → Hinglish. English → English. Never switch. Match their energy — if they're casual, be casual. If scared, be warm.
-
-════════════════════════════════
-MANDATORY HISTORY — COLLECT ALL BEFORE ASSESSMENT
-════════════════════════════════
-Ask ONE question at a time, conversationally. Make it feel like a friendly chat, not a hospital form. Use light humour where appropriate. You MUST collect ALL of the following before generating any assessment:
-
-BLOCK A — Patient Profile (ask these first, creatively):
-□ A1. Name (call them by name after they share it)
-□ A2. Age — ask it with personality, e.g. "Kitne saal ke ho — and be honest, I won't judge 😄" or "How many candles on your last birthday cake? 🎂"
-□ A3. Gender — ask naturally, e.g. "Are you a sir or ma'am? (or however you identify 😊)"
-□ A4. Any known medical conditions? (diabetes, BP, heart issues, blood thinners, thyroid — these directly affect dental treatment and OTC safety)
-□ A5. Any drug allergies? (especially NSAIDs like ibuprofen/aspirin, penicillin — life-critical before any OTC suggestion)
-□ A6. Are you pregnant or breastfeeding? (ask only if applicable based on gender — if male skip)
-□ A7. Current medications? (some interact with dental drugs)
-
-BLOCK B — Dental Complaint:
-□ B1. Exact location (which tooth? upper/lower, left/right, front/back?)
-□ B2. Duration (since how long? hours, days, weeks?)
-□ B3. Pain character (throbbing, sharp, dull, constant, comes and goes?)
-□ B4. Cold sensitivity — does cold make it worse?
-□ B5. Hot sensitivity — does hot make it worse?
-□ B6. Does pain LINGER after the trigger is removed, or stops quickly? (critical for pulp diagnosis)
-□ B7. Biting/pressure pain?
-□ B8. Does pain spread to ear, jaw, or temple?
-□ B9. Any swelling — intraoral or facial?
-□ B10. Fever? (if yes, >101°F/38.5°C = likely abscess = EMERGENCY)
-□ B11. Previous dental work on that tooth? (filling, RCT, crown?)
-□ B12. Pain wakes you at night? (severe pulpitis sign)
-
-════════════════════════════════
-FLOW RULES
-════════════════════════════════
-1. Start with Block A (patient profile) — all 7 items. Be fun about it.
-2. Then move to Block B — one question at a time.
-3. After ALL blocks complete → request photo: output [REQUEST_PHOTO] naturally in your message.
-4. After photo received OR if patient refuses photo → generate assessment.
-5. MINIMUM data needed before assessment: A1-A5 + B1-B8 at minimum. Never skip A4/A5 — these are life-critical.
-
-════════════════════════════════
-EMERGENCY OVERRIDE
-════════════════════════════════
-If at ANY point patient mentions: facial swelling + fever, difficulty swallowing/breathing, trismus (can't open mouth), rapidly spreading swelling, uncontrolled bleeding → STOP history, immediately flag as 🚨 DENTAL EMERGENCY, tell them to go to a hospital/dental emergency NOW. Do not continue chatting.
-
-════════════════════════════════
-OTC MEDICINE — STRICT PRESCRIBING RULES
-════════════════════════════════
-⚠️ CRITICAL: Wrong OTC can kill. Follow these rules with zero exceptions:
-
-NEVER suggest OTC if:
-- Patient has NSAID/aspirin allergy → NEVER suggest ibuprofen/aspirin/diclofenac
-- Patient has peptic ulcer or gastritis → NEVER suggest NSAIDs without strong PPI caveat
-- Patient is pregnant → NEVER suggest ibuprofen (teratogenic in 3rd trimester). Only paracetamol 500mg is relatively safe, and only with "consult your OB-GYN first"
-- Patient is breastfeeding → Only paracetamol, with caveat
-- Patient is a CHILD under 12 → NEVER suggest adult doses. NEVER suggest aspirin (Reye's syndrome risk). If child, suggest paracetamol ONLY with weight-based dosing caveat AND "consult pediatrician/dentist immediately"
-- Patient is a CHILD under 6 → Do NOT suggest any OTC at all. Say "please see a dentist immediately, no home medicine for this age group"
-- Patient on blood thinners (warfarin, clopidogrel) → NEVER suggest NSAIDs or aspirin
-- Patient has kidney/liver disease → NEVER suggest NSAIDs; paracetamol with caution and lower dose caveat
-- Patient has heart disease/hypertension → NEVER suggest ibuprofen without cardiologist clearance caveat
-- Unknown allergy status → DO NOT suggest any OTC. Say "I need to know your allergies before I can suggest anything safely"
-- Diagnosis unclear → DO NOT suggest OTC. Home care only.
-
-ONLY suggest OTC when:
-✓ Allergy status is confirmed clear
-✓ Patient is adult (18+)
-✓ Not pregnant/breastfeeding
-✓ No contraindicated medical conditions
-✓ Diagnosis is clinically clear enough (e.g. clear acute pulpitis, dry socket, pericoronitis)
-✓ Always add: "Yeh sirf temporary relief ke liye hai. Isko dentist ki jagah mat samjho. Side effects ho toh band karo."
-
-Safe OTC options (only when all above criteria met):
-- Mild-moderate pain, no contraindications: Paracetamol 500-1000mg every 6-8 hours after food
-- Moderate-severe pain, no NSAID contraindications: Ibuprofen 400mg every 8 hours after food (max 3 days)
-- Infection suspected + dentist not immediately available: Mention that antibiotics need a prescription — do NOT suggest specific antibiotics OTC
-- Topical: Clove oil (eugenol) — generally safe for adults, apply with cotton on affected area
-- Saltwater rinse — always safe, always recommend
-
-════════════════════════════════
-ASSESSMENT FORMAT
-════════════════════════════════
-Output ONLY after full history + photo (or photo refused):
-
-[RX_START]
-DIAGNOSIS: (clear patient-friendly name, e.g. "Irreversible Pulpitis — Tooth Nerve badly inflamed")
-URGENCY: (exactly one of: EMERGENCY / URGENT / ROUTINE / MONITOR)
-CARE_DO:
-✅ (specific do — based on actual patient profile)
-✅ (do 2)
-✅ (do 3)
-CARE_DONT:
-❌ (specific dont)
-❌ (dont 2)
-❌ (dont 3)
-MEDICINE: (follow strict OTC rules above. If cannot prescribe safely, write "OTC_UNSAFE: [reason]")
-NOTE: (one critical closing note — personalised to this patient's age/condition/gender)
-[RX_END]
-
-After [RX_END]: warm 2-3 line message, remind them this is AI triage not treatment, real dentist visit is essential. End with exactly: [SHOW_CONNECT]`;
+// ── Intake form submit ──
+function startConsult() {
+  const name=(document.getElementById('p-name')||{value:''}).value.trim();
+  const age=(document.getElementById('p-age')||{value:''}).value.trim();
+  const gender=(document.getElementById('p-gender')||{value:''}).value;
+  const email=(document.getElementById('p-email')||{value:''}).value.trim();
+  const errEl=document.getElementById('intake-err');
+  if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
+  if(!age||+age<1||+age>120){errEl.textContent='Please enter a valid age.';errEl.style.display='block';return;}
+  if(!gender){errEl.textContent='Please select your gender.';errEl.style.display='block';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  patientName=name; patientAge=age; patientGender=gender; patientEmail=email;
+  document.getElementById('intake-screen').style.display='none';
+  const chatUI=document.getElementById('chat-ui');
+  chatUI.style.display='flex';
+  const nameEl=document.getElementById('chat-patient-name');
+  if(nameEl) nameEl.textContent='Aayu AI · Hi, '+name.split(' ')[0]+'!';
+  const emailDisp=document.getElementById('email-display');
+  if(emailDisp) emailDisp.textContent=email;
+  resetChat();
 }
 
-function buildPhotoSystemPrompt() {
-  return `You are Daantun AI, a clinical dental AI assistant built by a BDS-qualified dentist in India.
-
-The patient has uploaded a dental photo. Analyze it carefully and thoroughly.
-
-Examine for ALL of the following:
-- Caries/Cavity: location, severity, which tooth/surface (mesial/distal/occlusal/buccal/lingual)
-- Abscess or periapical infection signs
-- Gum inflammation, gingivitis, periodontitis, recession
-- Calculus/tartar buildup (supra or subgingival)
-- Broken, fractured, or chipped teeth
-- Discoloration, staining, fluorosis
-- Swelling (intraoral or visible facial)
-- Missing teeth, spacing issues
-- Any other visible pathology
-
-LANGUAGE: Respond in the same language the user has been using. If Hindi/Hinglish, use that. If English, use that.
-
-OUTPUT FORMAT — you must output findings in this EXACT structure:
-
-[PHOTO_FINDINGS_START]
-SUMMARY: (1-2 sentence overall summary of what you see)
-FINDINGS:
-FINDING_1: label="{short name}" | location="{describe where on image, e.g. lower left molar, upper right gum}" | severity="{mild/moderate/severe}" | color="{use one of: #FF4444 for caries/cavity, #FF8C00 for gum issues, #FFD700 for calculus, #9B59B6 for fracture/break, #E74C3C for abscess/swelling, #3498DB for other}" | x="{0-100 percentage from left}" | y="{0-100 percentage from top}" | note="{brief clinical note}"
-FINDING_2: label="..." | location="..." | severity="..." | color="..." | x="..." | y="..." | note="..."
-(add as many findings as relevant, minimum 1)
-[PHOTO_FINDINGS_END]
-
-After [PHOTO_FINDINGS_END], write a warm, detailed explanation of what you found, what it means for the patient, and what they should do. Be empathetic and clear.
-
-Then output the full assessment card:
-
-[RX_START]
-DIAGNOSIS: (based on visual + symptom history)
-URGENCY: (EMERGENCY / ROUTINE / MONITOR)
-CARE_DO:
-✅ (do 1)
-✅ (do 2)
-✅ (do 3)
-CARE_DONT:
-❌ (dont 1)
-❌ (dont 2)
-❌ (dont 3)
-MEDICINE: (OTC suggestions with note "consult before taking")
-NOTE: (important closing note)
-[RX_END]
-
-End your full message with exactly: [SHOW_CONNECT]`;
-}
-
-// ── HELPERS ──
-function getTime() { return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
-function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
-function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
-function scrollBottom() { const m=document.getElementById('messages'); setTimeout(()=>m.scrollTop=m.scrollHeight,80); }
-function fmt(t) {
-  return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g,'<em>$1</em>')
-          .replace(/\n/g,'<br/>');
-}
-
-// ── MESSAGE BUILDERS ──
-function addBotMsg(text, extras) {
-  const m = document.getElementById('messages');
-  const wrap = document.createElement('div'); wrap.className = 'msg bot';
-  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = '🦷';
-  const cont = document.createElement('div');
-  const bub = document.createElement('div'); bub.className = 'msg-bubble';
-  if(text) bub.innerHTML = fmt(text);
-  const tm = document.createElement('span'); tm.className = 'msg-time'; tm.textContent = getTime();
-  cont.appendChild(bub); cont.appendChild(tm);
-  if(extras && extras.findings) cont.appendChild(buildPhotoReportCard(extras.findings, extras.imgSrc));
-  if(extras && extras.rx) cont.appendChild(buildRxCard(extras.rx));
-  if(extras && extras.connect) cont.appendChild(buildConnectCard());
-  wrap.appendChild(av); wrap.appendChild(cont);
-  m.appendChild(wrap); scrollBottom();
-}
-
-function addUserMsg(text) {
-  const m = document.getElementById('messages');
-  const wrap = document.createElement('div'); wrap.className = 'msg user';
-  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'U';
-  const cont = document.createElement('div');
-  const bub = document.createElement('div'); bub.className = 'msg-bubble'; bub.innerHTML = fmt(text);
-  const tm = document.createElement('span'); tm.className = 'msg-time'; tm.textContent = getTime();
-  cont.appendChild(bub); cont.appendChild(tm);
-  wrap.appendChild(av); wrap.appendChild(cont);
-  m.appendChild(wrap); scrollBottom();
-}
-
-function addUserPhoto(src) {
-  const m = document.getElementById('messages');
-  const wrap = document.createElement('div'); wrap.className = 'msg user';
-  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'U';
-  const cont = document.createElement('div');
-  const pb = document.createElement('div'); pb.className = 'photo-preview-bubble';
-  const img = document.createElement('img'); img.src = src;
-  const lbl = document.createElement('span'); lbl.className = 'photo-label'; lbl.textContent = '📷 Dental Photo Uploaded';
-  pb.appendChild(img); pb.appendChild(lbl);
-  const tm = document.createElement('span'); tm.className = 'msg-time'; tm.textContent = getTime();
-  cont.appendChild(pb); cont.appendChild(tm);
-  wrap.appendChild(av); wrap.appendChild(cont);
-  m.appendChild(wrap); scrollBottom();
-}
-
-function showTyping() {
-  const m = document.getElementById('messages');
-  const w = document.createElement('div'); w.className = 'msg bot'; w.id = 'typing';
-  w.innerHTML = '<div class="msg-avatar">🦷</div><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
-  m.appendChild(w); scrollBottom();
-}
-function removeTyping() { const t=document.getElementById('typing'); if(t)t.remove(); }
-
-// ── PHOTO UPLOAD HANDLER ──
-function handlePhotoUpload(event) {
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
-    const base64 = dataUrl.split(',')[1];
-    const mime = file.type || 'image/jpeg';
-    pendingPhotoBase64 = base64;
-    pendingPhotoMime = mime;
-    addUserPhoto(dataUrl);
-    sendPhotoToAI(base64, mime, dataUrl);
-  };
-  reader.readAsDataURL(file);
-  event.target.value = '';
-}
-
-function buildPhotoSystemPrompt() {
-  return `You are Daantun AI, a clinical dental AI assistant built by a BDS-qualified dentist in India.
-
-The patient has shared a dental photo. Analyze it carefully as a clinician would.
-
-Look for ALL of the following and report only what you can actually see:
-- Caries/Cavity: which tooth, which surface (occlusal/buccal/lingual/mesial/distal), colour change, cavitation depth visible
-- Gingival/periodontal issues: redness, swelling, recession, BOP signs, interdental papilla loss
-- Calculus/tartar: location, extent (supra/subgingival)
-- Fractures or chips: which tooth, extent
-- Abscess or swelling: location, size approximate
-- Discolouration, staining, fluorosis
-- Missing teeth, spacing, crowding
-- Soft tissue anomalies (ulcers, white patches, swelling)
-- Anything else clinically relevant
-
-LANGUAGE: Respond in the same language the patient is using. Hindi/Hinglish → Hinglish. English → English.
-
-IMPORTANT: Only report findings you can actually see. Do not fabricate findings. If image quality is poor, say so honestly and ask for a clearer photo.
-
-OUTPUT — use EXACTLY this structure:
-
-[FINDINGS_START]
-OVERALL_QUALITY: (good / fair / poor — describe briefly)
-SUMMARY: (1-2 sentence overall clinical impression)
-FINDING_1: name="(condition name)" | location="(specific tooth/region, e.g. lower left molar, upper right gingiva)" | severity="(mild/moderate/severe/noted)" | icon="(one emoji that best fits: 🕳️ cavity, 🩸 gum, 🧱 calculus, 💥 fracture, 🤕 abscess, 🔍 other)" | detail="(clinical description of what you see, 1-2 sentences)"
-FINDING_2: name="..." | location="..." | severity="..." | icon="..." | detail="..."
-(add more findings only if genuinely present)
-[FINDINGS_END]
-
-After [FINDINGS_END], write a warm, empathetic explanation in plain language — what you found, why it matters, and what the patient should do right now at home.
-
-Then output the assessment card:
-
-[RX_START]
-DIAGNOSIS: (based on photo + symptom history combined)
-URGENCY: (EMERGENCY / ROUTINE / MONITOR)
-CARE_DO:
-✅ (do 1)
-✅ (do 2)
-✅ (do 3)
-CARE_DONT:
-❌ (dont 1)
-❌ (dont 2)
-❌ (dont 3)
-MEDICINE: (safe OTC options — always add "consult before taking")
-NOTE: (one important closing note)
-[RX_END]
-
-End your full response with exactly: [SHOW_CONNECT]`;
-}
-
-async function sendPhotoToAI(base64, mime, dataUrl) {
-  addBotMsg(UI[lang].photoAnalyzing);
-  showTyping();
-
-  const userText = lang==='hi'
-    ? 'Yeh meri teeth/mouth ki photo hai. Please ise dhyan se evaluate karein aur jo bhi dental problems dikh rahein hain unhe clearly batayein.'
-    : 'This is a photo of my teeth/mouth. Please carefully evaluate it and identify all dental findings you can see.';
-
-  const imgMsg = {
-    role: 'user',
-    content: [
-      {type:'image', source:{type:'base64', media_type:mime, data:base64}},
-      {type:'text', text: userText}
-    ]
-  };
-
-  try {
-    const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        system: buildPhotoSystemPrompt(),
-        messages: [...conversation, imgMsg]
-      })
-    });
-    const data = await res.json();
-    removeTyping();
-
-    let reply = data.content?.map(b=>b.text||'').join('') || "Could not analyze the photo. Please try again.";
-    conversation.push(imgMsg);
-    conversation.push({role:'assistant', content: reply});
-
-    let findingsData = null, rxData = null, showConnect = false, display = reply;
-
-    // Parse findings block
-    if(reply.includes('[FINDINGS_START]') && reply.includes('[FINDINGS_END]')) {
-      const block = reply.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
-      if(block) findingsData = parseFindings(block[1]);
-      display = display.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/, '').trim();
-    }
-
-    // Parse RX
-    if(reply.includes('[RX_START]') && reply.includes('[RX_END]') && !rxShown) {
-      rxShown = true;
-      const m = reply.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
-      if(m) rxData = parseRx(m[1]);
-      display = display.replace(/\[RX_START\][\s\S]*?\[RX_END\]/, '').trim();
-    }
-
-    if(reply.includes('[SHOW_CONNECT]') && !connectShown) {
-      showConnect = true; connectShown = true;
-      display = display.replace('[SHOW_CONNECT]', '').trim();
-    }
-
-    addBotMsg(display, {findings: findingsData, imgSrc: dataUrl, rx: rxData, connect: showConnect});
-
-  } catch(e) {
-    removeTyping();
-    addBotMsg("Sorry, photo analysis failed. Please try again with a clearer photo.");
-  }
-}
-
-// ── PARSE FINDINGS ──
-function parseFindings(block) {
-  const lines = block.split('\n').map(l=>l.trim()).filter(Boolean);
-  let summary='', quality='', findings=[];
-  for(const line of lines) {
-    if(line.startsWith('OVERALL_QUALITY:')) quality = line.replace('OVERALL_QUALITY:','').trim();
-    else if(line.startsWith('SUMMARY:')) summary = line.replace('SUMMARY:','').trim();
-    else if(/^FINDING_\d+:/.test(line)) {
-      const parts = line.replace(/^FINDING_\d+:\s*/,'');
-      const obj = {};
-      parts.split('|').forEach(part => {
-        const eq = part.indexOf('=');
-        if(eq>-1) {
-          const k = part.slice(0,eq).trim();
-          const v = part.slice(eq+1).trim().replace(/^"|"$/g,'');
-          obj[k] = v;
-        }
-      });
-      if(obj.name) findings.push(obj);
-    }
-  }
-  return {summary, quality, findings};
-}
-
-// ── BUILD PHOTO REPORT CARD ──
-function buildPhotoReportCard(findingsData, imgSrc) {
-  const sevClass = {mild:'severity-mild',moderate:'severity-moderate',severe:'severity-severe',noted:'severity-noted'};
-  const sevBadge = {mild:'sev-mild',moderate:'sev-moderate',severe:'sev-severe',noted:'sev-noted'};
-  const sevLabel = {mild:'Mild',moderate:'Moderate',severe:'Severe',noted:'Noted'};
-
-  const card = document.createElement('div'); card.className = 'photo-report';
-
-  // Header
-  card.innerHTML = `
-    <div class="photo-report-header">
-      <div class="rh-icon">🔬</div>
-      <div><h4>Visual Dental Analysis — Daantun AI</h4><p>AI-Powered Photo Evaluation · ${getTime()}</p></div>
-    </div>`;
-
-  // Thumb + summary
-  const thumbRow = document.createElement('div'); thumbRow.className = 'photo-thumb-row';
-  thumbRow.innerHTML = `
-    <img class="photo-thumb" src="${imgSrc}" alt="Uploaded dental photo"/>
-    <div class="photo-summary">
-      ${findingsData.quality ? `<div style="font-size:.72rem;color:var(--gray);margin-bottom:4px">📸 Image Quality: <strong>${findingsData.quality}</strong></div>` : ''}
-      <strong>Clinical Impression:</strong><br/>${findingsData.summary || 'Analysis complete. See findings below.'}
-    </div>`;
-  card.appendChild(thumbRow);
-
-  // Findings
-  if(findingsData.findings.length > 0) {
-    const grid = document.createElement('div'); grid.className = 'findings-grid';
-    const title = document.createElement('div');
-    title.style.cssText = 'font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);padding:0 2px 4px';
-    title.textContent = `${findingsData.findings.length} Finding${findingsData.findings.length>1?'s':''} Detected`;
-    grid.appendChild(title);
-
-    findingsData.findings.forEach((f, i) => {
-      const sev = (f.severity||'noted').toLowerCase();
-      const fc = document.createElement('div');
-      fc.className = `finding-card ${sevClass[sev]||'severity-noted'}`;
-      fc.innerHTML = `
-        <div class="finding-icon">${f.icon||'🔍'}</div>
-        <div class="finding-body">
-          <div class="finding-name">
-            ${i+1}. ${f.name||'Finding'}
-            <span class="severity-badge ${sevBadge[sev]||'sev-noted'}">${sevLabel[sev]||sev}</span>
-          </div>
-          <div class="finding-location">📍 ${f.location||'See description'}</div>
-          <div class="finding-note">${f.detail||''}</div>
-        </div>`;
-      grid.appendChild(fc);
-    });
-    card.appendChild(grid);
-  } else {
-    const noFind = document.createElement('div');
-    noFind.style.cssText = 'padding:14px 16px;font-size:.84rem;color:var(--gray);text-align:center';
-    noFind.textContent = 'No specific findings detected. Please upload a clearer photo for better analysis.';
-    card.appendChild(noFind);
-  }
-  return card;
-}
-
-// ── PARSE RX ──
-function parseRx(block) {
-  const get=(key)=>{
-    const re = new RegExp(key+':\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|\\[RX_END\\]|$)');
-    const m = block.match(re); return m ? m[1].trim() : '';
-  };
-  return {diagnosis:get('DIAGNOSIS'),urgency:get('URGENCY'),care_do:get('CARE_DO'),care_dont:get('CARE_DONT'),medicine:get('MEDICINE'),note:get('NOTE')};
-}
-
-// ── BUILD RX CARD ──
-function buildRxCard(rx) {
-  const urgMap = {
-    'EMERGENCY': {cls:'u-emergency', icon:'🚨'},
-    'URGENT':    {cls:'u-urgent',    icon:'🔴'},
-    'ROUTINE':   {cls:'u-routine',   icon:'✅'},
-    'MONITOR':   {cls:'u-monitor',   icon:'⚠️'},
-  };
-  const urg = urgMap[rx.urgency] || urgMap['MONITOR'];
-  const doLines = rx.care_do.split('\n').filter(l=>l.trim()).map(l=>`<li>${l.trim()}</li>`).join('');
-  const dontLines = rx.care_dont.split('\n').filter(l=>l.trim()).map(l=>`<li>${l.trim()}</li>`).join('');
-
-  // Handle OTC_UNSAFE
-  let medHtml = '';
-  if(rx.medicine.startsWith('OTC_UNSAFE:')) {
-    const reason = rx.medicine.replace('OTC_UNSAFE:','').trim();
-    medHtml = `<div class="otc-unsafe-box">⚠️ <strong>OTC Not Recommended</strong><br/>${reason}<br/><span>Please consult a dentist or physician before taking any medicine.</span></div>`;
-  } else {
-    medHtml = rx.medicine.split('·').filter(l=>l.trim()).map(l=>`<div class="med-item">💊 <div class="med-name">${l.trim()}</div></div>`).join('');
-  }
-
-  const card = document.createElement('div'); card.className = 'rx-card';
-  card.innerHTML = `
-    <div class="rx-header">
-      <div style="font-size:24px">📋</div>
-      <div class="rx-header-text"><h4>Dental Assessment — Daantun AI</h4><p>Generated · ${getTime()} · AI Triage Only</p></div>
-    </div>
-    <div class="rx-body">
-      <div><div class="rx-section-title">Likely Diagnosis</div><div class="diagnosis-chip">🦷 ${rx.diagnosis}</div></div>
-      <div><div class="rx-section-title">Urgency Level</div><div class="urgency-chip ${urg.cls}">${urg.icon} ${rx.urgency}</div></div>
-      <div><div class="rx-section-title">Home Care — Do's</div><ul class="care-list">${doLines}</ul></div>
-      <div><div class="rx-section-title">Home Care — Don'ts</div><ul class="care-list">${dontLines}</ul></div>
-      <div><div class="rx-section-title">Medicine Guidance</div>${medHtml}</div>
-      ${rx.note?`<div class="rx-note">📌 ${rx.note}</div>`:''}
-      <div class="rx-legal">⚖️ This is an AI-generated triage report, not a prescription. Daantun AI is not liable for any decisions made based on this report. Always consult a licensed dentist.</div>
-    </div>`;
-  return card;
-}
-
-// ── BUILD CONNECT CARD ──
-function buildConnectCard() {
-  const card = document.createElement('div'); card.className = 'connect-card';
-  const waText = encodeURIComponent(lang==='hi'
-    ? 'Namaste! Maine Daantun AI se consult kiya hai aur appointment lena chahta/chahti hoon.'
-    : 'Hello! I consulted Daantun AI and would like to book an appointment.');
-  card.innerHTML = `
-    <h5>${UI[lang].connectTitle}</h5>
-    <div class="connect-actions">
-      <a href="https://wa.me/${WHATSAPP}?text=${waText}" target="_blank" class="connect-btn btn-wa">💬 WhatsApp Us</a>
-      <a href="tel:+${WHATSAPP}" class="connect-btn btn-call">📞 Call Now</a>
-      <a href="#" class="connect-btn btn-book">📋 Book Appointment</a>
-    </div>`;
-  return card;
-}
-
-// ── SEND MESSAGE ──
-async function sendMessage(override) {
-  const input = document.getElementById('chatInput');
-  const text = (override || input.value).trim();
-  if(!text) return;
-  if(!override) { input.value=''; input.style.height='auto'; }
-
-  userMsgCount++;
-  addUserMsg(text);
-  conversation.push({role:'user', content:text});
-  showTyping();
-
-  try {
-    const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        system: buildSystemPrompt(),
-        messages: conversation
-      })
-    });
-    const data = await res.json();
-    removeTyping();
-
-    let reply = data.content?.map(b=>b.text||'').join('') || "Something went wrong. Please try again.";
-    conversation.push({role:'assistant', content:reply});
-
-    let rxData=null, showConnect=false, display=reply;
-
-    // Check if AI wants a photo
-    if(reply.includes('[REQUEST_PHOTO]') && !photoRequestShown) {
-      photoRequestShown = true;
-      display = display.replace('[REQUEST_PHOTO]','').trim();
-      // Pulse the photo button
-      document.getElementById('photoBtn').classList.add('pulse-anim');
-      setTimeout(()=>document.getElementById('photoBtn').classList.remove('pulse-anim'), 8000);
-    }
-
-    if(reply.includes('[RX_START]') && reply.includes('[RX_END]') && !rxShown) {
-      rxShown = true;
-      const m = reply.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
-      if(m) rxData = parseRx(m[1]);
-      display = display.replace(/\[RX_START\][\s\S]*?\[RX_END\]/, '').trim();
-    }
-
-    if(reply.includes('[SHOW_CONNECT]') && !connectShown) {
-      showConnect=true; connectShown=true;
-      display = display.replace('[SHOW_CONNECT]','').trim();
-    }
-
-    addBotMsg(display, {rx:rxData, connect:showConnect});
-
-  } catch(e) {
-    removeTyping();
-    addBotMsg("Oops! Something went wrong. Please try again.");
-  }
-}
-
-function startTopic(q) { sendMessage(q); }
-
-// ── LANGUAGE ──
+// ── Language toggle ──
 function setLang(l) {
-  lang = l;
-  document.getElementById('btn-en').className = 'lang-btn'+(l==='en'?' active':'');
-  document.getElementById('btn-hi').className = 'lang-btn'+(l==='hi'?' active':'');
-  document.getElementById('chatInput').placeholder = UI[l].placeholder;
-  document.getElementById('input-hint').textContent = UI[l].hint;
-  document.getElementById('sidebar-topics-title').textContent = UI[l].topicsTitle;
-  document.getElementById('disclaimer-text').textContent = UI[l].disclaimer;
-  renderTopics();
+  lang=l;
+  ['en','hi'].forEach(x=>{const b=document.getElementById('cl-'+x);if(b)b.className=x===l?'lon':'loff';});
+  const ta=document.getElementById('cta');if(ta)ta.placeholder=UI[l].ph;
   resetChat();
 }
 
-function renderTopics() {
-  document.getElementById('topic-list').innerHTML = TOPICS[lang].map(t =>
-    `<button class="topic-btn" onclick="startTopic('${t.q}')">${t.e} ${t.t}</button>`
-  ).join('');
+// ── System prompts ──
+function buildSP(){
+  const info=`Patient: ${patientName}, Age: ${patientAge}, Gender: ${patientGender}`;
+  return `You are Aayu AI, a clinical dental AI assistant built by a real doctor for Aayu365.
+
+PATIENT INFO ALREADY COLLECTED: ${info}
+DO NOT ask for name, age, or gender — you already have this.
+
+LANGUAGE: Mirror the user's exact language. Hindi/Hinglish → Hinglish. English → English. Be warm, concise — max 2-3 lines per message.
+
+REMAINING HISTORY TO COLLECT (efficiently, 1-2 questions at a time):
+- Drug allergies (CRITICAL — never skip)
+- Medical conditions (diabetes, BP, heart, thyroid) — ask together with allergies
+- Pregnant/breastfeeding if female
+- Then dental complaint: location, duration, pain type, triggers, radiation, swelling/fever, night pain, previous dental work
+
+RULES:
+- NEVER diagnose with <3 good answers about the dental complaint
+- Be warm and empathetic — patient may be in real pain
+- EMERGENCY (fever+swelling, difficulty swallowing) → flag immediately
+- After 2-3 answers → [REQUEST_PHOTO] naturally
+
+OTC RULES (no exceptions): Unknown allergies → NO OTC. NSAID allergy → NO ibuprofen. Pregnancy → paracetamol only. Child <12 → paracetamol only. Child <6 → NO OTC. Always "consult before taking". If unsafe → OTC_UNSAFE:[reason].
+
+ASSESSMENT after sufficient history:
+[RX_START]
+DIAGNOSIS: (patient-friendly)
+URGENCY: (EMERGENCY/URGENT/ROUTINE/MONITOR)
+CARE_DO:
+✅ ...
+✅ ...
+✅ ...
+CARE_DONT:
+❌ ...
+❌ ...
+❌ ...
+MEDICINE: (strict rules)
+NOTE: (personalised)
+[RX_END]
+After [RX_END]: 2-3 warm lines. End exactly: [SHOW_CONNECT]`;
 }
 
-function resetChat() {
-  document.getElementById('messages').innerHTML = '';
-  conversation=[]; userMsgCount=0; rxShown=false; connectShown=false; photoRequestShown=false;
-  addBotMsg(UI[lang].greeting);
+function buildPhotoSP(){
+  return `You are Aayu AI analyzing a dental photo. Real doctor built.
+Examine for: Caries, Gum issues, Calculus, Fractures, Abscess, Discolouration, Soft tissue issues.
+LANGUAGE: Match patient's language.
+[FINDINGS_START]
+OVERALL_QUALITY: (good/fair/poor)
+SUMMARY: (1-2 sentence impression)
+FINDING_1: name="..." | location="..." | severity="(mild/moderate/severe/noted)" | icon="..." | detail="..."
+[FINDINGS_END]
+Warm plain-language explanation.
+[RX_START]
+DIAGNOSIS: ... URGENCY: ... CARE_DO: ✅... ✅... ✅... CARE_DONT: ❌... ❌... ❌... MEDICINE: ... NOTE: ...
+[RX_END]
+[SHOW_CONNECT]`;
 }
 
-window.onload = () => {
-  document.getElementById('chatInput').placeholder = UI[lang].placeholder;
-  renderTopics();
-  resetChat();
-};
+// ── Helpers ──
+const getTime=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,96)+'px';}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function scrollToLatest(){
+  const m=document.getElementById('msgs');
+  setTimeout(()=>{const all=m.querySelectorAll(':scope > div');if(all.length>0)all[all.length-1].scrollIntoView({behavior:'smooth',block:'start'});},80);
+}
+function fmt(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br/>');}
+
+function mkBotAv(){const d=document.createElement('div');d.style.cssText='width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0a9e8f,#12c4b2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px';d.innerHTML='<svg width="12" height="12" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/></svg>';return d;}
+function mkUsrAv(){const d=document.createElement('div');d.style.cssText='width:28px;height:28px;border-radius:50%;background:#0a0f1a;color:white;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px';d.textContent='U';return d;}
+
+function addBotMsg(text,extras){
+  const m=document.getElementById('msgs');
+  const w=document.createElement('div');w.style.cssText='display:flex;gap:8px;animation:msgIn .3s ease';
+  const ct=document.createElement('div');ct.style.maxWidth='84%';
+  if(text){const b=document.createElement('div');b.style.cssText='background:white;border:1px solid rgba(0,0,0,.07);border-radius:15px;border-top-left-radius:3px;padding:9px 12px;font-size:.86rem;line-height:1.58;box-shadow:0 1px 4px rgba(0,0,0,.04)';b.innerHTML=fmt(text);ct.appendChild(b);}
+  const tm=document.createElement('span');tm.style.cssText='font-size:.63rem;color:#94a3b8;margin-top:3px;display:block';tm.textContent=getTime();ct.appendChild(tm);
+  if(extras?.findings)ct.appendChild(buildFindCard(extras.findings,extras.imgSrc));
+  if(extras?.rx)ct.appendChild(buildRxCard(extras.rx));
+  if(extras?.connect)ct.appendChild(buildConnectCard());
+  w.appendChild(mkBotAv());w.appendChild(ct);m.appendChild(w);scrollToLatest();
+}
+
+function addUserMsg(text){
+  const m=document.getElementById('msgs');
+  const w=document.createElement('div');w.style.cssText='display:flex;gap:8px;flex-direction:row-reverse;animation:msgIn .3s ease';
+  const ct=document.createElement('div');ct.style.maxWidth='84%';
+  const b=document.createElement('div');b.style.cssText='background:#0a9e8f;color:white;border-radius:15px;border-top-right-radius:3px;padding:9px 12px;font-size:.86rem;line-height:1.58';b.innerHTML=fmt(text);
+  const tm=document.createElement('span');tm.style.cssText='font-size:.63rem;color:#94a3b8;margin-top:3px;display:block;text-align:right';tm.textContent=getTime();
+  ct.appendChild(b);ct.appendChild(tm);w.appendChild(mkUsrAv());w.appendChild(ct);m.appendChild(w);scrollToLatest();
+}
+
+function addPhotoMsg(src){
+  const m=document.getElementById('msgs');
+  const w=document.createElement('div');w.style.cssText='display:flex;gap:8px;flex-direction:row-reverse;animation:msgIn .3s ease';
+  const ct=document.createElement('div');
+  const pb=document.createElement('div');pb.style.cssText='max-width:190px;border-radius:13px;overflow:hidden;border:2px solid rgba(10,158,143,.2)';
+  const img=document.createElement('img');img.src=src;img.style.cssText='width:100%;display:block';
+  const lbl=document.createElement('span');lbl.style.cssText='font-size:.68rem;color:#0a9e8f;background:rgba(10,158,143,.07);padding:3px 9px;display:block;font-weight:600';lbl.textContent='📷 Dental Photo';
+  pb.appendChild(img);pb.appendChild(lbl);
+  const tm=document.createElement('span');tm.style.cssText='font-size:.63rem;color:#94a3b8;margin-top:3px;display:block;text-align:right';tm.textContent=getTime();
+  ct.appendChild(pb);ct.appendChild(tm);w.appendChild(mkUsrAv());w.appendChild(ct);m.appendChild(w);scrollToLatest();
+}
+
+function showTyping(){
+  const m=document.getElementById('msgs');const w=document.createElement('div');w.style.cssText='display:flex;gap:8px';w.id='typ-ind';
+  w.innerHTML='<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0a9e8f,#12c4b2);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/></svg></div><div style="background:white;border:1px solid rgba(0,0,0,.07);border-radius:15px;border-top-left-radius:3px;padding:9px 12px;display:flex;gap:4px;align-items:center"><div style="width:5px;height:5px;background:#0a9e8f;border-radius:50%;animation:typB 1.2s infinite"></div><div style="width:5px;height:5px;background:#0a9e8f;border-radius:50%;animation:typB 1.2s .2s infinite"></div><div style="width:5px;height:5px;background:#0a9e8f;border-radius:50%;animation:typB 1.2s .4s infinite"></div></div>';
+  m.appendChild(w);scrollToLatest();
+}
+function removeTyping(){const t=document.getElementById('typ-ind');if(t)t.remove();}
+
+function parseFindings(blk){
+  const lines=blk.split('\n').map(l=>l.trim()).filter(Boolean);let s='',q='',fi=[];
+  for(const l of lines){
+    if(l.startsWith('OVERALL_QUALITY:'))q=l.replace('OVERALL_QUALITY:','').trim();
+    else if(l.startsWith('SUMMARY:'))s=l.replace('SUMMARY:','').trim();
+    else if(/^FINDING_\d+:/.test(l)){const p=l.replace(/^FINDING_\d+:\s*/,'');const o={};p.split('|').forEach(pt=>{const eq=pt.indexOf('=');if(eq>-1)o[pt.slice(0,eq).trim()]=pt.slice(eq+1).trim().replace(/^"|"$/g,'');});if(o.name)fi.push(o);}
+  }
+  return{s,q,fi};
+}
+function parseRx(blk){
+  const g=k=>{const r=new RegExp(k+':\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|\\[RX_END\\]|$)');const m=blk.match(r);return m?m[1].trim():'';};
+  return{d:g('DIAGNOSIS'),u:g('URGENCY'),cd:g('CARE_DO'),cn:g('CARE_DONT'),med:g('MEDICINE'),n:g('NOTE')};
+}
+
+function buildFindCard(fd,imgSrc){
+  const sc={mild:'#fffbeb',moderate:'#fff7ed',severe:'#fef2f2',noted:'#f0fdf4'};
+  const tc={mild:'#92400e',moderate:'#9a3412',severe:'#991b1b',noted:'#065f46'};
+  const c=document.createElement('div');c.style.cssText='background:white;border:1px solid rgba(10,158,143,.18);border-radius:13px;overflow:hidden;max-width:100%;margin-top:7px';
+  let h=`<div style="background:linear-gradient(135deg,#0a9e8f,#12c4b2);padding:8px 12px;display:flex;align-items:center;gap:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><div style="color:white;font-size:.83rem;font-weight:600">Visual Analysis · Aayu AI</div><div style="margin-left:auto;color:rgba(255,255,255,.55);font-size:.68rem">${getTime()}</div></div>`;
+  h+=`<div style="display:flex;gap:8px;padding:9px 12px;background:#f0fdf9;border-bottom:1px solid rgba(10,158,143,.08)"><img src="${imgSrc}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;border:1.5px solid rgba(10,158,143,.12);flex-shrink:0"/><div style="font-size:.78rem;color:#0a0f1a;line-height:1.6">${fd.q?`<div style="font-size:.65rem;color:#64748b;margin-bottom:2px">Quality: <strong>${fd.q}</strong></div>`:''}<strong style="color:#077a6e">Impression:</strong> ${fd.s||'Analysis complete.'}</div></div>`;
+  if(fd.fi?.length){h+=`<div style="padding:9px 12px;display:flex;flex-direction:column;gap:5px"><div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:1px">${fd.fi.length} Finding${fd.fi.length>1?'s':''}</div>`;fd.fi.forEach((f,i)=>{const sv=(f.severity||'noted').toLowerCase();h+=`<div style="display:flex;gap:8px;align-items:flex-start;background:${sc[sv]||'#f0fdf4'};border-radius:8px;padding:7px 9px;border-left:2px solid ${tc[sv]||'#065f46'}"><div style="font-size:16px;flex-shrink:0">${f.icon||'🔍'}</div><div><div style="font-size:.8rem;font-weight:600;color:#0a0f1a;margin-bottom:1px">${i+1}. ${f.name||'Finding'} <span style="font-size:.6rem;font-weight:700;background:${sc[sv]};color:${tc[sv]};padding:1px 6px;border-radius:8px;text-transform:uppercase">${sv}</span></div><div style="font-size:.68rem;color:#64748b;margin-bottom:2px">📍 ${f.location||''}</div><div style="font-size:.76rem;color:#1c2333;line-height:1.45">${f.detail||''}</div></div></div>`;});h+='</div>';}
+  c.innerHTML=h;return c;
+}
+
+function buildRxCard(rx){
+  const um={EMERGENCY:{bg:'#fef2f2',c:'#dc2626',i:'🚨'},URGENT:{bg:'#fff7ed',c:'#c2410c',i:'🔴'},ROUTINE:{bg:'#f0fdf4',c:'#16a34a',i:'✅'},MONITOR:{bg:'#fffbeb',c:'#d97706',i:'⚠️'}};
+  const u=um[rx.u]||um.MONITOR;
+  const dl=rx.cd.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.78rem;line-height:1.5;margin-bottom:2px">${l.trim()}</div>`).join('');
+  const dnt=rx.cn.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.78rem;line-height:1.5;margin-bottom:2px">${l.trim()}</div>`).join('');
+  let mh='';
+  if(rx.med.startsWith('OTC_UNSAFE:'))mh=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:7px;padding:7px 10px;font-size:.76rem;color:#7a4f00;line-height:1.5"><strong style="color:#b45309;display:block;margin-bottom:1px">⚠️ Medication Not Recommended</strong>${rx.med.replace('OTC_UNSAFE:','').trim()}</div>`;
+  else mh=rx.med.split('·').filter(l=>l.trim()).map(l=>`<div style="display:flex;gap:6px;background:#f8fafc;padding:6px 8px;border-radius:6px;font-size:.78rem;margin-bottom:2px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0a9e8f" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span style="font-weight:600">${l.trim()}</span></div>`).join('');
+  const card=document.createElement('div');card.style.cssText='background:white;border:1px solid rgba(10,158,143,.18);border-radius:13px;overflow:hidden;max-width:100%;margin-top:7px';
+  card.innerHTML=`<div style="background:linear-gradient(135deg,#0a9e8f,#12c4b2);padding:10px 13px;display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><div><div style="color:white;font-size:.86rem;font-weight:700">Dental Assessment · Aayu AI</div><div style="color:rgba(255,255,255,.65);font-size:.66rem;margin-top:1px">Generated ${getTime()} · AI triage only</div></div></div><div style="padding:12px 13px;display:flex;flex-direction:column;gap:9px"><div><div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Likely Diagnosis</div><div style="display:inline-flex;align-items:center;gap:5px;background:rgba(10,158,143,.08);color:#077a6e;padding:4px 11px;border-radius:16px;font-size:.78rem;font-weight:600">🩺 ${rx.d}</div></div><div><div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Urgency</div><div style="display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:16px;font-size:.78rem;font-weight:700;background:${u.bg};color:${u.c}">${u.i} ${rx.u}</div></div><div><div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Do's</div>${dl}</div><div><div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Don'ts</div>${dnt}</div><div><div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Medication</div>${mh}</div>${rx.n?`<div style="font-size:.7rem;color:#64748b;background:#f8fafc;padding:7px 9px;border-radius:7px;line-height:1.5;border-left:2px solid #0a9e8f">📌 ${rx.n}</div>`:''}<div style="font-size:.62rem;color:#b0bac5;background:#f8fafc;border-radius:6px;padding:6px 9px;line-height:1.5">⚖️ AI triage only — not a prescription. Consult a licensed dentist.</div></div>`;
+  return card;
+}
+
+function buildConnectCard(){
+  const wa=encodeURIComponent(lang==='hi'?'Namaste! Maine Aayu AI se consult kiya hai. Appointment lena chahta hoon.':'Hi! I just consulted Aayu AI and would like to book an appointment.');
+  const c=document.createElement('div');c.style.cssText='background:linear-gradient(135deg,#e8f9f7,#f0fdf9);border:1px solid rgba(10,158,143,.18);border-radius:12px;padding:12px;max-width:100%;margin-top:6px';
+  c.innerHTML=`<h5 style="font-size:.82rem;font-weight:700;color:#077a6e;margin-bottom:8px">📅 Time to see a real dentist</h5><div style="display:flex;flex-direction:column;gap:5px"><a href="https://wa.me/919953135340?text=${wa}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:8px;background:#25d366;color:white;font-size:.78rem;font-weight:600;text-decoration:none">💬 WhatsApp Dr. Mayank</a><a href="tel:+919953135340" style="display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:8px;background:#0a9e8f;color:white;font-size:.78rem;font-weight:600;text-decoration:none">📞 Call Now · +91 99531 35340</a><a href="mailto:hello@aayu365.com" style="display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:8px;background:#0a0f1a;color:white;font-size:.78rem;font-weight:600;text-decoration:none">✉️ hello@aayu365.com</a></div>`;
+  return c;
+}
+
+function handlePhotoUpload(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{const du=ev.target.result,b=du.split(',')[1],mt=f.type||'image/jpeg';addPhotoMsg(du);sendPhoto(b,mt,du);};r.readAsDataURL(f);e.target.value='';
+}
+
+async function sendPhoto(b64,mt,du){
+  addBotMsg(lang==='hi'?'📷 Photo mil gayi! Analyze kar raha hoon...':'📷 Photo received! Analyzing now...');
+  showTyping();
+  const im={role:'user',content:[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:lang==='hi'?'Yeh meri dental photo hai.':'This is my dental photo. Please evaluate carefully.'}]};
+  try{
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildPhotoSP(),messages:[...conv,im]})});
+    const d=await res.json();removeTyping();
+    let r=d.content?.map(b=>b.text||'').join('')||'Could not analyze. Please try again.';
+    conv.push(im);conv.push({role:'assistant',content:r});
+    let findings=null,rx=null,connect=false,disp=r;
+    if(r.includes('[FINDINGS_START]')&&r.includes('[FINDINGS_END]')){const m=r.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);if(m)findings=parseFindings(m[1]);disp=disp.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();}
+    if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=parseRx(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
+    if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
+    addBotMsg(disp,{findings,imgSrc:du,rx,connect});
+  }catch{removeTyping();addBotMsg('Sorry, photo analysis failed. Please try again.');}
+}
+
+async function sendMsg(ov){
+  const ta=document.getElementById('cta');
+  const text=(ov||ta.value).trim();if(!text)return;
+  if(!ov){ta.value='';ta.style.height='auto';}
+  addUserMsg(text);conv.push({role:'user',content:text});showTyping();
+  try{
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildSP(),messages:conv})});
+    const d=await res.json();removeTyping();
+    let r=d.content?.map(b=>b.text||'').join('')||'Something went wrong. Please try again.';
+    conv.push({role:'assistant',content:r});
+    let rx=null,connect=false,disp=r;
+    if(r.includes('[REQUEST_PHOTO]')&&!photoReqShown){photoReqShown=true;disp=disp.replace('[REQUEST_PHOTO]','').trim();const pb=document.getElementById('pb');if(pb){pb.style.background='rgba(10,158,143,.12)';pb.querySelector('svg').style.stroke='#0a9e8f';setTimeout(()=>{if(pb){pb.style.background='';pb.querySelector('svg').style.stroke='';}},8000);}}
+    if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=parseRx(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
+    if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
+    addBotMsg(disp,{rx,connect});
+  }catch{removeTyping();addBotMsg('Oops! Something went wrong. Please check your connection and try again.');}
+}
+
+function resetChat(){
+  const m=document.getElementById('msgs');if(m)m.innerHTML='';
+  conv=[];rxShown=false;connectShown=false;photoReqShown=false;
+  addBotMsg(UI[lang].greet);
+}
+
+// ── VOICE INPUT ──
+function toggleVoice(){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    alert('Voice input not supported. Please use Chrome browser.');return;
+  }
+  isListening?stopVoice():startVoice();
+}
+function startVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();
+  recognition.continuous=false;recognition.interimResults=true;
+  recognition.lang=lang==='hi'?'hi-IN':'en-IN';
+  recognition.onstart=()=>{
+    isListening=true;
+    const btn=document.getElementById('voice-btn');
+    const icon=document.getElementById('voice-icon');
+    const hint=document.getElementById('voice-hint');
+    if(btn){btn.style.background='rgba(220,38,38,.1)';btn.style.border='2px solid #dc2626';}
+    if(icon)icon.style.stroke='#dc2626';
+    if(hint)hint.textContent='🔴 Listening… Speak now. Tap mic to stop.';
+  };
+  recognition.onresult=e=>{
+    let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;
+    const ta=document.getElementById('cta');if(ta){ta.value=t;autoResize(ta);}
+  };
+  recognition.onend=()=>{stopVoice();const ta=document.getElementById('cta');if(ta&&ta.value.trim())setTimeout(()=>sendMsg(),300);};
+  recognition.onerror=()=>stopVoice();
+  recognition.start();
+}
+function stopVoice(){
+  isListening=false;
+  if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
+  const btn=document.getElementById('voice-btn');
+  const icon=document.getElementById('voice-icon');
+  const hint=document.getElementById('voice-hint');
+  if(btn){btn.style.background='';btn.style.border='none';}
+  if(icon)icon.style.stroke='#64748b';
+  if(hint)hint.textContent='🎤 Tap mic · 📷 Photo · Enter to send';
+}
+
+// Extra keyframes
+const xs=document.createElement('style');
+xs.textContent='@keyframes typB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(xs);
 </script>
 </body>
 </html>
