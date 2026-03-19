@@ -1501,6 +1501,21 @@ async function sendPhoto(b64,mt,du){
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
     addBot(disp,{findings,imgSrc:du,rx,connect});
+    if(connectShown && patientEmail){
+  fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name:patientName,
+      age:patientAge,
+      gender:patientGender,
+      email:patientEmail,
+      messages:conv,
+      sessionId:patientEmail+'_'+Date.now()
+    })
+  }).then(()=>console.log('✅ Consultation saved'))
+  .catch(e=>console.log('Save error:',e));
+}
   }catch{rmTyping();addBot('Sorry, photo analysis failed. Please try again.');}
 }
 
@@ -1519,6 +1534,21 @@ async function sendMsg(ov){
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
     addBot(disp,{rx,connect});
+    if(connectShown && patientEmail){
+  fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name:patientName,
+      age:patientAge,
+      gender:patientGender,
+      email:patientEmail,
+      messages:conv,
+      sessionId:patientEmail+'_'+Date.now()
+    })
+  }).then(()=>console.log('✅ Consultation saved'))
+  .catch(e=>console.log('Save error:',e));
+}
   }catch{rmTyping();addBot('Oops! Something went wrong. Check your connection and try again.');}
 }
 
