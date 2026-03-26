@@ -18,7 +18,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -477,9 +476,6 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .is-btn{width:100%;background:var(--g);color:white;border:none;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .25s}
 .is-btn:hover{background:var(--gd);transform:translateY(-1px)}
 .is-priv{font-size:.65rem;color:#b0bac5;margin-top:.8rem;text-align:center;line-height:1.5}
-.gender-chip{flex:1;padding:8px 6px;border:1.5px solid var(--border);border-radius:9px;background:white;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;font-family:var(--fb);transition:all .2s}
-.gender-chip:hover{border-color:var(--g);color:var(--g)}
-.gender-chip.active{background:var(--g);color:white;border-color:var(--g)}
 
 /* Chat UI */
 #chat-ui{flex:1;display:none;flex-direction:column;background:var(--light);height:100%;overflow:hidden}
@@ -508,12 +504,6 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .ch-bp{background:var(--light);position:relative}.ch-bp:hover{background:var(--gp)}.ch-bp svg{width:16px;height:16px;stroke:#64748b;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}.ch-bp:hover svg{stroke:var(--g)}.ch-bp input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .ch-bs{background:var(--g)}.ch-bs:hover{background:var(--gd)}.ch-bs svg{width:14px;height:14px;fill:white}
 .ch-hint{font-size:.61rem;color:#b0bac5;margin-top:4px;text-align:center}
-
-/* ── QUICK REPLY CHIPS ── */
-.chips-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:6px 1rem 2px;background:#f5faf9}
-.chip{display:inline-flex;align-items:center;gap:4px;background:white;border:1.5px solid rgba(10,158,143,.3);border-radius:20px;padding:5px 12px;font-size:.78rem;font-weight:500;color:#0a9e8f;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:var(--fb)}
-.chip:hover{background:#0a9e8f;color:white;border-color:#0a9e8f;transform:translateY(-1px)}
-.chip:active{transform:translateY(0)}
 
 /* ═══ LEGAL ═══ */
 .legal-pg{padding-top:var(--nh)}
@@ -1202,84 +1192,7 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
      CHAT — FULLY ISOLATED SCREEN
 ══════════════════════════════ -->
 <div id="pg-chat" class="pg">
-
-  <!-- ── LOGIN SCREEN ── -->
-  <div id="login-screen">
-    <div class="is-bg-g"></div><div class="is-bg-glow"></div>
-    <div class="is-card" style="max-width:380px">
-      <div class="is-head">
-        <div class="is-logo">
-          <div class="is-logo-ic"><svg width="16" height="16" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.5)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <span class="is-logo-nm">Datun <em style="font-style:normal;color:var(--g)">AI</em></span>
-        </div>
-        <button class="is-back" onclick="goHome()">← Back</button>
-      </div>
-
-      <h2 class="is-h" style="margin-bottom:.2rem">Welcome Back 👋</h2>
-      <p class="is-sub" style="margin-bottom:1.4rem">Login to start your free dental consultation</p>
-
-      <!-- Google Login -->
-      <button id="google-login-btn" onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;color:#1c2333;cursor:pointer;font-family:var(--fb);transition:all .25s;margin-bottom:.8rem">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Continue with Google
-      </button>
-
-      <!-- OR divider -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:.8rem">
-        <div style="flex:1;height:1px;background:#e2e8f0"></div>
-        <span style="font-size:.72rem;color:#b0bac5;font-weight:500">OR</span>
-        <div style="flex:1;height:1px;background:#e2e8f0"></div>
-      </div>
-
-      <!-- Email login -->
-      <div class="if"><label>Email</label><input id="l-email" type="email" placeholder="your@email.com" autocomplete="email"/></div>
-      <div class="if" style="margin-bottom:.5rem"><label>Password</label><input id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginWithEmail()"/></div>
-
-      <div id="login-err" class="is-err"></div>
-
-      <button class="is-btn" onclick="loginWithEmail()" style="margin-bottom:.6rem">Login →</button>
-
-      <p style="font-size:.74rem;text-align:center;color:var(--muted);margin-bottom:.5rem">
-        New user?
-        <a href="#" onclick="showSignup();return false" style="color:#0a9e8f;font-weight:600;text-decoration:none">Create account</a>
-      </p>
-
-      <p class="is-priv">🔒 Secure · DPDP Act 2023 · No spam ever</p>
-    </div>
-  </div>
-
-  <!-- ── SIGNUP SCREEN ── -->
-  <div id="signup-screen" style="display:none;flex:1;background:var(--dark);align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden">
-    <div class="is-bg-g"></div><div class="is-bg-glow"></div>
-    <div class="is-card" style="max-width:380px;position:relative;z-index:1">
-      <div class="is-head">
-        <div class="is-logo">
-          <div class="is-logo-ic"><svg width="16" height="16" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.5)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <span class="is-logo-nm">Datun <em style="font-style:normal;color:var(--g)">AI</em></span>
-        </div>
-        <button class="is-back" onclick="showLogin()">← Back</button>
-      </div>
-
-      <h2 class="is-h" style="margin-bottom:.2rem">Create Account</h2>
-      <p class="is-sub" style="margin-bottom:1.4rem">Free forever. No credit card needed.</p>
-
-      <div class="if"><label>Full Name</label><input id="s-name" type="text" placeholder="e.g. Rahul Sharma" autocomplete="name"/></div>
-      <div class="if"><label>Email</label><input id="s-email" type="email" placeholder="your@email.com" autocomplete="email"/></div>
-      <div class="if" style="margin-bottom:.5rem"><label>Password <span>(min 8 characters)</span></label><input id="s-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')signupWithEmail()"/></div>
-
-      <div id="signup-err" class="is-err"></div>
-      <button class="is-btn" onclick="signupWithEmail()">Create Account →</button>
-
-      <p style="font-size:.74rem;text-align:center;color:var(--muted);margin-top:.6rem">
-        Already have account?
-        <a href="#" onclick="showLogin();return false" style="color:#0a9e8f;font-weight:600;text-decoration:none">Login</a>
-      </p>
-      <p class="is-priv" style="margin-top:.5rem">By signing up, you agree to our <a href="#" onclick="goPage('privacy');return false" style="color:#0a9e8f;text-decoration:none">Privacy Policy</a></p>
-    </div>
-  </div>
-
-  <!-- ── INTAKE SCREEN (after login — only age + gender) ── -->
-  <div id="intake-screen" style="display:none">
+  <div id="intake-screen">
     <div class="is-bg-g"></div><div class="is-bg-glow"></div>
     <div class="is-card">
       <div class="is-head">
@@ -1287,34 +1200,22 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
           <div class="is-logo-ic"><svg width="16" height="16" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.5)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <span class="is-logo-nm">Datun <em style="font-style:normal;color:var(--g)">AI</em></span>
         </div>
-        <button class="is-back" onclick="showLogin()">← Back</button>
+        <button class="is-back" onclick="goHome()">← Back</button>
       </div>
-      <h2 class="is-h">One Last Step 🦷</h2>
-      <p class="is-sub">So Datun AI can personalise your dental assessment</p>
-
-      <div class="if">
-        <label>Age <span id="age-val" style="color:#0a9e8f;font-weight:700">25</span></label>
-        <input id="p-age" type="range" min="1" max="100" value="25"
-          style="width:100%;accent-color:#0a9e8f;cursor:pointer;margin-top:4px"
-          oninput="document.getElementById('age-val').textContent=this.value"/>
-        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:#b0bac5;margin-top:2px"><span>1</span><span>50</span><span>100</span></div>
+      <h2 class="is-h">Quick Details</h2>
+      <p class="is-sub">So Datun AI skips the basics and goes straight to your dental concern.</p>
+      <div class="if"><label>Full Name</label><input id="p-name" type="text" placeholder="e.g. Rahul Sharma" autocomplete="name"/></div>
+      <div class="if-row">
+        <div class="if"><label>Age</label><input id="p-age" type="number" min="1" max="120" placeholder="28"/></div>
+        <div class="if"><label>Gender</label><select id="p-gender"><option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
       </div>
-
-      <div class="if">
-        <label>Gender</label>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <button onclick="selectGender('Male',this)" class="gender-chip">Male</button>
-          <button onclick="selectGender('Female',this)" class="gender-chip">Female</button>
-          <button onclick="selectGender('Other',this)" class="gender-chip">Other</button>
-        </div>
-      </div>
-
+      <div class="if"><label>Email <span>(summary sent here)</span></label><input id="p-email" type="email" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')startConsult()"/></div>
       <div id="intake-err" class="is-err"></div>
-      <button class="is-btn" onclick="startConsult()">Start Consultation →</button>
-      <p class="is-priv">🔒 DPDP Act 2023 · Data used only for dental assessment</p>
+      <button class="is-btn" onclick="startConsult()">Start My Consultation →</button>
+      <p class="is-priv">By continuing, you agree your health data is used only for dental assessment. <a href="#" onclick="goPage('privacy');return false" style="color:#0a9e8f;text-decoration:none">Privacy Policy</a></p>
+      <p class="is-priv">🔒 Secure · DPDP Act 2023 · No spam ever</p>
     </div>
   </div>
-
   <div id="chat-ui">
     <div class="ch-hd">
       <button class="ch-back" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
@@ -1324,7 +1225,6 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
     </div>
     <div id="email-strip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#077a6e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Summary → <strong id="email-display" style="margin-left:2px"></strong></div>
     <div id="msgs"></div>
-    <div id="chips-area" class="chips-wrap" style="display:none"></div>
     <div class="ch-disc">⚠️ AI guidance only — not a prescription. Always consult a qualified dentist.</div>
     <div class="ch-ft">
       <div class="ch-ir">
@@ -1417,9 +1317,15 @@ function goPage(name){
   if(t)t.classList.add('on');
   if(name!=='chat')window.scrollTo({top:0,behavior:'instant'});
   if(name==='chat'){
-    showLogin();
-    conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
-    patientName='';patientAge='';patientGender='';patientEmail='';selectedGender='';
+    const is=document.getElementById('intake-screen');
+    const cu=document.getElementById('chat-ui');
+    if(is)is.style.display='flex';
+    if(cu)cu.style.display='none';
+    ['p-name','p-age','p-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    const pg=document.getElementById('p-gender');if(pg)pg.value='';
+    const err=document.getElementById('intake-err');if(err)err.style.display='none';
+    conv=[];rxShown=false;connectShown=false;photoReqShown=false;
+    patientName='';patientAge='';patientGender='';patientEmail='';
   }
 }
 function goHome(){goPage('home');}
@@ -1449,7 +1355,7 @@ const p3d=document.getElementById('phone3d');
 if(p3d){document.addEventListener('mousemove',e=>{const r=p3d.getBoundingClientRect();if(!r.width)return;const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;p3d.style.transform=`perspective(1000px) rotateY(${((.5-x)*12).toFixed(1)}deg) rotateX(${((y-.5)*8).toFixed(1)}deg)`;});}
 
 // ── CHAT STATE ──
-let lang='en',conv=[],rxShown=false,connectShown=false,photoReqShown=false,consultationSaved=false;
+let lang='en',conv=[],rxShown=false,connectShown=false,photoReqShown=false;
 let patientName='',patientAge='',patientGender='',patientEmail='';
 let isListening=false,recognition=null;
 
@@ -1458,152 +1364,22 @@ const UI={
   hi:{ph:'Apni dant ki samasya batayein...',get greet(){return `Namaste ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon.\n\nAaj kya dant ki pareshani ho rahi hai? Seedha batayein.`;}}
 };
 
-// ── AUTH0 SETUP ──
-const AUTH0_DOMAIN = 'datunai.us.auth0.com';
-const AUTH0_CLIENT_ID = 'Cb4hGvbPMVhovaQVeDXFlWCegBe5LyDI';
-const BACKEND = 'https://dentscan-ai-backend-production.up.railway.app';
-let auth0Client = null;
-let authToken = null;
-
-async function initAuth0() {
-  try {
-    auth0Client = await auth0.createAuth0Client({
-      domain: AUTH0_DOMAIN,
-      clientId: AUTH0_CLIENT_ID,
-      authorizationParams: {
-        redirect_uri: window.location.origin,
-        audience: `https://${AUTH0_DOMAIN}/api/v2/`
-      },
-      cacheLocation: 'localstorage'
-    });
-    // Handle redirect callback
-    if (window.location.search.includes('code=')) {
-      await auth0Client.handleRedirectCallback();
-      window.history.replaceState({}, document.title, window.location.pathname);
-      await handleLoginSuccess();
-    }
-  } catch (e) {
-    console.error('Auth0 init error:', e);
-  }
-}
-initAuth0();
-
-async function handleLoginSuccess() {
-  try {
-    authToken = await auth0Client.getTokenSilently();
-    const user = await auth0Client.getUser();
-    // Save to backend
-    await fetch(BACKEND + '/api/auth/user', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' }
-    });
-    // Auto-fill from Google
-    patientName = user.name || '';
-    patientEmail = user.email || '';
-    // Show intake (age + gender only)
-    showIntake();
-  } catch (e) {
-    console.error('Login success error:', e);
-    showLogin();
-  }
-}
-
-async function loginWithGoogle() {
-  try {
-    await auth0Client.loginWithRedirect({
-      authorizationParams: { connection: 'google-oauth2' }
-    });
-  } catch (e) {
-    showErr('login-err', 'Google login failed. Please try again.');
-  }
-}
-
-async function loginWithEmail() {
-  const email = document.getElementById('l-email').value.trim();
-  const pass = document.getElementById('l-pass').value;
-  if (!email || !pass) return showErr('login-err', 'Please enter email and password.');
-  const btn = document.querySelector('#login-screen .is-btn');
-  btn.textContent = 'Logging in...'; btn.disabled = true;
-  try {
-    await auth0Client.loginWithRedirect({
-      authorizationParams: {
-        connection: 'Username-Password-Authentication',
-        login_hint: email
-      }
-    });
-  } catch (e) {
-    btn.textContent = 'Login →'; btn.disabled = false;
-    showErr('login-err', 'Login failed. Check your credentials.');
-  }
-}
-
-async function signupWithEmail() {
-  const name = document.getElementById('s-name').value.trim();
-  const email = document.getElementById('s-email').value.trim();
-  const pass = document.getElementById('s-pass').value;
-  if (!name) return showErr('signup-err', 'Please enter your name.');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr('signup-err', 'Please enter a valid email.');
-  if (pass.length < 8) return showErr('signup-err', 'Password must be at least 8 characters.');
-  const btn = document.querySelector('#signup-screen .is-btn');
-  btn.textContent = 'Creating account...'; btn.disabled = true;
-  try {
-    // Auth0 signup via redirect
-    await auth0Client.loginWithRedirect({
-      authorizationParams: {
-        connection: 'Username-Password-Authentication',
-        screen_hint: 'signup',
-        login_hint: email
-      }
-    });
-  } catch (e) {
-    btn.textContent = 'Create Account →'; btn.disabled = false;
-    showErr('signup-err', 'Signup failed. Please try again.');
-  }
-}
-
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  if (el) { el.textContent = msg; el.style.display = 'block'; }
-}
-
-function showLogin() {
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('signup-screen').style.display = 'none';
-  document.getElementById('intake-screen').style.display = 'none';
-}
-
-function showSignup() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('signup-screen').style.display = 'flex';
-  document.getElementById('intake-screen').style.display = 'none';
-}
-
-function showIntake() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('signup-screen').style.display = 'none';
-  document.getElementById('intake-screen').style.display = 'flex';
-}
-
-let selectedGender = '';
-function selectGender(g, el) {
-  selectedGender = g;
-  document.querySelectorAll('.gender-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function startConsult() {
-  const age = document.getElementById('p-age').value;
-  const errEl = document.getElementById('intake-err');
-  if (!selectedGender) { errEl.textContent = 'Please select your gender.'; errEl.style.display = 'block'; return; }
-  errEl.style.display = 'none';
-  patientAge = age;
-  patientGender = selectedGender;
-  // Show chat
-  document.getElementById('intake-screen').style.display = 'none';
-  const cu = document.getElementById('chat-ui'); cu.style.display = 'flex';
-  const ne = document.getElementById('ch-pname');
-  if (ne) ne.textContent = 'DATUN AI · Hi, ' + (patientName.split(' ')[0] || 'there') + '!';
-  const ed = document.getElementById('email-display'); if (ed) ed.textContent = patientEmail;
+function startConsult(){
+  const name=(document.getElementById('p-name')||{value:''}).value.trim();
+  const age=(document.getElementById('p-age')||{value:''}).value.trim();
+  const gender=(document.getElementById('p-gender')||{value:''}).value;
+  const email=(document.getElementById('p-email')||{value:''}).value.trim();
+  const errEl=document.getElementById('intake-err');
+  if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
+  if(!age||+age<1||+age>120){errEl.textContent='Please enter a valid age.';errEl.style.display='block';return;}
+  if(!gender){errEl.textContent='Please select your gender.';errEl.style.display='block';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  patientName=name;patientAge=age;patientGender=gender;patientEmail=email;
+  document.getElementById('intake-screen').style.display='none';
+  const cu=document.getElementById('chat-ui');cu.style.display='flex';
+  const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · Hi, '+name.split(' ')[0]+'!';
+  const ed=document.getElementById('email-display');if(ed)ed.textContent=email;
   resetChat();
 }
 
@@ -1616,40 +1392,15 @@ function setLang(l){
 
 function buildSP(){
   const info=`Patient: ${patientName}, Age: ${patientAge}, Gender: ${patientGender}`;
-  return `You are DATUN AI — India's most trusted free AI dental assistant. Built by Dr. Mayank Vats (BDS). You speak like a warm, confident doctor-friend — never robotic.
-
-PATIENT INFO COLLECTED: ${info} — NEVER ask name, age, or gender again.
-
-LANGUAGE RULE: Match user's EXACT language always. Hindi/Hinglish → Hinglish. English → English. Tamil → Tamil. Bengali → Bengali. Same for chips.
-
-PERSONALITY: Warm, direct, confident. Like a doctor friend texting you. Max 2-3 lines per message. No bullet walls. Never say "I understand" or "Great question". Just respond naturally.
-
-CHIPS RULE — CRITICAL:
-After EVERY question, add chips on a new line:
-[OPTIONS: option1 | option2 | option3]
-- Max 4 options. Same language as conversation. Short (max 4 words each).
-- NEVER include "Pata nahi" or "Not sure" as an option — guide patient to find the answer instead.
-- If patient seems confused → AI gives action: "Thanda paani us daant pe rakho — kya lagta hai?"
-- Open/narrative questions = no chips. Clinical yes/no questions = always chips.
-
-LOCATION FLOW (2-step):
-Step 1: "Dard kahan hai?"
-[OPTIONS: Upar | Neeche | Dono jagah]
-Step 2 (after upar/neeche): "Left ya right side?"
-[OPTIONS: Left | Right | Beech mein]
-Step 3: "Aage ke daant ya peeche?"
-[OPTIONS: Aage | Peeche | Dono]
-
-HISTORY FLOW:
-1. First message: ask drug allergies + medical conditions together. Female → ask pregnant/breastfeeding. Add chips.
-2. Then: location (2-step chips), duration, sensitivity, character. One topic at a time.
-3. NEVER diagnose with <3 good dental answers.
-4. EMERGENCY (fever+swelling, difficulty swallowing) → flag immediately, no chips needed.
-5. After 2-3 answers → [REQUEST_PHOTO] naturally + chips: [OPTIONS: 📷 Photo bhejta hoon | Skip karna hai]
-
-OTC RULES: Unknown allergies → NO OTC. NSAID allergy → NO ibuprofen. Pregnancy → paracetamol only. Child<12 → paracetamol only. Child<6 → NO OTC. Blood thinners → NO NSAIDs. Always add "consult pharmacist". Unsafe → OTC_UNSAFE:[reason].
-
-ASSESSMENT FORMAT:
+  return `You are DATUN AI, a clinical dental AI assistant built by a real doctor for DatunAI.
+PATIENT INFO ALREADY COLLECTED: ${info} — DO NOT ask for name, age, or gender again.
+LANGUAGE: Mirror user's exact language. Hindi/Hinglish → Hinglish. English → English. Warm, concise — max 2-3 lines per message.
+REMAINING HISTORY (efficiently, 1-2 questions at a time):
+First message: ask drug allergies + medical conditions (diabetes, BP, heart, thyroid) together. If female: add pregnant/breastfeeding.
+Then dental complaint: location, duration, pain character, cold/hot sensitivity, pain lingering after trigger (critical), biting pain, radiation to ear/jaw, swelling/fever, previous dental work, night pain.
+RULES: NEVER diagnose with <3 good dental answers. EMERGENCY (fever+swelling, difficulty swallowing) → flag immediately. After 2-3 answers → [REQUEST_PHOTO] naturally.
+OTC RULES: Unknown allergies → NO OTC. NSAID allergy → NO ibuprofen. Pregnancy → paracetamol only. Child<12 → paracetamol only. Child<6 → NO OTC. Blood thinners → NO NSAIDs. Always "consult before taking". If unsafe → OTC_UNSAFE:[reason].
+ASSESSMENT:
 [RX_START]
 DIAGNOSIS: ... URGENCY: (EMERGENCY/URGENT/ROUTINE/MONITOR)
 CARE_DO: ✅ ... ✅ ... ✅ ...
@@ -1657,7 +1408,7 @@ CARE_DONT: ❌ ... ❌ ... ❌ ...
 MEDICINE: ...
 NOTE: ...
 [RX_END]
-After [RX_END]: warm 2-3 lines in patient's language. End exactly: [SHOW_CONNECT]`;
+After [RX_END]: warm 2-3 lines. End exactly: [SHOW_CONNECT]`;
 }
 
 function buildPSP(){return `You are Datun AI analyzing a dental photo. Built by a real doctor.
@@ -1683,18 +1434,14 @@ function mkB(){const d=document.createElement('div');d.style.cssText='width:26px
 function mkU(){const d=document.createElement('div');d.style.cssText='width:26px;height:26px;border-radius:50%;background:#0a0f1a;color:white;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px';d.textContent='U';return d;}
 
 function addBot(text,ex){
-  // Parse chips from [OPTIONS:] tag
-  const{clean,chips}=parseChips(text||'');
   const m=document.getElementById('msgs');const w=document.createElement('div');w.style.cssText='display:flex;gap:8px;animation:msgIn .3s ease';
   const ct=document.createElement('div');ct.style.maxWidth='84%';
-  if(clean){const b=document.createElement('div');b.style.cssText='background:white;border:1px solid rgba(0,0,0,.07);border-radius:14px;border-top-left-radius:3px;padding:9px 11px;font-size:.84rem;line-height:1.56;box-shadow:0 1px 4px rgba(0,0,0,.04)';b.innerHTML=fmt(clean);ct.appendChild(b);}
+  if(text){const b=document.createElement('div');b.style.cssText='background:white;border:1px solid rgba(0,0,0,.07);border-radius:14px;border-top-left-radius:3px;padding:9px 11px;font-size:.84rem;line-height:1.56;box-shadow:0 1px 4px rgba(0,0,0,.04)';b.innerHTML=fmt(text);ct.appendChild(b);}
   const tm=document.createElement('span');tm.style.cssText='font-size:.62rem;color:#94a3b8;margin-top:2px;display:block';tm.textContent=gT();ct.appendChild(tm);
   if(ex?.findings)ct.appendChild(bFC(ex.findings,ex.imgSrc));
   if(ex?.rx)ct.appendChild(bRX(ex.rx));
   if(ex?.connect)ct.appendChild(bCN());
   w.appendChild(mkB());w.appendChild(ct);m.appendChild(w);scrollTop();
-  // Render chips after message
-  renderChips(chips);
 }
 function addUser(text){
   const m=document.getElementById('msgs');const w=document.createElement('div');w.style.cssText='display:flex;gap:8px;flex-direction:row-reverse;animation:msgIn .3s ease';
@@ -1749,33 +1496,6 @@ function bCN(){
   return c;
 }
 
-function renderChips(options){
-  const area=document.getElementById('chips-area');
-  if(!area)return;
-  area.innerHTML='';
-  if(!options||!options.length){area.style.display='none';return;}
-  area.style.display='flex';
-  options.forEach(opt=>{
-    const ch=document.createElement('button');
-    ch.className='chip';
-    ch.textContent=opt.trim();
-    ch.onclick=()=>{
-      area.style.display='none';
-      area.innerHTML='';
-      sendMsg(opt.trim());
-    };
-    area.appendChild(ch);
-  });
-}
-
-function parseChips(text){
-  const m=text.match(/\[OPTIONS:\s*([^\]]+)\]/);
-  if(!m)return{clean:text,chips:[]};
-  const chips=m[1].split('|').map(s=>s.trim()).filter(Boolean);
-  const clean=text.replace(/\[OPTIONS:[^\]]+\]/,'').trim();
-  return{clean,chips};
-}
-
 function handlePhotoUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const du=ev.target.result,b=du.split(',')[1],mt=f.type||'image/jpeg';addPhoto(du);sendPhoto(b,mt,du);};r.readAsDataURL(f);e.target.value='';}
 
 async function sendPhoto(b64,mt,du){
@@ -1791,8 +1511,7 @@ async function sendPhoto(b64,mt,du){
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
     addBot(disp,{findings,imgSrc:du,rx,connect});
-    if(connectShown && patientEmail && !consultationSaved){
-      consultationSaved=true;
+    if(connectShown && patientEmail){
   fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -1814,8 +1533,6 @@ async function sendMsg(ov){
   const ta=document.getElementById('cta');
   const text=(ov||ta.value).trim();if(!text)return;
   if(!ov){ta.value='';ta.style.height='auto';}
-  // Clear chips
-  renderChips([]);
   addUser(text);conv.push({role:'user',content:text});showTyping();
   try{
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildSP(),messages:conv})});
@@ -1827,8 +1544,7 @@ async function sendMsg(ov){
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
     addBot(disp,{rx,connect});
-    if(connectShown && patientEmail && !consultationSaved){
-      consultationSaved=true;
+    if(connectShown && patientEmail){
   fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -1846,7 +1562,7 @@ async function sendMsg(ov){
   }catch{rmTyping();addBot('Oops! Something went wrong. Check your connection and try again.');}
 }
 
-function resetChat(){const m=document.getElementById('msgs');if(m)m.innerHTML='';conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;addBot(UI[lang].greet);}
+function resetChat(){const m=document.getElementById('msgs');if(m)m.innerHTML='';conv=[];rxShown=false;connectShown=false;photoReqShown=false;addBot(UI[lang].greet);}
 
 // Voice
 function toggleVoice(){if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice input not supported. Please use Chrome.');return;}isListening?stopVoice():startVoice();}
