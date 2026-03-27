@@ -1656,8 +1656,18 @@ function renderChips(options){
     c.className='chip';
     c.textContent=opt.trim();
     c.onclick=()=>{
+      const isOther=/(kuch aur|something else|other|aur kuch|இதர|অন্য|इतर|మరేదైనా|ಬೇರೆ|બીજું|ਕੁਝ ਹੋਰ)/i.test(opt.trim());
       renderChips([]);
-      sendMsg(opt.trim());
+      if(isOther){
+        const ta=document.getElementById('cta');
+        if(ta){
+          ta.focus();
+          ta.placeholder='Please type your concern...';
+          setTimeout(()=>{ta.placeholder=UI[lang]?.ph||'Type here...';},8000);
+        }
+      } else {
+        sendMsg(opt.trim());
+      }
     };
     area.appendChild(c);
   });
