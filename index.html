@@ -1393,8 +1393,16 @@ let patientName='',patientAge='',patientGender='',patientEmail='';
 let isListening=false,recognition=null;
 
 const UI={
-  en:{ph:'Describe your dental concern...',get greet(){return `Hello ${patientName?patientName.split(' ')[0]:''}! 👋 I'm Datun AI — your dental assistant.\n\nWhat's your dental concern today? Tell me and I'll help right away.`;}},
-  hi:{ph:'Apni dant ki samasya batayein...',get greet(){return `Namaste ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon.\n\nAaj kya dant ki pareshani ho rahi hai? Seedha batayein.`;}}
+  en:{ph:'Describe your dental concern...',get greet(){return `Hello ${patientName?patientName.split(' ')[0]:''}! 👋 I'm Datun AI — your dental assistant.\n\nWhat's your dental concern today? [OPTIONS: Tooth pain|Swelling|Bleeding gums|Something else]`;}},
+  hi:{ph:'Apni dant ki samasya batayein...',get greet(){return `Namaste ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon — aapka dental dost.\n\nAaj kya takleef hai? [OPTIONS: Dard hai|Sujan hai|Khoon aa rha|Kuch aur]`;}},
+  hinglish:{ph:'Apni problem batao...',get greet(){return `Hey ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon.\n\nKya problem hai aaj? [OPTIONS: Dard hai|Sujan|Bleeding|Kuch aur]`;}},
+  ta:{ph:'உங்கள் பல் பிரச்சனையை சொல்லுங்கள்...',get greet(){return `வணக்கம் ${patientName?patientName.split(' ')[0]:''}! 👋 நான் Datun AI.\n\nஇன்று என்ன பிரச்சனை? [OPTIONS: வலி|வீக்கம்|ரத்தம்|வேறு ஏதாவது]`;}},
+  bn:{ph:'আপনার সমস্যা বলুন...',get greet(){return `নমস্কার ${patientName?patientName.split(' ')[0]:''}! 👋 আমি Datun AI.\n\nআজ কী সমস্যা? [OPTIONS: ব্যথা|ফোলা|রক্ত|অন্য কিছু]`;}},
+  mr:{ph:'तुमची समस्या सांगा...',get greet(){return `नमस्कार ${patientName?patientName.split(' ')[0]:''}! 👋 मी Datun AI आहे.\n\nआज काय त्रास आहे? [OPTIONS: दुखणे|सूज|रक्त येणे|इतर काही]`;}},
+  te:{ph:'మీ సమస్య చెప్పండి...',get greet(){return `నమస్కారం ${patientName?patientName.split(' ')[0]:''}! 👋 నేను Datun AI.\n\nఈరోజు ఏమి సమస్య? [OPTIONS: నొప్పి|వాపు|రక్తం|మరేదైనా]`;}},
+  kn:{ph:'ನಿಮ್ಮ ಸಮಸ್ಯೆ ಹೇಳಿ...',get greet(){return `ನಮಸ್ಕಾರ ${patientName?patientName.split(' ')[0]:''}! 👋 ನಾನು Datun AI.\n\nಇಂದು ಏನು ತೊಂದರೆ? [OPTIONS: ನೋವು|ಊತ|ರಕ್ತ|ಬೇರೆ ಏನಾದರೂ]`;}},
+  gu:{ph:'તમારી સમસ્યા જણાવો...',get greet(){return `નમસ્તે ${patientName?patientName.split(' ')[0]:''}! 👋 હું Datun AI છું.\n\nઆજે શું તકલીફ છે? [OPTIONS: દુખાવો|સોજો|લોહી|બીજું કંઈ]`;}},
+  pa:{ph:'ਆਪਣੀ ਸਮੱਸਿਆ ਦੱਸੋ...',get greet(){return `ਸਤ ਸ੍ਰੀ ਅਕਾਲ ${patientName?patientName.split(' ')[0]:''}! 👋 ਮੈਂ Datun AI ਹਾਂ.\n\nਅੱਜ ਕੀ ਤਕਲੀਫ਼ ਹੈ? [OPTIONS: ਦਰਦ|ਸੋਜ|ਖੂਨ|ਕੁਝ ਹੋਰ]`;}}
 };
 
 // ── LANGUAGE SELECTOR ──
@@ -1457,7 +1465,7 @@ function buildSP(){
   const info=`Patient: ${patientName}, Age: ${patientAge}, Gender: ${patientGender}`;
   return `You are DATUN AI, a warm friendly dental assistant — like a doctor friend who genuinely cares.
 PATIENT INFO: ${info} — DO NOT ask name, age, gender again.
-LANGUAGE: ${langInstructions[lang]||'Respond in English.'} Patient selected language: ${langNames[lang]||'English'}. ALL responses AND chips MUST be in this language only. Never switch languages.
+STRICT LANGUAGE RULE: ${langInstructions[lang]||'Respond ONLY in English.'} Patient has selected ${langNames[lang]||'English'} as their language. Every single word in your response INCLUDING chips options MUST be in ${langNames[lang]||'English'} only. If you respond in any other language, you are making a critical error. Do NOT use English if patient selected Hindi or any other language.
 TONE: Conversational, warm, simple — like texting a caring friend. Short messages — max 2 lines. NO medical jargon.
 CHIPS: After EVERY question, add [OPTIONS: a|b|c|d] — max 4 options. Simple human language — NO medical terms in chips. 
 CHIP RULES: No "Pata nahi" — use "Yaad nahi" or "Pakka nahi". Make chips feel like real answers a person would say.
