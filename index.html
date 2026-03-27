@@ -1670,8 +1670,15 @@ function parseChips(text){
   const cleanText=text.replace(/\[OPTIONS:[^\]]+\]/,'').trim();
   return{text:cleanText,chips};
 }
-function resetChat(){const m=document.getElementById('msgs');if(m)m.innerHTML='';conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;addBot(UI[lang].greet);}
-
+function resetChat(){
+  const m=document.getElementById('msgs');if(m)m.innerHTML='';
+  conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
+  renderChips([]);
+  const greetText=UI[lang]?UI[lang].greet:UI['en'].greet;
+  const parsed=parseChips(greetText);
+  renderChips(parsed.chips);
+  addBot(parsed.text);
+}
 // Voice
 function toggleVoice(){if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice input not supported. Please use Chrome.');return;}isListening?stopVoice():startVoice();}
 function startVoice(){
