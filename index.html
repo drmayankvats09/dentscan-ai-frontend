@@ -478,6 +478,14 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .is-priv{font-size:.65rem;color:#b0bac5;margin-top:.8rem;text-align:center;line-height:1.5}
   /* ── CHIPS ── */
 #chips-area{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 4px;background:#f5faf9;border-top:1px solid rgba(10,158,143,.08);flex-shrink:0}
+  /* ── LANG SELECTOR ── */
+.lang-opt{
+  border:1.5px solid var(--border);border-radius:9px;padding:7px 10px;
+  font-size:.78rem;font-weight:500;color:var(--dark2);cursor:pointer;
+  text-align:center;transition:all .18s;background:white;
+}
+.lang-opt:hover{border-color:var(--g);color:var(--g)}
+.lang-opt.selected{background:var(--g);color:white;border-color:var(--g);font-weight:600}
 #chips-area:empty{display:none}
 .chip{display:inline-flex;align-items:center;background:white;border:1.5px solid rgba(10,158,143,.35);border-radius:20px;padding:6px 13px;font-size:.8rem;font-weight:500;color:#0a9e8f;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:var(--fb);box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .chip:hover{background:#0a9e8f;color:white;border-color:#0a9e8f;transform:translateY(-1px)}
@@ -1210,6 +1218,22 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
       </div>
       <h2 class="is-h">Quick Details</h2>
       <p class="is-sub">So Datun AI skips the basics and goes straight to your dental concern.</p>
+      <div class="if">
+  <label>Language / भाषा चुनें</label>
+  <div id="lang-selector" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+    <div class="lang-opt" onclick="selectLang('en')" data-lang="en">🇬🇧 English</div>
+    <div class="lang-opt" onclick="selectLang('hi')" data-lang="hi">🇮🇳 हिंदी</div>
+    <div class="lang-opt" onclick="selectLang('hinglish')" data-lang="hinglish">🤝 Hinglish</div>
+    <div class="lang-opt" onclick="selectLang('ta')" data-lang="ta">தமிழ் Tamil</div>
+    <div class="lang-opt" onclick="selectLang('bn')" data-lang="bn">বাংলা Bengali</div>
+    <div class="lang-opt" onclick="selectLang('mr')" data-lang="mr">मराठी Marathi</div>
+    <div class="lang-opt" onclick="selectLang('te')" data-lang="te">తెలుగు Telugu</div>
+    <div class="lang-opt" onclick="selectLang('kn')" data-lang="kn">ಕನ್ನಡ Kannada</div>
+    <div class="lang-opt" onclick="selectLang('gu')" data-lang="gu">ગુજરાતી Gujarati</div>
+    <div class="lang-opt" onclick="selectLang('pa')" data-lang="pa">ਪੰਜਾਬੀ Punjabi</div>
+  </div>
+  <div id="lang-err" style="color:#dc2626;font-size:.72rem;margin-top:4px;display:none">Please select a language</div>
+</div>
       <div class="if"><label>Full Name</label><input id="p-name" type="text" placeholder="e.g. Rahul Sharma" autocomplete="name"/></div>
       <div class="if-row">
         <div class="if"><label>Age</label><input id="p-age" type="number" min="1" max="120" placeholder="28"/></div>
@@ -1332,7 +1356,8 @@ function goPage(name){
     const pg=document.getElementById('p-gender');if(pg)pg.value='';
     const err=document.getElementById('intake-err');if(err)err.style.display='none';
     conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
-    patientName='';
+    patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
+    document.querySelectorAll('.lang-opt').forEach(el=>el.classList.remove('selected'));
   }
 }
 function goHome(){goPage('home');}
@@ -1371,17 +1396,46 @@ const UI={
   hi:{ph:'Apni dant ki samasya batayein...',get greet(){return `Namaste ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon.\n\nAaj kya dant ki pareshani ho rahi hai? Seedha batayein.`;}}
 };
 
+// ── LANGUAGE SELECTOR ──
+let selectedLang='';
+const langNames={
+  en:'English',hi:'Hindi',hinglish:'Hinglish',
+  ta:'Tamil',bn:'Bengali',mr:'Marathi',
+  te:'Telugu',kn:'Kannada',gu:'Gujarati',pa:'Punjabi'
+};
+const langInstructions={
+  en:'Respond ONLY in English.',
+  hi:'Respond ONLY in Hindi.',
+  hinglish:'Respond ONLY in Hinglish (Hindi+English mix).',
+  ta:'Respond ONLY in Tamil.',
+  bn:'Respond ONLY in Bengali.',
+  mr:'Respond ONLY in Marathi.',
+  te:'Respond ONLY in Telugu.',
+  kn:'Respond ONLY in Kannada.',
+  gu:'Respond ONLY in Gujarati.',
+  pa:'Respond ONLY in Punjabi.'
+};
+
+function selectLang(l){
+  selectedLang=l;
+  document.querySelectorAll('.lang-opt').forEach(el=>{
+    el.classList.toggle('selected',el.dataset.lang===l);
+  });
+  document.getElementById('lang-err').style.display='none';
+}
 function startConsult(){
   const name=(document.getElementById('p-name')||{value:''}).value.trim();
   const age=(document.getElementById('p-age')||{value:''}).value.trim();
   const gender=(document.getElementById('p-gender')||{value:''}).value;
   const email=(document.getElementById('p-email')||{value:''}).value.trim();
   const errEl=document.getElementById('intake-err');
+  if(!selectedLang){document.getElementById('lang-err').style.display='block';errEl.style.display='none';return;}
   if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
   if(!age||+age<1||+age>120){errEl.textContent='Please enter a valid age.';errEl.style.display='block';return;}
   if(!gender){errEl.textContent='Please select your gender.';errEl.style.display='block';return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';return;}
   errEl.style.display='none';
+  lang=selectedLang;
   patientName=name;patientAge=age;patientGender=gender;patientEmail=email;
   document.getElementById('intake-screen').style.display='none';
   const cu=document.getElementById('chat-ui');cu.style.display='flex';
@@ -1402,7 +1456,7 @@ function buildSP(){
   const info=`Patient: ${patientName}, Age: ${patientAge}, Gender: ${patientGender}`;
   return `You are DATUN AI, a warm friendly dental assistant — like a doctor friend who genuinely cares.
 PATIENT INFO: ${info} — DO NOT ask name, age, gender again.
-LANGUAGE: Mirror user exactly in ALL responses AND chips. Supported languages: Hindi, English, Hinglish, Tamil, Bengali, Marathi, Telugu, Kannada, Gujarati, Punjabi. Detect user language automatically and respond + chips in SAME language. Never mix languages unless user does.
+LANGUAGE: ${langInstructions[lang]||'Respond in English.'} Patient selected language: ${langNames[lang]||'English'}. ALL responses AND chips MUST be in this language only. Never switch languages.
 TONE: Conversational, warm, simple — like texting a caring friend. Short messages — max 2 lines. NO medical jargon.
 CHIPS: After EVERY question, add [OPTIONS: a|b|c|d] — max 4 options. Simple human language — NO medical terms in chips. 
 CHIP RULES: No "Pata nahi" — use "Yaad nahi" or "Pakka nahi". Make chips feel like real answers a person would say.
