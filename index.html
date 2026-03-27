@@ -476,6 +476,12 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .is-btn{width:100%;background:var(--g);color:white;border:none;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .25s}
 .is-btn:hover{background:var(--gd);transform:translateY(-1px)}
 .is-priv{font-size:.65rem;color:#b0bac5;margin-top:.8rem;text-align:center;line-height:1.5}
+  /* ── CHIPS ── */
+#chips-area{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 4px;background:#f5faf9;border-top:1px solid rgba(10,158,143,.08);flex-shrink:0}
+#chips-area:empty{display:none}
+.chip{display:inline-flex;align-items:center;background:white;border:1.5px solid rgba(10,158,143,.35);border-radius:20px;padding:6px 13px;font-size:.8rem;font-weight:500;color:#0a9e8f;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:var(--fb);box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.chip:hover{background:#0a9e8f;color:white;border-color:#0a9e8f;transform:translateY(-1px)}
+.chip:active{transform:translateY(0);background:#077a6e;border-color:#077a6e;color:white}
 
 /* Chat UI */
 #chat-ui{flex:1;display:none;flex-direction:column;background:var(--light);height:100%;overflow:hidden}
@@ -1225,6 +1231,7 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
     </div>
     <div id="email-strip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#077a6e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Summary → <strong id="email-display" style="margin-left:2px"></strong></div>
     <div id="msgs"></div>
+    <div id="chips-area"></div>
     <div class="ch-disc">⚠️ AI guidance only — not a prescription. Always consult a qualified dentist.</div>
     <div class="ch-ft">
       <div class="ch-ir">
@@ -1393,14 +1400,22 @@ function setLang(l){
 
 function buildSP(){
   const info=`Patient: ${patientName}, Age: ${patientAge}, Gender: ${patientGender}`;
-  return `You are DATUN AI, a clinical dental AI assistant built by a real doctor for DatunAI.
-PATIENT INFO ALREADY COLLECTED: ${info} — DO NOT ask for name, age, or gender again.
-LANGUAGE: Mirror user's exact language. Hindi/Hinglish → Hinglish. English → English. Warm, concise — max 2-3 lines per message.
-REMAINING HISTORY (efficiently, 1-2 questions at a time):
-First message: ask drug allergies + medical conditions (diabetes, BP, heart, thyroid) together. If female: add pregnant/breastfeeding.
-Then dental complaint: location, duration, pain character, cold/hot sensitivity, pain lingering after trigger (critical), biting pain, radiation to ear/jaw, swelling/fever, previous dental work, night pain.
-RULES: NEVER diagnose with <3 good dental answers. EMERGENCY (fever+swelling, difficulty swallowing) → flag immediately. After 2-3 answers → [REQUEST_PHOTO] naturally.
-OTC RULES: Unknown allergies → NO OTC. NSAID allergy → NO ibuprofen. Pregnancy → paracetamol only. Child<12 → paracetamol only. Child<6 → NO OTC. Blood thinners → NO NSAIDs. Always "consult before taking". If unsafe → OTC_UNSAFE:[reason].
+  return `You are DATUN AI, a warm friendly dental assistant — like a doctor friend who genuinely cares.
+PATIENT INFO: ${info} — DO NOT ask name, age, gender again.
+LANGUAGE: Mirror user exactly in ALL responses AND chips. Supported languages: Hindi, English, Hinglish, Tamil, Bengali, Marathi, Telugu, Kannada, Gujarati, Punjabi. Detect user language automatically and respond + chips in SAME language. Never mix languages unless user does.
+TONE: Conversational, warm, simple — like texting a caring friend. Short messages — max 2 lines. NO medical jargon.
+CHIPS: After EVERY question, add [OPTIONS: a|b|c|d] — max 4 options. Simple human language — NO medical terms in chips. 
+CHIP RULES: No "Pata nahi" — use "Yaad nahi" or "Pakka nahi". Make chips feel like real answers a person would say.
+CHIP EXAMPLES:
+- Dard kaisa hai? [OPTIONS: Thoda sa|Bahut zyada|Aata jaata hai|Sirf raat ko]
+- Thanda paani lagta hai? Ek ghunt lo aur us daant ke paas roko — lagta hai? [OPTIONS: Haan lagta 😬|Nahi yaar|Kabhi kabhi]
+- Koi dawai se pehle takleef hui? [OPTIONS: Nahi kabhi nahi|Haan hua tha|Yaad nahi]
+- Gaal pe sujan hai? Haath rakhke dekho. [OPTIONS: Haan ek taraf|Dono taraf|Nahi hai]
+HISTORY ORDER (1-2 questions at a time, short):
+1. Pehle: allergy + conditions (diabetes, BP) — simple language. Female: pregnancy.
+2. Phir: complaint location, duration, pain type, sensitivity, swelling, fever, night pain.
+RULES: NEVER diagnose with less than 3 answers. EMERGENCY (fever+swelling, swallowing problem) → flag immediately. After 2-3 answers → [REQUEST_PHOTO] naturally.
+OTC RULES: Unknown allergy → NO OTC. Pregnancy → paracetamol only. Child<12 → paracetamol only. Child<6 → NO OTC. Blood thinners → NO NSAIDs. If unsafe → OTC_UNSAFE:[reason].
 ASSESSMENT:
 [RX_START]
 DIAGNOSIS: ... URGENCY: (EMERGENCY/URGENT/ROUTINE/MONITOR)
@@ -1409,9 +1424,7 @@ CARE_DONT: ❌ ... ❌ ... ❌ ...
 MEDICINE: ...
 NOTE: ...
 [RX_END]
-After [RX_END]: warm 2-3 lines. End exactly: [SHOW_CONNECT]`;
-}
-
+After [RX_END]: warm 2-3 lines. End exactly: [SHOW_CONNECT]`;}
 function buildPSP(){return `You are Datun AI analyzing a dental photo. Built by a real doctor.
 LANGUAGE: Match patient's language.
 Examine for: Caries, Gum issues, Calculus, Fractures, Abscess, Discolouration, Soft tissue.
@@ -1511,7 +1524,9 @@ async function sendPhoto(b64,mt,du){
     if(r.includes('[FINDINGS_START]')&&r.includes('[FINDINGS_END]')){const m=r.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);if(m)findings=pFI(m[1]);disp=disp.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();}
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
-    addBot(disp,{findings,imgSrc:du,rx,connect});
+    const parsed=parseChips(disp);
+    renderChips(parsed.chips);
+    addBot(parsed.text,{findings,imgSrc:du,rx,connect});
     if(connectShown && patientEmail && !consultationSaved){
   consultationSaved=true;
   fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
@@ -1545,7 +1560,9 @@ async function sendMsg(ov){
     if(r.includes('[REQUEST_PHOTO]')&&!photoReqShown){photoReqShown=true;disp=disp.replace('[REQUEST_PHOTO]','').trim();const pb=document.getElementById('pb');if(pb){pb.style.background='rgba(10,158,143,.12)';pb.querySelector('svg').style.stroke='#0a9e8f';setTimeout(()=>{if(pb){pb.style.background='';pb.querySelector('svg').style.stroke='';}},8000);}}
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
-    addBot(disp,{rx,connect});
+    const parsed=parseChips(disp);
+    renderChips(parsed.chips);
+    addBot(parsed.text,{rx,connect});
     if(connectShown && patientEmail && !consultationSaved){
   consultationSaved=true;
   fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
@@ -1565,6 +1582,31 @@ async function sendMsg(ov){
   }catch{rmTyping();addBot('Oops! Something went wrong. Check your connection and try again.');}
 }
 
+  // ── CHIPS ──
+function renderChips(options){
+  const area=document.getElementById('chips-area');
+  if(!area)return;
+  area.innerHTML='';
+  if(!options||!options.length)return;
+  options.forEach(opt=>{
+    const c=document.createElement('button');
+    c.className='chip';
+    c.textContent=opt.trim();
+    c.onclick=()=>{
+      renderChips([]);
+      sendMsg(opt.trim());
+    };
+    area.appendChild(c);
+  });
+}
+
+function parseChips(text){
+  const match=text.match(/\[OPTIONS:\s*([^\]]+)\]/);
+  if(!match)return{text,chips:[]};
+  const chips=match[1].split('|').map(s=>s.trim()).filter(Boolean).slice(0,4);
+  const cleanText=text.replace(/\[OPTIONS:[^\]]+\]/,'').trim();
+  return{text:cleanText,chips};
+}
 function resetChat(){const m=document.getElementById('msgs');if(m)m.innerHTML='';conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;addBot(UI[lang].greet);}
 
 // Voice
