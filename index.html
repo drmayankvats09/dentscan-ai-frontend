@@ -1236,10 +1236,7 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
   <div id="lang-err" style="color:#dc2626;font-size:.72rem;margin-top:4px;display:none">Please select a language</div>
 </div>
       <div class="if"><label>Full Name</label><input id="p-name" type="text" placeholder="e.g. Rahul Sharma" autocomplete="name"/></div>
-      <div class="if-row">
-        <div class="if"><label>Age</label><input id="p-age" type="number" min="1" max="120" placeholder="28"/></div>
-        <div class="if"><label>Gender</label><select id="p-gender"><option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-      </div>
+      <div style="display:none"><input id="p-age" value=""/><select id="p-gender"><option value=""></option></select></div>
       <div class="if"><label>Email <span>(summary sent here)</span></label><input id="p-email" type="email" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')startConsult()"/></div>
       <div id="intake-err" class="is-err"></div>
       <button class="is-btn" onclick="startConsult()">Start My Consultation →</button>
@@ -1393,16 +1390,16 @@ let patientName='',patientAge='',patientGender='',patientEmail='';
 let isListening=false,recognition=null;
 
 const UI={
-  en:{ph:'Describe your dental concern...',get greet(){return `Hello ${patientName?patientName.split(' ')[0]:''}! 👋 I'm Datun AI — your dental assistant.\n\nWhat's your dental concern today? [OPTIONS: Tooth pain|Swelling|Bleeding gums|Something else]`;}},
-  hi:{ph:'Apni dant ki samasya batayein...',get greet(){return `Namaste ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon — aapka dental dost.\n\nAaj kya takleef hai? [OPTIONS: Dard hai|Sujan hai|Khoon aa rha|Kuch aur]`;}},
-  hinglish:{ph:'Apni problem batao...',get greet(){return `Hey ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon.\n\nKya problem hai aaj? [OPTIONS: Dard hai|Sujan|Bleeding|Kuch aur]`;}},
-  ta:{ph:'உங்கள் பல் பிரச்சனையை சொல்லுங்கள்...',get greet(){return `வணக்கம் ${patientName?patientName.split(' ')[0]:''}! 👋 நான் Datun AI.\n\nஇன்று என்ன பிரச்சனை? [OPTIONS: வலி|வீக்கம்|ரத்தம்|வேறு ஏதாவது]`;}},
-  bn:{ph:'আপনার সমস্যা বলুন...',get greet(){return `নমস্কার ${patientName?patientName.split(' ')[0]:''}! 👋 আমি Datun AI.\n\nআজ কী সমস্যা? [OPTIONS: ব্যথা|ফোলা|রক্ত|অন্য কিছু]`;}},
-  mr:{ph:'तुमची समस्या सांगा...',get greet(){return `नमस्कार ${patientName?patientName.split(' ')[0]:''}! 👋 मी Datun AI आहे.\n\nआज काय त्रास आहे? [OPTIONS: दुखणे|सूज|रक्त येणे|इतर काही]`;}},
-  te:{ph:'మీ సమస్య చెప్పండి...',get greet(){return `నమస్కారం ${patientName?patientName.split(' ')[0]:''}! 👋 నేను Datun AI.\n\nఈరోజు ఏమి సమస్య? [OPTIONS: నొప్పి|వాపు|రక్తం|మరేదైనా]`;}},
-  kn:{ph:'ನಿಮ್ಮ ಸಮಸ್ಯೆ ಹೇಳಿ...',get greet(){return `ನಮಸ್ಕಾರ ${patientName?patientName.split(' ')[0]:''}! 👋 ನಾನು Datun AI.\n\nಇಂದು ಏನು ತೊಂದರೆ? [OPTIONS: ನೋವು|ಊತ|ರಕ್ತ|ಬೇರೆ ಏನಾದರೂ]`;}},
-  gu:{ph:'તમારી સમસ્યા જણાવો...',get greet(){return `નમસ્તે ${patientName?patientName.split(' ')[0]:''}! 👋 હું Datun AI છું.\n\nઆજે શું તકલીફ છે? [OPTIONS: દુખાવો|સોજો|લોહી|બીજું કંઈ]`;}},
-  pa:{ph:'ਆਪਣੀ ਸਮੱਸਿਆ ਦੱਸੋ...',get greet(){return `ਸਤ ਸ੍ਰੀ ਅਕਾਲ ${patientName?patientName.split(' ')[0]:''}! 👋 ਮੈਂ Datun AI ਹਾਂ.\n\nਅੱਜ ਕੀ ਤਕਲੀਫ਼ ਹੈ? [OPTIONS: ਦਰਦ|ਸੋਜ|ਖੂਨ|ਕੁਝ ਹੋਰ]`;}}
+  en:{ph:'Describe your dental concern...',get greet(){return `Hello ${patientName?patientName.split(' ')[0]:''}! 👋 I'm Datun AI — your personal dental assistant, available 24/7! 😊\n\nJust a quick thing before we start — are you male, female or other? [OPTIONS: Male|Female|Other]`;}},
+  hi:{ph:'Apni dant ki samasya batayein...',get greet(){return `Namaste ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon — aapka 24/7 dental dost! 😊\n\nShuru karne se pehle — aap male hain, female hain ya other? [OPTIONS: Male|Female|Other]`;}},
+  hinglish:{ph:'Apni problem batao...',get greet(){return `Hey ${patientName?patientName.split(' ')[0]:''}! 👋 Main Datun AI hoon — tera dental buddy! 😊\n\nEk quick cheez — tu male hai, female hai ya other? [OPTIONS: Male|Female|Other]`;}},
+  ta:{ph:'உங்கள் பல் பிரச்சனையை சொல்லுங்கள்...',get greet(){return `வணக்கம் ${patientName?patientName.split(' ')[0]:''}! 👋 நான் Datun AI — உங்கள் பல் நண்பர்! 😊\n\nதொடங்குவதற்கு முன் — நீங்கள் ஆண், பெண் அல்லது other? [OPTIONS: ஆண்|பெண்|Other]`;}},
+  bn:{ph:'আপনার সমস্যা বলুন...',get greet(){return `নমস্কার ${patientName?patientName.split(' ')[0]:''}! 👋 আমি Datun AI — আপনার দাঁতের বন্ধু! 😊\n\nশুরুর আগে — আপনি কি পুরুষ, মহিলা নাকি other? [OPTIONS: পুরুষ|মহিলা|Other]`;}},
+  mr:{ph:'तुमची समस्या सांगा...',get greet(){return `नमस्कार ${patientName?patientName.split(' ')[0]:''}! 👋 मी Datun AI — तुमचा दंत मित्र! 😊\n\nसुरू करण्यापूर्वी — तुम्ही पुरुष, महिला की other? [OPTIONS: पुरुष|महिला|Other]`;}},
+  te:{ph:'మీ సమస్య చెప్పండి...',get greet(){return `నమస్కారం ${patientName?patientName.split(' ')[0]:''}! 👋 నేను Datun AI — మీ దంత స్నేహితుడు! 😊\n\nప్రారంభించే ముందు — మీరు పురుషుడా, స్త్రీయా లేదా other? [OPTIONS: పురుషుడు|స్త్రీ|Other]`;}},
+  kn:{ph:'ನಿಮ್ಮ ಸಮಸ್ಯೆ ಹೇಳಿ...',get greet(){return `ನಮಸ್ಕಾರ ${patientName?patientName.split(' ')[0]:''}! 👋 ನಾನು Datun AI — ನಿಮ್ಮ ದಂತ ಗೆಳೆಯ! 😊\n\nಪ್ರಾರಂಭಿಸುವ ಮೊದಲು — ನೀವು ಪುರುಷರಾ, ಮಹಿಳೆಯಾ ಅಥವಾ other? [OPTIONS: ಪುರುಷ|ಮಹಿಳೆ|Other]`;}},
+  gu:{ph:'તમારી સમસ્યા જણાવો...',get greet(){return `નમસ્તે ${patientName?patientName.split(' ')[0]:''}! 👋 હું Datun AI — તમારો દાંતનો મિત્ર! 😊\n\nશરૂ કરતા પહેલા — તમે પુરુષ, સ્ત્રી કે other? [OPTIONS: પુરુષ|સ્ત્રી|Other]`;}},
+  pa:{ph:'ਆਪਣੀ ਸਮੱਸਿਆ ਦੱਸੋ...',get greet(){return `ਸਤ ਸ੍ਰੀ ਅਕਾਲ ${patientName?patientName.split(' ')[0]:''}! 👋 ਮੈਂ Datun AI — ਤੁਹਾਡਾ ਦੰਦਾਂ ਦਾ ਦੋਸਤ! 😊\n\nਸ਼ੁਰੂ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ — ਤੁਸੀਂ ਮਰਦ, ਔਰਤ ਜਾਂ other? [OPTIONS: ਮਰਦ|ਔਰਤ|Other]`;}}
 };
 
 // ── LANGUAGE SELECTOR ──
@@ -1440,8 +1437,6 @@ function startConsult(){
   const errEl=document.getElementById('intake-err');
   if(!selectedLang){document.getElementById('lang-err').style.display='block';errEl.style.display='none';return;}
   if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
-  if(!age||+age<1||+age>120){errEl.textContent='Please enter a valid age.';errEl.style.display='block';return;}
-  if(!gender){errEl.textContent='Please select your gender.';errEl.style.display='block';return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';return;}
   errEl.style.display='none';
   lang=selectedLang;
@@ -1486,8 +1481,8 @@ You are DATUN AI — India's most advanced AI dental assistant, built by Dr. May
 PATIENT INFO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${info}
-NEVER ask name, age, or gender again — already collected.
-
+NEVER ask name again — already collected.
+AGE & GENDER: NOT collected yet. You MUST ask these first before anything else.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 WHO YOU ARE — PERSONALITY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1539,6 +1534,18 @@ CHIPS RULES
 CLINICAL HISTORY FLOW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Follow this order — one question at a time:
+
+STEP 0 — GENDER (first message after greeting):
+Greet warmly with patient's name + ji. Then IMMEDIATELY ask gender in same message:
+"Aap male hain, female hain ya other?" 
+[OPTIONS: Male|Female|Other]
+Silently save this answer as patient's gender for the entire consultation.
+
+STEP 0B — AGE (second message):
+After gender — ask age in simple human language:
+"Aur aapki umar kitni hai ji? Please type karein 😊"
+NO chips for age — user types the number.
+Silently save this as patient's age.
 
 STEP 1 — CHIEF COMPLAINT:
 "Kya takleef hai ji aaj? 🦷" [OPTIONS: Dard hai|Sujan hai|Khoon aa rha|Kuch aur]
