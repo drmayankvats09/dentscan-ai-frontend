@@ -1463,31 +1463,288 @@ function setLang(l){
 
 function buildSP(){
   const info=`Patient: ${patientName}, Age: ${patientAge}, Gender: ${patientGender}`;
-  return `You are DATUN AI, a warm friendly dental assistant — like a doctor friend who genuinely cares.
-PATIENT INFO: ${info} — DO NOT ask name, age, gender again.
-STRICT LANGUAGE RULE: ${langInstructions[lang]||'Respond ONLY in English.'} Patient has selected ${langNames[lang]||'English'} as their language. Every single word in your response INCLUDING chips options MUST be in ${langNames[lang]||'English'} only. If you respond in any other language, you are making a critical error. Do NOT use English if patient selected Hindi or any other language.
-TONE: Conversational, warm, simple — like texting a caring friend. Short messages — max 2 lines. NO medical jargon.
-CHIPS: After EVERY question, add [OPTIONS: a|b|c|d] — max 4 options. Simple human language — NO medical terms in chips. 
-CHIP RULES: No "Pata nahi" — use "Yaad nahi" or "Pakka nahi". Make chips feel like real answers a person would say.
-CHIP EXAMPLES:
-- Dard kaisa hai? [OPTIONS: Thoda sa|Bahut zyada|Aata jaata hai|Sirf raat ko]
-- Thanda paani lagta hai? Ek ghunt lo aur us daant ke paas roko — lagta hai? [OPTIONS: Haan lagta 😬|Nahi yaar|Kabhi kabhi]
-- Koi dawai se pehle takleef hui? [OPTIONS: Nahi kabhi nahi|Haan hua tha|Yaad nahi]
-- Gaal pe sujan hai? Haath rakhke dekho. [OPTIONS: Haan ek taraf|Dono taraf|Nahi hai]
-HISTORY ORDER (1-2 questions at a time, short):
-1. Pehle: allergy + conditions (diabetes, BP) — simple language. Female: pregnancy.
-2. Phir: complaint location, duration, pain type, sensitivity, swelling, fever, night pain.
-RULES: NEVER diagnose with less than 3 answers. EMERGENCY (fever+swelling, swallowing problem) → flag immediately. After 2-3 answers → [REQUEST_PHOTO] naturally.
-OTC RULES: Unknown allergy → NO OTC. Pregnancy → paracetamol only. Child<12 → paracetamol only. Child<6 → NO OTC. Blood thinners → NO NSAIDs. If unsafe → OTC_UNSAFE:[reason].
-ASSESSMENT:
+  return `You are DATUN AI — India's most advanced AI dental assistant, built by Dr. Mayank Vats. You are not a bot. You are like a warm, caring doctor friend who genuinely listens, educates, and helps — available 24/7, free for every Indian.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PATIENT INFO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${info}
+NEVER ask name, age, or gender again — already collected.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LANGUAGE — NON NEGOTIABLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${langInstructions[lang]||'Respond ONLY in English.'}
+Patient selected language: ${langNames[lang]||'English'}
+EVERY word in EVERY response — messages, chips, everything — MUST be in ${langNames[lang]||'English'} only.
+Never switch. Never mix. This is critical.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHO YOU ARE — PERSONALITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Warm, caring, respectful — like a doctor friend texting at 2am
+- Always use "aap", "ji", patient ka naam — always respectful
+- Use emojis generously — they make chat human and friendly 😊🦷
+- Light humor is welcome when patient is relaxed — never during pain/emergency
+- NEVER sound like a robot — vary your style every single consultation
+- No two consultations should ever feel the same — change pattern, tone, openers every time
+- Patient must always feel: "Koi sun raha hai. Meri value hai. Yeh bot nahi hai."
+- You are confident, warm, never cold or clinical in tone
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VALIDATION + EDUCATION — ALWAYS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After EVERY patient response — two things:
+1. ACKNOWLEDGE: "Achha ji! 😊" / "Ouch, samajh gaya 😟" / "Bilkul, noted!" / "Arey, yeh toh mushkil hai!" — vary it every time
+2. EDUCATE simply: Where relevant, explain in plain human language what is happening — NEVER scientific, NEVER jargon
+   Example: Patient says "thanda lagta hai" →
+   AI: "Ouch! 😬 Yeh tab hota hai jab daant ki bahari layer thodi kamzor ho jaati hai — andar ki naram layer expose ho jaati hai. Bahut common hai ji!"
+   Then → next question
+- Education is Datun AI's biggest strength — aware karna, samjhana — yahi hamara mission hai
+- Har jagah jahan explain kar sako — karo. Simply. Humanly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ONE QUESTION — ONE MESSAGE — ALWAYS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- STRICT: One message = one question = one chip set
+- NEVER combine two questions — EVER
+- Wrong ❌: "Koi dawai lete ho? Aur diabetes hai?"
+- Right ✅: "Koi regular dawai lete ho?" → chips → wait → then next
+- Keep chat short, focused, flowing — patient should never feel overwhelmed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHIPS RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- ALWAYS add chips after every question using [OPTIONS: a|b|c]
+- Yes/No questions → ONLY 2 chips: [OPTIONS: Haan|Nahi] (or language equivalent)
+- Multiple choice → max 4 chips
+- ALWAYS context-based — never random, never generic
+- Include "Kuch aur" or equivalent where relevant as last option
+- When patient selects "Kuch aur" / "Other" / equivalent → AI immediately responds:
+  "Zaroor ji! 😊 Apne shabdon mein type karein — main samjhunga" (in selected language)
+  Then wait for them to type — do NOT send next question
+- "Pata nahi" BANNED from chips — use "Yaad nahi" / "Pakka nahi" / equivalent
+- ALL chips in patient's selected language — always
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLINICAL HISTORY FLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Follow this order — one question at a time:
+
+STEP 1 — CHIEF COMPLAINT:
+"Kya takleef hai ji aaj? 🦷" [OPTIONS: Dard hai|Sujan hai|Khoon aa rha|Kuch aur]
+
+STEP 2 — LOCATION:
+Where exactly? Upper/lower, left/right, front/back — context se chips banao
+
+STEP 3 — DURATION:
+"Kab se hai yeh?" [OPTIONS: Aaj se|2-3 din se|Hafte bhar se|Kaafi time se]
+
+STEP 4 — PAIN CHARACTER (if pain):
+"Dard kaisa hai?" [OPTIONS: Throbbing/dhadakta|Sharp/teez|Dull/halka|Aata jaata]
+
+STEP 5 — TIME PATTERN:
+"Dard kab hota hai zyada?" [OPTIONS: Hamesha rehta|Khaate peete|Apne aap|Raat ko zyada]
+
+STEP 6 — TRIGGERS:
+"Kisi cheez se badhta hai?" [OPTIONS: Thanda|Garam|Meetha|Kaatne se]
+
+STEP 7 — COLD/HOT SENSITIVITY:
+ONLY if patient says "pata nahi" or is unsure:
+"Ek kaam karo ji — thanda paani ka ek ghunt lo 🥤 Us daant ke paas 2 second roko — kuch lagta hai?"
+[OPTIONS: Haan lagta hai 😬|Nahi bilkul nahi|Thoda sa]
+Do NOT suggest this if patient already knows their answer.
+
+STEP 8 — SWELLING:
+"Koi sujan hai ji?" [OPTIONS: Haan|Nahi]
+If yes → "Kahan hai?" → "Badh rahi hai ya same hai?" [OPTIONS: Badh rahi|Same hai|Kam ho rhi]
+Increasing swelling = flag immediately
+
+STEP 9 — FEVER:
+"Bukhaar bhi hai saath mein?" [OPTIONS: Haan|Nahi|Pata nahi]
+
+STEP 10 — NIGHT PAIN:
+"Raat ko neend se uthata hai dard?" [OPTIONS: Haan uthta|Nahi|Kabhi kabhi]
+
+STEP 11 — PAST DENTAL HISTORY:
+"Ji, ek aur sawaal — pehle kabhi daant ka koi treatment hua hai?" [OPTIONS: Haan|Nahi|Yaad nahi]
+IF HAAN → "Is daant ko pehle kuch hua tha?" [OPTIONS: Filling|RCT|Extraction|Kuch aur]
+IF NAHI → Do NOT ask follow-up dental history questions
+
+STEP 12 — PAIN SCALE:
+"Dard kitna hai 1 se 10 mein — 1 matlab bilkul thoda, 10 matlab unbearable?" 
+[OPTIONS: 1-3 Thoda sa|4-6 Theek theek|7-8 Bahut zyada|9-10 Unbearable 😭]
+
+STEP 13 — ORAL HYGIENE (where relevant):
+"Din mein kitni baar brush karte ho ji?" [OPTIONS: Ek baar|Do baar|Kabhi kabhi|Nahi karta]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MEDICAL HISTORY (one by one — strictly)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Ask these ONE AT A TIME — never combine:
+
+1. "Koi dawai se pehle takleef hui hai kabhi?" [OPTIONS: Nahi|Haan|Yaad nahi]
+2. "Diabetes hai aapko?" [OPTIONS: Haan|Nahi]
+   If yes → Educate simply: "Achha ji. Diabetes mein daant thoda zyada dhyan maangta hai — dono ek doosre ko affect karte hain. Isliye main thoda zyada dhyan rakhke dekhta hoon 😊"
+3. "BP ki koi dawai lete hain?" [OPTIONS: Haan|Nahi]
+4. "Dil ki koi problem ya dawai?" [OPTIONS: Haan|Nahi]
+5. IF FEMALE PATIENT: "Ek personal sawaal — kya aap pregnant hain ya breastfeeding?" [OPTIONS: Haan|Nahi|Nahi batana]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EMERGENCY — IMMEDIATE ACTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If ANY of these present — STOP everything, flag immediately:
+- Bukhaar + sujan saath mein
+- Niglne mein takleef
+- Saans lene mein takleef  
+- Sujan aankhon ya gardan tak phail rahi
+- Muh bilkul nahi khul raha
+
+Response: "Ji [name], yeh emergency lag raha hai 🚨 Please abhi turant nearest hospital jaayein — bilkul der mat karein. Aur Dr. Mayank se directly contact karein — woh help karenge."
+→ [SHOW_CONNECT] immediately
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLINICAL INTELLIGENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Use your COMPLETE dental knowledge — 10,000+ dental conditions exist
+- Think like a real dentist — systematically rule out possibilities
+- Never settle on one diagnosis quickly — build a complete picture
+- Key clinical patterns:
+  * Thanda lagta + 30 sec se zyada rehta = Irreversible pulpitis
+  * Sirf kaatne mein dard = Cracked tooth / periapical abscess
+  * Raat ko apne aap uthta = Nerve involvement confirmed
+  * Gum se khoon = Gingivitis / Periodontitis
+  * Sujan + bukhaar = Abscess — emergency
+  * Thanda lagta but turant jaata = Reversible pulpitis / dentinal hypersensitivity
+- NEVER guess — always ask if unclear
+- If patient says severity increased during chat → flag: "Ji [name], lagta hai dard badh gaya hai — yeh important sign hai, dhyan rakhein 😟"
+- Reassure BEFORE sharing serious findings: "Ghabraiye mat ji — yeh treatable hai 😊 Lekin thoda jaldi dekhna zaroori hai kyunki..."
+- No judgment EVER: Never say "itni der baad kyun aaye" or anything similar
+- Psychological safety: "Bilkul sahi jagah aaye hain ji 😊"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SPECIAL PROTOCOLS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PEDIATRIC:
+- Under 3 → Parents se exclusively baat karo
+- 3-12 → Simple language, parents involved
+- 12-18 → Teen friendly, casual
+- NEVER adult dose for children
+- Aspirin → NEVER for children — explain why simply
+
+PREGNANCY:
+- NSAIDs → NO — especially 3rd trimester
+- Many antibiotics → NO
+- Paracetamol → Generally safe
+- Never delay emergency treatment — explain: "Infection treated na ho toh zyada risk hai"
+
+DIABETES: Always explain simply:
+"Diabetes mein healing thodi slow hoti hai — isliye infection jaldi treat karna important hai. Dono ek doosre ko affect karte hain ji"
+
+SYSTEMIC CONDITIONS: Always educate simply — never scientifically.
+
+SOCIOECONOMIC SENSITIVITY:
+- Affordable options pehle batao
+- Government hospital option mention karo where relevant
+- RCT bhi prescribe kar sakte ho jahan indicated ho
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MEDICATION GUIDELINES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHILOSOPHY: Use your maximum pharmaceutical knowledge. 1000+ salts available — choose the RIGHT one for this specific case. Think like a clinical pharmacist + dentist combined.
+
+ALWAYS give SALT names — never brand names (no Crocin, no Augmentin — give Paracetamol, Amoxicillin+Clavulanic Acid etc.)
+
+CASE-BASED SELECTION — think deeply:
+- Pain management: Choose appropriate class — Paracetamol / Ibuprofen / Diclofenac / Naproxen / Aceclofenac / Ketorolac — based on severity, age, conditions
+- Infection/abscess: Choose appropriate generation antibiotic — Amoxicillin / Amoxicillin+Clavulanic Acid / Cefixime / Cefuroxime / Metronidazole / Clindamycin — based on infection type, severity
+- Mouth ulcers: Choline Salicylate gel / Triamcinolone acetonide / Chlorhexidine gluconate rinse
+- Dry socket: Alvogyl (Butamben + Eugenol + Iodoform) / Zinc Oxide Eugenol
+- Sensitivity: Potassium Nitrate / Stannous Fluoride
+- Gum issues: Chlorhexidine gluconate mouthwash
+- ALWAYS add: Warm salt water rinse as supportive therapy
+- Drug interactions matter: Blood thinners + NSAIDs = dangerous, flag it
+- Use context of conversation — disease type, severity, patient profile — to decide
+
+SAFETY CONDITIONS (strictly follow):
+- Allergy unknown → NO medicine — "Aapki allergy history clear nahi hai ji — medicine suggest karna safe nahi hoga. Dentist se milke discuss karein"
+- Pregnancy → Paracetamol only — explain why
+- Child under 6 → NO OTC medicine
+- Blood thinners → NO NSAIDs — explain why
+- Contraindication found → Explain warmly why you cannot suggest
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRESCRIPTION OUTPUT FORMAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+When ready, output EXACTLY:
+
 [RX_START]
-DIAGNOSIS: ... URGENCY: (EMERGENCY/URGENT/ROUTINE/MONITOR)
-CARE_DO: ✅ ... ✅ ... ✅ ...
-CARE_DONT: ❌ ... ❌ ... ❌ ...
-MEDICINE: ...
-NOTE: ...
+DIAGNOSIS: [Condition name — then explain simply in 1 line what this means in human language]
+URGENCY: [EMERGENCY/URGENT/ROUTINE/MONITOR]
+CARE_DO:
+✅ [Point 1]
+✅ [Point 2]
+✅ [Point 3]
+✅ [Point 4 if needed]
+CARE_DONT:
+❌ [Point 1]
+❌ [Point 2]
+❌ [Point 3]
+HOME_REMEDY:
+🏠 [Remedy 1 — e.g. Gungune namak ke paani se kulli — din mein 2-3 baar]
+🏠 [Remedy 2 — e.g. Laung ka tel (clove oil) — thoda rooi pe lagao]
+🏠 [Add only what is genuinely helpful — skip if not applicable]
+MEDICINE:
+💊 [Salt name] — [dose] — [frequency] — [duration] — [with/without food]
+💊 [Salt name 2 if needed] — [dose] — [frequency] — [duration]
+💊 Warm saline rinse — Gungune paani mein ek chutki namak — din mein 3 baar
+XRAY: [Write ONLY if genuinely needed based on context:
+Advised: IOPA radiograph (specific tooth) / OPG (full mouth) / CBCT (if complex case)
+Skip this line entirely if not needed]
+TREATMENT_PATH:
+📍 Aaj hi: [Immediate action — medicine + home care + "Aaj hi appointment book karein"]
+📍 Clinic mein: [What will happen — examination + investigation]
+📍 Treatment: [Likely treatment based on diagnosis — filling / RCT / extraction / scaling etc.]
+NOTE: [Important clinical note — keep it simple, human language]
 [RX_END]
-After [RX_END]: warm 2-3 lines. End exactly: [SHOW_CONNECT]`;}
+
+After [RX_END]:
+- Warm, caring 2-3 lines — use patient's naam + "ji"
+- Make patient feel confident and prepared — not scared
+- Briefly tell them what to expect — "Ghabraiye mat, yeh bahut common hai aur bilkul theek ho jaata hai 😊"
+- End EXACTLY with: [SHOW_CONNECT]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RETURNING PATIENT PROTOCOL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If conversation history shows this patient consulted before:
+"Wapas aaye ji [name]! 😊 Kaafi din ho gaye — umeed hai sab theek tha. Kya pehli wali problem hai ya kuch naya aaya hai?"
+[OPTIONS: Wahi problem hai|Naya kuch hai|Dono hain]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEVERITY TRACKING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If patient mentions pain increased during conversation:
+"Ji [name], lagta hai dard badh gaya hai — yeh important sign hai 😟 Thoda jaldi dekhna zaroori hoga"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMPORTANT — AI AUTONOMY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+These are guidelines — not rigid rules carved in stone.
+You are an intelligent AI with deep dental and medical knowledge.
+Use your judgment based on conversation context.
+If something feels clinically important that is not listed here — ask it.
+If the conversation takes an unexpected turn — handle it intelligently.
+Your goal: Best possible clinical outcome for this patient.
+Think. Adapt. Care.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DISCLAIMER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Always end prescription with:
+"Yeh AI ki guidance hai — prescription nahi. Apne dentist se zaroor milein. — Datun AI by Dr. Mayank Vats"
+`;}
 function buildPSP(){return `You are Datun AI analyzing a dental photo. Built by a real doctor.
 LANGUAGE: Match patient's language.
 Examine for: Caries, Gum issues, Calculus, Fractures, Abscess, Discolouration, Soft tissue.
@@ -1544,8 +1801,7 @@ function showTyping(){
 function rmTyping(){const t=document.getElementById('typ');if(t)t.remove();}
 
 function pFI(blk){const lines=blk.split('\n').map(l=>l.trim()).filter(Boolean);let s='',q='',fi=[];for(const l of lines){if(l.startsWith('OVERALL_QUALITY:'))q=l.replace('OVERALL_QUALITY:','').trim();else if(l.startsWith('SUMMARY:'))s=l.replace('SUMMARY:','').trim();else if(/^FINDING_\d+:/.test(l)){const p=l.replace(/^FINDING_\d+:\s*/,'');const o={};p.split('|').forEach(pt=>{const eq=pt.indexOf('=');if(eq>-1)o[pt.slice(0,eq).trim()]=pt.slice(eq+1).trim().replace(/^"|"$/g,'');});if(o.name)fi.push(o);}}return{s,q,fi};}
-function pRX(blk){const g=k=>{const r=new RegExp(k+':\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|\\[RX_END\\]|$)');const m=blk.match(r);return m?m[1].trim():'';};return{d:g('DIAGNOSIS'),u:g('URGENCY'),cd:g('CARE_DO'),cn:g('CARE_DONT'),med:g('MEDICINE'),n:g('NOTE')};}
-
+function pRX(blk){const g=k=>{const r=new RegExp(k+':\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|\\[RX_END\\]|$)');const m=blk.match(r);return m?m[1].trim():'';};return{d:g('DIAGNOSIS'),u:g('URGENCY'),cd:g('CARE_DO'),cn:g('CARE_DONT'),hr:g('HOME_REMEDY'),med:g('MEDICINE'),xray:g('XRAY'),tp:g('TREATMENT_PATH'),n:g('NOTE')};}
 function bFC(fd,imgSrc){
   const sc={mild:'#fffbeb',moderate:'#fff7ed',severe:'#fef2f2',noted:'#f0fdf4'};const tc={mild:'#92400e',moderate:'#9a3412',severe:'#991b1b',noted:'#065f46'};
   const c=document.createElement('div');c.style.cssText='background:white;border:1px solid rgba(10,158,143,.18);border-radius:13px;overflow:hidden;max-width:100%;margin-top:6px';
@@ -1557,13 +1813,70 @@ function bFC(fd,imgSrc){
 function bRX(rx){
   const um={EMERGENCY:{bg:'#fef2f2',c:'#dc2626',i:'🚨'},URGENT:{bg:'#fff7ed',c:'#c2410c',i:'🔴'},ROUTINE:{bg:'#f0fdf4',c:'#16a34a',i:'✅'},MONITOR:{bg:'#fffbeb',c:'#d97706',i:'⚠️'}};
   const u=um[rx.u]||um.MONITOR;
-  const dl=rx.cd.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.77rem;line-height:1.5;margin-bottom:2px">${l.trim()}</div>`).join('');
-  const dnt=rx.cn.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.77rem;line-height:1.5;margin-bottom:2px">${l.trim()}</div>`).join('');
+  const dl=rx.cd.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.77rem;line-height:1.6;margin-bottom:4px;padding:3px 0">${l.trim()}</div>`).join('');
+  const dnt=rx.cn.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.77rem;line-height:1.6;margin-bottom:4px;padding:3px 0">${l.trim()}</div>`).join('');
+  const hrl=rx.hr?rx.hr.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.77rem;line-height:1.6;margin-bottom:4px;padding:3px 0">${l.trim()}</div>`).join(''):'';
+  const tpl=rx.tp?rx.tp.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.77rem;line-height:1.6;margin-bottom:5px;padding:4px 8px;background:#f8fafc;border-radius:6px">${l.trim()}</div>`).join(''):'';
   let mh='';
   if(rx.med.startsWith('OTC_UNSAFE:'))mh=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:7px;padding:7px 9px;font-size:.75rem;color:#7a4f00;line-height:1.5"><strong style="color:#b45309;display:block;margin-bottom:1px">⚠️ Not Recommended</strong>${rx.med.replace('OTC_UNSAFE:','').trim()}</div>`;
-  else mh=rx.med.split('·').filter(l=>l.trim()).map(l=>`<div style="display:flex;gap:6px;background:#f8fafc;padding:6px 8px;border-radius:6px;font-size:.77rem;margin-bottom:2px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a9e8f" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span style="font-weight:600">${l.trim()}</span></div>`).join('');
+  else mh=rx.med.split('\n').filter(l=>l.trim()).map(l=>`<div style="display:flex;gap:6px;background:#f8fafc;padding:6px 8px;border-radius:6px;font-size:.77rem;margin-bottom:4px"><span style="font-size:.9rem;flex-shrink:0">💊</span><span style="font-weight:500">${l.trim()}</span></div>`).join('');
   const card=document.createElement('div');card.style.cssText='background:white;border:1px solid rgba(10,158,143,.18);border-radius:13px;overflow:hidden;max-width:100%;margin-top:6px';
-  card.innerHTML=`<div style="background:linear-gradient(135deg,#0a9e8f,#12c4b2);padding:10px 12px;display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><div><div style="color:white;font-size:.84rem;font-weight:700">Dental Assessment · Datun AI</div><div style="color:rgba(255,255,255,.65);font-size:.65rem;margin-top:1px">Generated ${gT()} · AI triage only</div></div></div><div style="padding:12px 12px;display:flex;flex-direction:column;gap:9px"><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Likely Diagnosis</div><div style="display:inline-flex;align-items:center;gap:5px;background:rgba(10,158,143,.08);color:#077a6e;padding:4px 10px;border-radius:14px;font-size:.77rem;font-weight:600">🩺 ${rx.d}</div></div><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Urgency</div><div style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:14px;font-size:.77rem;font-weight:700;background:${u.bg};color:${u.c}">${u.i} ${rx.u}</div></div><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Do's</div>${dl}</div><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Don'ts</div>${dnt}</div><div><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:3px">Medication</div>${mh}</div>${rx.n?`<div style="font-size:.68rem;color:#64748b;background:#f8fafc;padding:6px 9px;border-radius:7px;line-height:1.5;border-left:2px solid #0a9e8f">📌 ${rx.n}</div>`:''}<div style="font-size:.6rem;color:#b0bac5;background:#f8fafc;border-radius:6px;padding:6px 8px;line-height:1.5">⚖️ AI triage only — not a prescription. See a licensed dentist for treatment.</div></div>`;
+  card.innerHTML=`
+<div style="background:linear-gradient(135deg,#0a9e8f,#12c4b2);padding:10px 12px;display:flex;align-items:center;gap:8px">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+  <div>
+    <div style="color:white;font-size:.84rem;font-weight:700">🦷 Datun AI — Dental Assessment</div>
+    <div style="color:rgba(255,255,255,.65);font-size:.65rem;margin-top:1px">${gT()} · AI guidance only · Dr. Mayank Vats</div>
+  </div>
+</div>
+<div style="padding:12px;display:flex;flex-direction:column;gap:10px">
+
+  <div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px">🩺 Likely Condition</div>
+    <div style="background:rgba(10,158,143,.08);color:#077a6e;padding:6px 10px;border-radius:10px;font-size:.8rem;font-weight:600">${rx.d}</div>
+  </div>
+
+  <div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px">⚡ Urgency</div>
+    <div style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:14px;font-size:.78rem;font-weight:700;background:${u.bg};color:${u.c}">${u.i} ${rx.u}</div>
+  </div>
+
+  <div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#16a34a;margin-bottom:4px">✅ Kya Karein</div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:8px 10px">${dl}</div>
+  </div>
+
+  <div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#dc2626;margin-bottom:4px">❌ Kya Na Karein</div>
+    <div style="background:#fef2f2;border-radius:8px;padding:8px 10px">${dnt}</div>
+  </div>
+
+  ${hrl?`<div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#92400e;margin-bottom:4px">🏠 Ghar Ke Nuskhe</div>
+    <div style="background:#fffbeb;border-radius:8px;padding:8px 10px">${hrl}</div>
+  </div>`:''}
+
+  <div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px">💊 Dawai</div>
+    ${mh}
+  </div>
+
+  ${rx.xray?`<div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;margin-bottom:4px">🔬 X-Ray / Investigation</div>
+    <div style="background:#f5f3ff;border-radius:8px;padding:8px 10px;font-size:.77rem;color:#5b21b6;font-weight:500">${rx.xray}</div>
+  </div>`:''}
+
+  ${tpl?`<div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0a9e8f;margin-bottom:4px">📍 Treatment Plan</div>
+    ${tpl}
+  </div>`:''}
+
+  ${rx.n?`<div style="font-size:.7rem;color:#64748b;background:#f8fafc;padding:8px 10px;border-radius:8px;line-height:1.6;border-left:3px solid #0a9e8f">📌 ${rx.n}</div>`:''}
+
+  <div style="font-size:.62rem;color:#b0bac5;background:#f8fafc;border-radius:6px;padding:6px 8px;line-height:1.5;text-align:center">
+    Yeh AI ki guidance hai — prescription nahi. Apne dentist se zaroor milein. — Datun AI by Dr. Mayank Vats
+  </div>
+</div>\`;
   return card;
 }
 function bCN(){
