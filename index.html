@@ -1355,7 +1355,7 @@ const p3d=document.getElementById('phone3d');
 if(p3d){document.addEventListener('mousemove',e=>{const r=p3d.getBoundingClientRect();if(!r.width)return;const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;p3d.style.transform=`perspective(1000px) rotateY(${((.5-x)*12).toFixed(1)}deg) rotateX(${((y-.5)*8).toFixed(1)}deg)`;});}
 
 // ── CHAT STATE ──
-let lang='en',conv=[],rxShown=false,connectShown=false,photoReqShown=false;
+let lang='en',conv=[],rxShown=false,connectShown=false,photoReqShown=false,consultationSaved=false;
 let patientName='',patientAge='',patientGender='',patientEmail='';
 let isListening=false,recognition=null;
 
@@ -1511,7 +1511,8 @@ async function sendPhoto(b64,mt,du){
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
     addBot(disp,{findings,imgSrc:du,rx,connect});
-    if(connectShown && patientEmail){
+    if(connectShown && patientEmail && !consultationSaved){
+  consultationSaved=true;
   fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -1544,7 +1545,8 @@ async function sendMsg(ov){
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
     addBot(disp,{rx,connect});
-    if(connectShown && patientEmail){
+    if(connectShown && patientEmail && !consultationSaved){
+  consultationSaved=true;
   fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
