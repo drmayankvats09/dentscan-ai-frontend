@@ -1219,19 +1219,20 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
       <h2 class="is-h">Quick Details</h2>
       <p class="is-sub">So Datun AI skips the basics and goes straight to your dental concern.</p>
       <div class="if">
-  <label>Language / भाषा चुनें</label>
-  <div id="lang-selector" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
-    <div class="lang-opt" onclick="selectLang('en')" data-lang="en">🇬🇧 English</div>
-    <div class="lang-opt" onclick="selectLang('hi')" data-lang="hi">🇮🇳 हिंदी</div>
-    <div class="lang-opt" onclick="selectLang('hinglish')" data-lang="hinglish">🤝 Hinglish</div>
-    <div class="lang-opt" onclick="selectLang('ta')" data-lang="ta">தமிழ் Tamil</div>
-    <div class="lang-opt" onclick="selectLang('bn')" data-lang="bn">বাংলা Bengali</div>
-    <div class="lang-opt" onclick="selectLang('mr')" data-lang="mr">मराठी Marathi</div>
-    <div class="lang-opt" onclick="selectLang('te')" data-lang="te">తెలుగు Telugu</div>
-    <div class="lang-opt" onclick="selectLang('kn')" data-lang="kn">ಕನ್ನಡ Kannada</div>
-    <div class="lang-opt" onclick="selectLang('gu')" data-lang="gu">ગુજરાતી Gujarati</div>
-    <div class="lang-opt" onclick="selectLang('pa')" data-lang="pa">ਪੰਜਾਬੀ Punjabi</div>
-  </div>
+  <label>Language / भाषा</label>
+  <select id="p-lang" onchange="selectLang(this.value)">
+    <option value="">Select Language</option>
+    <option value="en">🇬🇧 English</option>
+    <option value="hi">🇮🇳 हिंदी Hindi</option>
+    <option value="hinglish">🤝 Hinglish</option>
+    <option value="ta">தமிழ் Tamil</option>
+    <option value="bn">বাংলা Bengali</option>
+    <option value="mr">मराठी Marathi</option>
+    <option value="te">తెలుగు Telugu</option>
+    <option value="kn">ಕನ್ನಡ Kannada</option>
+    <option value="gu">ગુજરાતી Gujarati</option>
+    <option value="pa">ਪੰਜਾਬੀ Punjabi</option>
+  </select>
   <div id="lang-err" style="color:#dc2626;font-size:.72rem;margin-top:4px;display:none">Please select a language</div>
 </div>
       <div class="if"><label>Full Name</label><input id="p-name" type="text" placeholder="e.g. Rahul Sharma" autocomplete="name"/></div>
@@ -1357,7 +1358,7 @@ function goPage(name){
     const err=document.getElementById('intake-err');if(err)err.style.display='none';
     conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
     patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
-    document.querySelectorAll('.lang-opt').forEach(el=>el.classList.remove('selected'));
+    const pl=document.getElementById('p-lang');if(pl)pl.value='';
   }
 }
 function goHome(){goPage('home');}
