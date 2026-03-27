@@ -1324,8 +1324,8 @@ function goPage(name){
     ['p-name','p-age','p-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     const pg=document.getElementById('p-gender');if(pg)pg.value='';
     const err=document.getElementById('intake-err');if(err)err.style.display='none';
-    conv=[];rxShown=false;connectShown=false;photoReqShown=false;
-    patientName='';patientAge='';patientGender='';patientEmail='';
+    conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
+    patientName='';
   }
 }
 function goHome(){goPage('home');}
@@ -1380,6 +1380,7 @@ function startConsult(){
   const cu=document.getElementById('chat-ui');cu.style.display='flex';
   const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · Hi, '+name.split(' ')[0]+'!';
   const ed=document.getElementById('email-display');if(ed)ed.textContent=email;
+  consultationSaved=false;
   resetChat();
 }
 
@@ -1564,7 +1565,7 @@ async function sendMsg(ov){
   }catch{rmTyping();addBot('Oops! Something went wrong. Check your connection and try again.');}
 }
 
-function resetChat(){const m=document.getElementById('msgs');if(m)m.innerHTML='';conv=[];rxShown=false;connectShown=false;photoReqShown=false;addBot(UI[lang].greet);}
+function resetChat(){const m=document.getElementById('msgs');if(m)m.innerHTML='';conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;addBot(UI[lang].greet);}
 
 // Voice
 function toggleVoice(){if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice input not supported. Please use Chrome.');return;}isListening?stopVoice():startVoice();}
