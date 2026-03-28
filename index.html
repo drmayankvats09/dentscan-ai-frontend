@@ -1422,6 +1422,133 @@ const langInstructions={
   pa:'Respond ONLY in Punjabi.'
 };
 
+const rxLabels = {
+  en: {
+    condition: '🩺 Likely Condition',
+    urgency: '⚡ Urgency',
+    do: '✅ What To Do',
+    dont: '❌ What NOT To Do',
+    homeRemedy: '🏠 Home Remedies',
+    medicine: '💊 Medicine',
+    xray: '🔬 X-Ray / Investigation',
+    treatmentPlan: '📍 Treatment Plan',
+    disclaimer: 'This is AI guidance — not a prescription. Please consult your dentist. — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 Time to see a real dentist'
+  },
+  hi: {
+    condition: '🩺 संभावित समस्या',
+    urgency: '⚡ अर्जेंसी',
+    do: '✅ क्या करें',
+    dont: '❌ क्या न करें',
+    homeRemedy: '🏠 घर के नुस्खे',
+    medicine: '💊 दवाई',
+    xray: '🔬 एक्स-रे / जाँच',
+    treatmentPlan: '📍 इलाज का रास्ता',
+    disclaimer: 'यह AI की गाइडेंस है — प्रिस्क्रिप्शन नहीं। अपने डेंटिस्ट से ज़रूर मिलें। — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 असली डेंटिस्ट से मिलें'
+  },
+  hinglish: {
+    condition: '🩺 Likely Condition',
+    urgency: '⚡ Urgency',
+    do: '✅ Kya Karein',
+    dont: '❌ Kya Na Karein',
+    homeRemedy: '🏠 Ghar Ke Nuskhe',
+    medicine: '💊 Dawai',
+    xray: '🔬 X-Ray / Investigation',
+    treatmentPlan: '📍 Treatment Plan',
+    disclaimer: 'Yeh AI ki guidance hai — prescription nahi. Apne dentist se zaroor milein. — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 Time to see a real dentist'
+  },
+  ta: {
+    condition: '🩺 சாத்தியமான நிலை',
+    urgency: '⚡ அவசரம்',
+    do: '✅ என்ன செய்ய வேண்டும்',
+    dont: '❌ என்ன செய்யக்கூடாது',
+    homeRemedy: '🏠 வீட்டு வைத்தியம்',
+    medicine: '💊 மருந்து',
+    xray: '🔬 எக்ஸ்-ரே / பரிசோதனை',
+    treatmentPlan: '📍 சிகிச்சை திட்டம்',
+    disclaimer: 'இது AI வழிகாட்டுதல் — மருந்துச் சீட்டு அல்ல। உங்கள் பல் மருத்துவரை சந்தியுங்கள். — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 பல் மருத்துவரை சந்தியுங்கள்'
+  },
+  bn: {
+    condition: '🩺 সম্ভাব্য সমস্যা',
+    urgency: '⚡ জরুরি',
+    do: '✅ কী করবেন',
+    dont: '❌ কী করবেন না',
+    homeRemedy: '🏠 ঘরোয়া প্রতিকার',
+    medicine: '💊 ওষুধ',
+    xray: '🔬 এক্স-রে / পরীক্ষা',
+    treatmentPlan: '📍 চিকিৎসা পরিকল্পনা',
+    disclaimer: 'এটি AI-এর নির্দেশনা — প্রেসক্রিপশন নয়। আপনার ডেন্টিস্টের সাথে দেখা করুন। — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 ডেন্টিস্টের সাথে দেখা করুন'
+  },
+  mr: {
+    condition: '🩺 संभाव्य समस्या',
+    urgency: '⚡ तातडी',
+    do: '✅ काय करावे',
+    dont: '❌ काय करू नये',
+    homeRemedy: '🏠 घरगुती उपाय',
+    medicine: '💊 औषध',
+    xray: '🔬 एक्स-रे / तपासणी',
+    treatmentPlan: '📍 उपचार योजना',
+    disclaimer: 'हे AI मार्गदर्शन आहे — प्रिस्क्रिप्शन नाही. आपल्या दंतवैद्याला भेटा. — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 दंतवैद्याला भेटा'
+  },
+  te: {
+    condition: '🩺 సంభావ్య సమస్య',
+    urgency: '⚡ అత్యవసరం',
+    do: '✅ ఏమి చేయాలి',
+    dont: '❌ ఏమి చేయకూడదు',
+    homeRemedy: '🏠 ఇంటి చిట్కాలు',
+    medicine: '💊 మందు',
+    xray: '🔬 ఎక్స్-రే / పరీక్ష',
+    treatmentPlan: '📍 చికిత్స ప్రణాళిక',
+    disclaimer: 'ఇది AI మార్గదర్శకత్వం — ప్రిస్క్రిప్షన్ కాదు. మీ దంతవైద్యుడిని సంప్రదించండి. — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 దంతవైద్యుడిని సంప్రదించండి'
+  },
+  kn: {
+    condition: '🩺 ಸಂಭಾವ್ಯ ಸಮಸ್ಯೆ',
+    urgency: '⚡ ತುರ್ತು',
+    do: '✅ ಏನು ಮಾಡಬೇಕು',
+    dont: '❌ ಏನು ಮಾಡಬಾರದು',
+    homeRemedy: '🏠 ಮನೆ ಮದ್ದು',
+    medicine: '💊 ಔಷಧಿ',
+    xray: '🔬 ಎಕ್ಸ್-ರೇ / ಪರೀಕ್ಷೆ',
+    treatmentPlan: '📍 ಚಿಕಿತ್ಸಾ ಯೋಜನೆ',
+    disclaimer: 'ಇದು AI ಮಾರ್ಗದರ್ಶನ — ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಅಲ್ಲ. ನಿಮ್ಮ ದಂತವೈದ್ಯರನ್ನು ಭೇಟಿ ಮಾಡಿ. — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 ದಂತವೈದ್ಯರನ್ನು ಭೇಟಿ ಮಾಡಿ'
+  },
+  gu: {
+    condition: '🩺 સંભવિત સમસ્યા',
+    urgency: '⚡ તાકીદ',
+    do: '✅ શું કરવું',
+    dont: '❌ શું ન કરવું',
+    homeRemedy: '🏠 ઘરેલું ઉપાય',
+    medicine: '💊 દવા',
+    xray: '🔬 એક્સ-રે / તપાસ',
+    treatmentPlan: '📍 સારવાર યોજના',
+    disclaimer: 'આ AI માર્ગદર્શન છે — પ્રિસ્ક્રિપ્શન નથી. તમારા ડેન્ટિસ્ટને મળો. — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 ડેન્ટિસ્ટને મળો'
+  },
+  pa: {
+    condition: '🩺 ਸੰਭਾਵਿਤ ਸਮੱਸਿਆ',
+    urgency: '⚡ ਜ਼ਰੂਰੀ',
+    do: '✅ ਕੀ ਕਰਨਾ ਹੈ',
+    dont: '❌ ਕੀ ਨਹੀਂ ਕਰਨਾ',
+    homeRemedy: '🏠 ਘਰੇਲੂ ਨੁਸਖੇ',
+    medicine: '💊 ਦਵਾਈ',
+    xray: '🔬 ਐਕਸ-ਰੇ / ਜਾਂਚ',
+    treatmentPlan: '📍 ਇਲਾਜ ਦੀ ਯੋਜਨਾ',
+    disclaimer: 'ਇਹ AI ਦੀ ਗਾਈਡੈਂਸ ਹੈ — ਨੁਸਖਾ ਨਹੀਂ। ਆਪਣੇ ਦੰਦਾਂ ਦੇ ਡਾਕਟਰ ਨੂੰ ਮਿਲੋ। — Datun AI by Dr. Mayank Vats',
+    connectTitle: '📅 ਦੰਦਾਂ ਦੇ ਡਾਕਟਰ ਨੂੰ ਮਿਲੋ'
+  }
+};
+
+function getRxL() {
+  return rxLabels[lang] || rxLabels['en'];
+}
+
 function selectLang(l){
   selectedLang=l;
   document.querySelectorAll('.lang-opt').forEach(el=>{
@@ -1835,6 +1962,7 @@ function bFC(fd,imgSrc){
   c.innerHTML=h;return c;
 }
 function bRX(rx){
+  const L=getRxL();
   const um={EMERGENCY:{bg:'#fef2f2',c:'#dc2626',i:'🚨'},URGENT:{bg:'#fff7ed',c:'#c2410c',i:'🔴'},ROUTINE:{bg:'#f0fdf4',c:'#16a34a',i:'✅'},MONITOR:{bg:'#fffbeb',c:'#d97706',i:'⚠️'}};
   const u=um[rx.u]||um.MONITOR;
   const dl=rx.cd.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.77rem;line-height:1.6;margin-bottom:4px;padding:3px 0">${l.trim()}</div>`).join('');
@@ -1856,56 +1984,57 @@ function bRX(rx){
 <div style="padding:12px;display:flex;flex-direction:column;gap:10px">
 
   <div>
-    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px">🩺 Likely Condition</div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px"> ${L.condition}</div>
     <div style="background:rgba(10,158,143,.08);color:#077a6e;padding:6px 10px;border-radius:10px;font-size:.8rem;font-weight:600">${rx.d}</div>
   </div>
 
   <div>
-    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px">⚡ Urgency</div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px"> ${L.urgency}</div>
     <div style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:14px;font-size:.78rem;font-weight:700;background:${u.bg};color:${u.c}">${u.i} ${rx.u}</div>
   </div>
 
   <div>
-    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#16a34a;margin-bottom:4px">✅ Kya Karein</div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#16a34a;margin-bottom:4px"> ${L.do}</div>
     <div style="background:#f0fdf4;border-radius:8px;padding:8px 10px">${dl}</div>
   </div>
 
   <div>
-    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#dc2626;margin-bottom:4px">❌ Kya Na Karein</div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#dc2626;margin-bottom:4px"> ${L.dont}</div>
     <div style="background:#fef2f2;border-radius:8px;padding:8px 10px">${dnt}</div>
   </div>
 
   ${hrl?`<div>
-    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#92400e;margin-bottom:4px">🏠 Ghar Ke Nuskhe</div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#92400e;margin-bottom:4px"> ${L.homeRemedy}</div>
     <div style="background:#fffbeb;border-radius:8px;padding:8px 10px">${hrl}</div>
   </div>`:''}
 
   <div>
-    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px">💊 Dawai</div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px"> ${L.medicine}</div>
     ${mh}
   </div>
 
   ${rx.xray?`<div>
-    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;margin-bottom:4px">🔬 X-Ray / Investigation</div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;margin-bottom:4px"> ${L.xray}</div>
     <div style="background:#f5f3ff;border-radius:8px;padding:8px 10px;font-size:.77rem;color:#5b21b6;font-weight:500">${rx.xray}</div>
   </div>`:''}
 
   ${tpl?`<div>
-    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0a9e8f;margin-bottom:4px">📍 Treatment Plan</div>
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0a9e8f;margin-bottom:4px"> ${L.treatmentPlan}</div>
     ${tpl}
   </div>`:''}
 
-  ${rx.n?`<div style="font-size:.7rem;color:#64748b;background:#f8fafc;padding:8px 10px;border-radius:8px;line-height:1.6;border-left:3px solid #0a9e8f">📌 ${rx.n}</div>`:''}
+  ${rx.n?`<div style="font-size:.7rem;color:#64748b;background:#f8fafc;padding:8px 10px;border-radius:8px;line-height:1.6;border-left:3px solid #0a9e8f"> ${rx.n}</div>`:''}
 
   <div style="font-size:.62rem;color:#b0bac5;background:#f8fafc;border-radius:6px;padding:6px 8px;line-height:1.5;text-align:center">
-    Yeh AI ki guidance hai — prescription nahi. Apne dentist se zaroor milein. — Datun AI by Dr. Mayank Vats
+    ${L.disclaimer}
   </div>`;
   return card;
 }
 function bCN(){
+  const L=getRxL();
   const wa=encodeURIComponent(lang==='hi'?'Namaste! Maine Datun AI se consult kiya hai. Appointment lena chahta hoon.':'Hi! I just consulted Datun AI and would like to book an appointment.');
   const c=document.createElement('div');c.style.cssText='background:linear-gradient(135deg,#e8f9f7,#f0fdf9);border:1px solid rgba(10,158,143,.18);border-radius:12px;padding:12px;max-width:100%;margin-top:5px';
-  c.innerHTML=`<h5 style="font-size:.8rem;font-weight:700;color:#077a6e;margin-bottom:8px">📅 Time to see a real dentist</h5><div style="display:flex;flex-direction:column;gap:5px"><a href="https://wa.me/919953135340?text=${wa}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#25d366;color:white;font-size:.77rem;font-weight:600;text-decoration:none">💬 WhatsApp Dr. Mayank</a><a href="tel:+919953135340" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a9e8f;color:white;font-size:.77rem;font-weight:600;text-decoration:none">📞 Call · +91 99531 35340</a><a href="mailto:hello@datunai.com" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a0f1a;color:white;font-size:.77rem;font-weight:600;text-decoration:none">✉️ hello@datunai.com</a></div>`;
+  c.innerHTML=`<h5 style="font-size:.8rem;font-weight:700;color:#077a6e;margin-bottom:8px"> ${L.connectTitle}</h5><div style="display:flex;flex-direction:column;gap:5px"><a href="https://wa.me/919953135340?text=${wa}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#25d366;color:white;font-size:.77rem;font-weight:600;text-decoration:none">💬 WhatsApp Dr. Mayank</a><a href="tel:+919953135340" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a9e8f;color:white;font-size:.77rem;font-weight:600;text-decoration:none">📞 Call · +91 99531 35340</a><a href="mailto:hello@datunai.com" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a0f1a;color:white;font-size:.77rem;font-weight:600;text-decoration:none">✉️ hello@datunai.com</a></div>`;
   return c;
 }
 
