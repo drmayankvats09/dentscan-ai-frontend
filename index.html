@@ -1348,7 +1348,8 @@ function goPage(name){
   if(name==='chat'){
     const is=document.getElementById('intake-screen');
     const cu=document.getElementById('chat-ui');
-    if(is)is.style.display='flex';
+    if(is)is.style.display='none';
+    showLoginScreen();
     if(cu)cu.style.display='none';
     ['p-name','p-age','p-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     const pg=document.getElementById('p-gender');if(pg)pg.value='';
@@ -1549,6 +1550,78 @@ function getRxL() {
   return rxLabels[lang] || rxLabels['en'];
 }
 
+  function showLoginScreen(){
+  const ls=document.getElementById('login-screen');
+  const is=document.getElementById('intake-screen');
+  if(ls)ls.style.display='flex';
+  if(is)is.style.display='none';
+  setTimeout(()=>{const card=document.getElementById('login-card');if(card){card.style.transform='translateY(0)';card.style.opacity='1';}},50);
+}
+function hideLoginScreen(){
+  const ls=document.getElementById('login-screen');
+  if(ls)ls.style.display='none';
+  const is=document.getElementById('intake-screen');
+  if(is)is.style.display='flex';
+}
+function showResetPassword(){
+  document.getElementById('login-form-view').style.display='none';
+  document.getElementById('reset-view').style.display='block';
+}
+function showLoginForm(){
+  document.getElementById('reset-view').style.display='none';
+  document.getElementById('login-form-view').style.display='block';
+}
+function loginWithGoogle(){
+  window.location.href='https://datunai.us.auth0.com/authorize?response_type=code&client_id=Cb4hGvbPMVhovaQVeDXFlWCegBe5LyDI&redirect_uri='+encodeURIComponent(window.location.origin)+'&scope=openid%20profile%20email&connection=google-oauth2';
+}
+function doLogin(){
+  const email=(document.getElementById('l-email')||{value:''}).value.trim();
+  const pass=(document.getElementById('l-pass')||{value:''}).value.trim();
+  const name=(document.getElementById('l-name')||{value:''}).value.trim();
+  const err=document.getElementById('login-err');
+  if(!email||!pass){err.textContent='Please enter email and password.';err.style.display='block';return;}
+  err.style.display='none';
+  const btn=document.getElementById('login-btn');
+  btn.textContent='Signing in...';btn.disabled=true;
+  fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/login',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email,password:pass})
+  }).then(r=>r.json()).then(d=>{
+    if(d.error){err.textContent=d.error;err.style.display='block';btn.textContent='Sign In →';btn.disabled=false;return;}
+    patientName=name||d.name||email.split('@')[0];
+    patientEmail=email;
+    localStorage.setItem('datun_token',d.token||'');
+    hideLoginScreen();
+  }).catch(()=>{err.textContent='Something went wrong. Try again.';err.style.display='block';btn.textContent='Sign In →';btn.disabled=false;});
+}
+function doSignup(){
+  const email=(document.getElementById('l-email')||{value:''}).value.trim();
+  const pass=(document.getElementById('l-pass')||{value:''}).value.trim();
+  const name=(document.getElementById('l-name')||{value:''}).value.trim();
+  const err=document.getElementById('login-err');
+  if(!name||!email||!pass){err.textContent='Please fill all fields.';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='Password must be 6+ characters.';err.style.display='block';return;}
+  err.style.display='none';
+  fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/signup',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name,email,password:pass})
+  }).then(r=>r.json()).then(d=>{
+    if(d.error){err.textContent=d.error;err.style.display='block';return;}
+    patientName=name;patientEmail=email;
+    localStorage.setItem('datun_token',d.token||'');
+    hideLoginScreen();
+  }).catch(()=>{err.textContent='Signup failed. Try again.';err.style.display='block';});
+}
+function doReset(){
+  const email=(document.getElementById('r-email')||{value:''}).value.trim();
+  const err=document.getElementById('reset-err');
+  if(!email){err.textContent='Please enter your email.';err.style.display='block';return;}
+  err.style.display='none';
+  fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/reset',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email})
+  }).then(()=>{alert('Reset link sent! Check your email.');showLoginForm();}).catch(()=>{err.textContent='Failed. Try again.';err.style.display='block';});
+}
 function selectLang(l){
   selectedLang=l;
   document.querySelectorAll('.lang-opt').forEach(el=>{
