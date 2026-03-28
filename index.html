@@ -1206,6 +1206,46 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
      CHAT — FULLY ISOLATED SCREEN
 ══════════════════════════════ -->
 <div id="pg-chat" class="pg">
+  <div id="login-screen" style="flex:1;background:var(--dark);display:none;align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(10,158,143,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(10,158,143,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none"></div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:350px;background:radial-gradient(ellipse,rgba(10,158,143,.08),transparent);filter:blur(40px);pointer-events:none"></div>
+  <div id="login-card" style="background:white;border-radius:24px;padding:2rem 1.8rem;max-width:400px;width:100%;position:relative;z-index:1;box-shadow:0 25px 80px rgba(0,0,0,.5);transform:translateY(30px);opacity:0;transition:all .6s cubic-bezier(.16,1,.3,1)">
+    <div style="text-align:center;margin-bottom:1.8rem">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#0a9e8f,#12c4b2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto .8rem;box-shadow:0 8px 24px rgba(10,158,143,.35)">
+        <svg width="26" height="26" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-family:var(--fd);font-size:1.4rem;color:var(--dark2);letter-spacing:.04em">DATUN <span style="color:var(--g)">AI</span></div>
+      <div style="font-size:.65rem;color:var(--muted);font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-top:2px">24/7 Dental Assistant</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-top:.6rem;font-weight:300;line-height:1.5">India's free AI dental expert.<br/>Sign in to start your consultation.</p>
+    </div>
+    <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1.5px solid var(--border);border-radius:12px;padding:11px;background:white;cursor:pointer;font-family:var(--fb);font-size:.86rem;font-weight:600;color:var(--dark2);transition:all .2s;margin-bottom:.8rem" onmouseover="this.style.borderColor='#0a9e8f';this.style.background='#f0fdf9'" onmouseout="this.style.borderColor='var(--border)';this.style.background='white'">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-size:.7rem;color:var(--muted);font-weight:500">or</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <div id="login-form-view">
+      <div style="margin-bottom:.7rem"><input id="l-name" type="text" placeholder="Full Name" autocomplete="name" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);-webkit-appearance:none;transition:border-color .2s" onfocus="this.style.borderColor='#0a9e8f'" onblur="this.style.borderColor='var(--border)'"/></div>
+      <div style="margin-bottom:.7rem"><input id="l-email" type="email" placeholder="Email Address" autocomplete="email" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);-webkit-appearance:none;transition:border-color .2s" onfocus="this.style.borderColor='#0a9e8f'" onblur="this.style.borderColor='var(--border)'"/></div>
+      <div style="margin-bottom:.4rem"><input id="l-pass" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);-webkit-appearance:none;transition:border-color .2s" onfocus="this.style.borderColor='#0a9e8f'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div style="text-align:right;margin-bottom:.9rem"><a href="#" onclick="showResetPassword();return false" style="font-size:.72rem;color:var(--g);text-decoration:none;font-weight:500">Forgot Password?</a></div>
+      <div id="login-err" style="color:#dc2626;font-size:.74rem;margin-bottom:.6rem;display:none;text-align:center;background:#fef2f2;padding:6px 10px;border-radius:7px"></div>
+      <button onclick="doLogin()" id="login-btn" style="width:100%;background:var(--g);color:white;border:none;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .25s;margin-bottom:.6rem">Sign In →</button>
+      <button onclick="doSignup()" style="width:100%;background:var(--dark2);color:white;border:none;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .25s">Create Account →</button>
+    </div>
+    <div id="reset-view" style="display:none">
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:.8rem;text-align:center">Enter your email — we'll send a reset link.</p>
+      <input id="r-email" type="email" placeholder="Email Address" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);margin-bottom:.7rem;-webkit-appearance:none;transition:border-color .2s" onfocus="this.style.borderColor='#0a9e8f'" onblur="this.style.borderColor='var(--border)'"/>
+      <div id="reset-err" style="color:#dc2626;font-size:.74rem;margin-bottom:.6rem;display:none;text-align:center;background:#fef2f2;padding:6px 10px;border-radius:7px"></div>
+      <button onclick="doReset()" style="width:100%;background:var(--g);color:white;border:none;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);margin-bottom:.6rem">Send Reset Link</button>
+      <button onclick="showLoginForm()" style="width:100%;background:none;border:1.5px solid var(--border);border-radius:10px;padding:10px;font-size:.82rem;color:var(--muted);cursor:pointer;font-family:var(--fb)">← Back to Login</button>
+    </div>
+    <p style="font-size:.63rem;color:#b0bac5;text-align:center;margin-top:.8rem;line-height:1.5">🔒 DPDP Act 2023 · Your data is safe · No spam</p>
+  </div>
+</div>
   <div id="intake-screen">
     <div class="is-bg-g"></div><div class="is-bg-glow"></div>
     <div class="is-card">
