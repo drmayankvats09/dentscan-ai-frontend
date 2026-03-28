@@ -1933,11 +1933,20 @@ function startConsult(){
   errEl.style.display='none';
   lang=selectedLang;
   patientName=name;patientAge=age;patientGender=gender;patientEmail=email;
+  if(auth0Client&&currentUserId){
+    auth0Client.getTokenSilently().then(token=>{
+      fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({preferred_language:selectedLang})
+      }).catch(e=>console.log('Lang save error:',e));
+    }).catch(e=>console.log('Token error:',e));
+  }
   document.getElementById('intake-screen').style.display='none';
   const cu=document.getElementById('chat-ui');cu.style.display='flex';
   const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · Hi, '+name.split(' ')[0]+'!';
   const ed=document.getElementById('email-display');if(ed)ed.textContent=email;
-  updateLangBadge();
+  const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent=langNames[lang]||'English';
   consultationSaved=false;
   resetChat();
 }
