@@ -508,23 +508,32 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .ls-footer{font-size:.63rem;color:#b0bac5;text-align:center;margin-top:.8rem;line-height:1.5}
 .ls-name-row{display:none;margin-bottom:.6rem}
 .ls-lang-row{display:none;margin-bottom:.6rem}
-/* ── HISTORY SCREEN ── */
-#history-screen{display:none;flex:1;flex-direction:column;background:var(--light);height:100%;overflow:hidden}
-.hs-header{background:linear-gradient(135deg,var(--dark2),var(--dark3));padding:1rem;display:flex;align-items:center;gap:.6rem}
-.hs-header h3{color:white;font-family:var(--fd);font-size:1rem;flex:1}
-.hs-new-btn{background:var(--g);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:var(--fb)}
-.hs-list{flex:1;overflow-y:auto;padding:1rem}
-.hs-card{background:white;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
-.hs-card:hover{border-color:var(--g);box-shadow:0 2px 12px rgba(10,158,143,.1)}
-.hs-card-date{font-size:.68rem;color:var(--muted)}
-.hs-card-complaint{font-size:.84rem;font-weight:600;color:var(--dark2);margin:4px 0}
-.hs-card-diag{font-size:.76rem;color:var(--muted)}
-.hs-card-urgency{display:inline-block;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:4px;margin-top:4px}
-.hs-card-urgency.emergency{background:#fef2f2;color:#dc2626}
-.hs-card-urgency.urgent{background:#fff7ed;color:#ea580c}
-.hs-card-urgency.routine{background:#f0fdf4;color:#16a34a}
-.hs-card-urgency.monitor{background:#eff6ff;color:#2563eb}
-.hs-empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:.85rem}
+  
+/* ── SIDE DRAWER (ChatGPT style) ── */
+#side-drawer{position:fixed;top:0;right:-320px;width:300px;height:100%;background:var(--dark2);z-index:100000;transition:right .3s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;box-shadow:-5px 0 30px rgba(0,0,0,.4)}
+#side-drawer.open{right:0}
+#drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99999;display:none}
+#drawer-overlay.open{display:block}
+.sd-header{padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.1)}
+.sd-header h3{color:white;font-family:var(--fd);font-size:1rem}
+.sd-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:1.4rem;cursor:pointer;padding:4px 8px}
+.sd-close:hover{color:white}
+.sd-new-btn{width:calc(100% - 2rem);margin:1rem;background:var(--g);color:white;border:none;border-radius:10px;padding:10px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:var(--fb)}
+.sd-new-btn:hover{background:var(--gd)}
+.sd-list{flex:1;overflow-y:auto;padding:0 1rem 1rem}
+.sd-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all .2s}
+.sd-card:hover{background:rgba(10,158,143,.15);border-color:rgba(10,158,143,.3)}
+.sd-card-date{font-size:.62rem;color:rgba(255,255,255,.4)}
+.sd-card-complaint{font-size:.8rem;font-weight:500;color:rgba(255,255,255,.9);margin:3px 0}
+.sd-card-diag{font-size:.7rem;color:rgba(255,255,255,.5)}
+.sd-card-urgency{display:inline-block;font-size:.6rem;font-weight:600;padding:2px 6px;border-radius:4px;margin-top:3px}
+.sd-card-urgency.emergency{background:rgba(220,38,38,.2);color:#fca5a5}
+.sd-card-urgency.urgent{background:rgba(234,88,12,.2);color:#fdba74}
+.sd-card-urgency.routine{background:rgba(22,163,74,.2);color:#86efac}
+.sd-card-urgency.monitor{background:rgba(37,99,235,.2);color:#93c5fd}
+.sd-empty{text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.4);font-size:.8rem}
+.ch-hamburger{background:rgba(255,255,255,.1);border:none;border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .2s;margin-left:auto}
+.ch-hamburger:hover{background:rgba(255,255,255,.18)}
  
   /* ── LANG SELECTOR ── */
 .lang-opt{
@@ -1321,7 +1330,7 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
       <button class="ch-back" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
       <div class="ch-av"><svg width="16" height="16" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="ch-inf"><h4 id="ch-pname">Datun AI · Dental</h4><p><span class="ch-live"></span>Online · Voice &amp; Photo enabled</p></div>
-      <div class="ch-lang" id="ch-lang-badge" style="background:rgba(10,158,143,.25);border-radius:15px;padding:4px 12px;font-size:.7rem;font-weight:600;color:white"></div>
+      <div class="ch-lang" id="ch-lang-badge" style="background:rgba(10,158,143,.25);border-radius:15px;padding:4px 12px;font-size:.7rem;font-weight:600;color:white"></div><button class="ch-hamburger" onclick="openDrawer()" title="My Consultations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     </div>
     <div id="email-strip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#077a6e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Summary → <strong id="email-display" style="margin-left:2px"></strong></div>
     <div id="msgs"></div>
@@ -1542,14 +1551,27 @@ async function handleLoggedInUser(user){
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({preferred_language:selectedLang||'en'})
+      body:JSON.stringify({preferred_language:selectedLang||''})
     });
     const data=await res.json();
     if(data.userId)currentUserId=data.userId;
-    if(data.preferred_language)selectedLang=data.preferred_language;
-    lang=selectedLang||'en';
-  }catch(e){console.error('User save error:',e);}
-  await showHistoryScreen();
+    if(data.preferred_language&&data.preferred_language!=='en'){
+      selectedLang=data.preferred_language;
+      lang=selectedLang;
+      startNewConsultation();
+    }else{
+      showIntakeForm();
+    }
+  }catch(e){console.error('User save error:',e);showIntakeForm();}
+}
+
+function showIntakeForm(){
+  const ls=document.getElementById('login-screen');if(ls)ls.style.display='none';
+  const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
+  const cu=document.getElementById('chat-ui');if(cu)cu.style.display='none';
+  const is=document.getElementById('intake-screen');if(is)is.style.display='flex';
+  const pn=document.getElementById('p-name');if(pn&&patientName)pn.value=patientName;
+  const pe=document.getElementById('p-email');if(pe&&patientEmail)pe.value=patientEmail;
 }
 
 function showForgotPassword(){
@@ -1627,6 +1649,34 @@ function startNewConsultation(){
   resetChat();
 }
 
+// ── SIDE DRAWER ──
+async function openDrawer(){
+  document.getElementById('side-drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  const list=document.getElementById('sd-list');
+  list.innerHTML='<div class="sd-empty">Loading...</div>';
+  try{
+    const token=await auth0Client.getTokenSilently();
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const data=await res.json();
+    if(!data.consultations||!data.consultations.length){
+      list.innerHTML='<div class="sd-empty">No past consultations yet. 🦷</div>';
+      return;
+    }
+    list.innerHTML=data.consultations.map(c=>{
+      const d=new Date(c.timestamp).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      const u=(c.urgency||'routine').toLowerCase();
+      return '<div class="sd-card"><div class="sd-card-date">'+d+'</div><div class="sd-card-complaint">'+(c.chief_complaint||'Consultation')+'</div><div class="sd-card-diag">'+(c.diagnosis||'')+'</div><span class="sd-card-urgency '+u+'">'+(c.urgency||'').toUpperCase()+'</span></div>';
+    }).join('');
+  }catch(e){list.innerHTML='<div class="sd-empty">Could not load history.</div>';}
+}
+
+function closeDrawer(){
+  document.getElementById('side-drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
 function showLoginScreen(){
   const ls=document.getElementById('login-screen');if(ls)ls.style.display='flex';
   const is=document.getElementById('intake-screen');if(is)is.style.display='none';
@@ -2475,5 +2525,11 @@ function stopVoice(){isListening=false;if(recognition){try{recognition.stop();}c
 // Keyframes
 const xs=document.createElement('style');xs.textContent='@keyframes tB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}';document.head.appendChild(xs);
 </script>
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+<div id="side-drawer">
+  <div class="sd-header"><h3>My Consultations</h3><button class="sd-close" onclick="closeDrawer()">✕</button></div>
+  <button class="sd-new-btn" onclick="closeDrawer();startNewConsultation()">+ New Consultation</button>
+  <div id="sd-list" class="sd-list"></div>
+</div>
 </body>
 </html>
