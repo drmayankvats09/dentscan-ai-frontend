@@ -1770,7 +1770,7 @@ EVERY response, EVERY [OPTIONS: chip1|chip2], EVERY acknowledgment — MUST be i
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `;}
 function buildPSP(){return `You are Datun AI analyzing a dental photo. Built by a real doctor.
-LANGUAGE: Match patient's language.
+LANGUAGE: Patient selected ${langNames[lang]||'English'}. ${langInstructions[lang]||'Respond ONLY in English.'} Every word MUST be in ${langNames[lang]||'English'} only.
 Examine for: Caries, Gum issues, Calculus, Fractures, Abscess, Discolouration, Soft tissue.
 [FINDINGS_START]
 OVERALL_QUALITY:(good/fair/poor)
@@ -1796,8 +1796,7 @@ function addBot(text,ex){
   const ct=document.createElement('div');ct.style.maxWidth='84%';
   if(text){const b=document.createElement('div');b.style.cssText='background:white;border:1px solid rgba(0,0,0,.07);border-radius:14px;border-top-left-radius:3px;padding:9px 11px;font-size:.84rem;line-height:1.56;box-shadow:0 1px 4px rgba(0,0,0,.04)';b.innerHTML=fmt(text);ct.appendChild(b);}
   const tm=document.createElement('span');tm.style.cssText='font-size:.62rem;color:#94a3b8;margin-top:2px;display:block';tm.textContent=gT();ct.appendChild(tm);
-  if(ex?.findings)ct.appendChild(bFC(ex.findings,ex.imgSrc));
-  if(ex?.rx)ct.appendChild(bRX(ex.rx));
+  if(ex?.rx)ct.appendChild(bRX(ex.rx,ex.findings,ex.imgSrc));
   if(ex?.connect)ct.appendChild(bCN());
   w.appendChild(mkB());w.appendChild(ct);m.appendChild(w);scrollTop();
 }
@@ -1834,7 +1833,7 @@ function bFC(fd,imgSrc){
   if(fd.fi?.length){h+=`<div style="padding:9px 11px;display:flex;flex-direction:column;gap:5px"><div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:1px">${fd.fi.length} Finding${fd.fi.length>1?'s':''}</div>`;fd.fi.forEach((f,i)=>{const sv=(f.severity||'noted').toLowerCase();h+=`<div style="display:flex;gap:8px;align-items:flex-start;background:${sc[sv]||'#f0fdf4'};border-radius:8px;padding:7px 9px;border-left:2px solid ${tc[sv]||'#065f46'}"><div style="font-size:16px;flex-shrink:0">${f.icon||'🔍'}</div><div><div style="font-size:.79rem;font-weight:600;color:#0a0f1a;margin-bottom:1px">${i+1}. ${f.name||'Finding'} <span style="font-size:.58rem;font-weight:700;background:${sc[sv]};color:${tc[sv]};padding:1px 6px;border-radius:8px;text-transform:uppercase">${sv}</span></div><div style="font-size:.67rem;color:#64748b;margin-bottom:2px">📍 ${f.location||''}</div><div style="font-size:.76rem;color:#1c2333;line-height:1.45">${f.detail||''}</div></div></div>`;});h+='</div>';}
   c.innerHTML=h;return c;
 }
-function bRX(rx){
+function bRX(rx,fd,imgSrc){
   const um={EMERGENCY:{bg:'#fef2f2',c:'#dc2626',i:'🚨'},URGENT:{bg:'#fff7ed',c:'#c2410c',i:'🔴'},ROUTINE:{bg:'#f0fdf4',c:'#16a34a',i:'✅'},MONITOR:{bg:'#fffbeb',c:'#d97706',i:'⚠️'}};
   const u=um[rx.u]||um.MONITOR;
   const dl=rx.cd.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:.77rem;line-height:1.6;margin-bottom:4px;padding:3px 0">${l.trim()}</div>`).join('');
@@ -1851,6 +1850,7 @@ function bRX(rx){
   <div>
     <div style="color:white;font-size:.84rem;font-weight:700">🦷 Datun AI — Dental Assessment</div>
     <div style="color:rgba(255,255,255,.65);font-size:.65rem;margin-top:1px">${gT()} · AI guidance only · Dr. Mayank Vats</div>
+
   </div>
 </div>
 <div style="padding:12px;display:flex;flex-direction:column;gap:10px">
@@ -1859,6 +1859,8 @@ function bRX(rx){
     <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px">🩺 Likely Condition</div>
     <div style="background:rgba(10,158,143,.08);color:#077a6e;padding:6px 10px;border-radius:10px;font-size:.8rem;font-weight:600">${rx.d}</div>
   </div>
+
+  ${fd&&fd.fi&&fd.fi.length?'<div><div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0a9e8f;margin-bottom:4px">📷 Photo Analysis</div>'+(imgSrc?'<img src="'+imgSrc+'" style="width:60px;height:60px;border-radius:8px;object-fit:cover;margin-bottom:6px;display:block"/>':'')+'<div style="font-size:.77rem;color:#334155;background:#f0fdf9;padding:6px 8px;border-radius:7px;margin-bottom:4px">'+(fd.s||'')+'</div>'+fd.fi.map(function(f){return'<div style="font-size:.75rem;padding:4px 6px;background:#f8fafc;border-radius:6px;margin-bottom:3px;border-left:2px solid #0a9e8f">'+(f.icon||'🔍')+' <strong>'+(f.name||'')+'</strong> — '+(f.location||'')+' — <em>'+(f.severity||'')+'</em><br/><span style="font-size:.7rem;color:#64748b">'+(f.detail||'')+'</span></div>';}).join('')+'</div>':''}
 
   <div>
     <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:4px">⚡ Urgency</div>
@@ -1912,7 +1914,7 @@ function bCN(){
 function handlePhotoUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const du=ev.target.result,b=du.split(',')[1],mt=f.type||'image/jpeg';addPhoto(du);sendPhoto(b,mt,du);};r.readAsDataURL(f);e.target.value='';}
 
 async function sendPhoto(b64,mt,du){
-  addBot(lang==='hi'?'📷 Photo mil gayi! Analyze kar raha hoon...':'📷 Photo received! Analyzing now...');showTyping();
+  const analyzeMsg={en:'📷 Photo received! Analyzing now... 🔍',hi:'📷 Photo mil gayi! Analyze kar raha hoon... 🔍',hinglish:'📷 Photo mil gayi! Analyze karta hoon... 🔍',ta:'📷 படம் வந்தது! பகுப்பாய்வு செய்கிறேன்... 🔍',bn:'📷 ছবি পেয়েছি! বিশ্লেষণ করছি... 🔍',mr:'📷 फोटो मिला! विश्लेषण करतो... 🔍',te:'📷 ఫోటో వచ్చింది! విశ్లేషిస్తున్నాను... 🔍',kn:'📷 ಫೋಟೋ ಬಂತು! ವಿಶ್ಲೇಷಿಸುತ್ತಿದ್ದೇನೆ... 🔍',gu:'📷 ફોટો મળ્યો! વિશ્લેષણ કરું છું... 🔍',pa:'📷 ਫੋਟੋ ਮਿਲੀ! ਵਿਸ਼ਲੇਸ਼ਣ ਕਰ ਰਿਹਾ ਹਾਂ... 🔍'};addBot(analyzeMsg[lang]||analyzeMsg.en);showTyping();
   const im={role:'user',content:[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:lang==='hi'?'Yeh meri dental photo hai.':'This is my dental photo. Evaluate carefully.'}]};
   try{
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildPSP(),messages:[...conv,im]})});
@@ -1956,28 +1958,24 @@ async function sendMsg(ov){
     let r=d.content?.map(b=>b.text||'').join('')||'Something went wrong. Please try again.';
     conv.push({role:'assistant',content:r});
     let rx=null,connect=false,disp=r;
-    if(r.includes('[REQUEST_PHOTO]')&&!photoReqShown){photoReqShown=true;disp=disp.replace('[REQUEST_PHOTO]','').trim();const pb=document.getElementById('pb');if(pb){pb.style.background='rgba(10,158,143,.12)';pb.querySelector('svg').style.stroke='#0a9e8f';setTimeout(()=>{if(pb){pb.style.background='';pb.querySelector('svg').style.stroke='';}},8000);}}
-    if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
-    if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
-    const parsed=parseChips(disp);
-    renderChips(parsed.chips);
-    addBot(parsed.text,{rx,connect});
-    if(connectShown && patientEmail && !consultationSaved){
-  consultationSaved=true;
-  fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      name:patientName,
-      age:patientAge,
-      gender:patientGender,
-      email:patientEmail,
-      messages:conv,
-      sessionId:patientEmail+'_'+Date.now()
-    })
-  }).then(()=>console.log('✅ Consultation saved'))
-  .catch(e=>console.log('Save error:',e));
-}
+    if(r.includes('[REQUEST_PHOTO]')&&!photoReqShown){
+      photoReqShown=true;
+      disp=disp.replace('[REQUEST_PHOTO]','').trim();
+      const photoChipSets={en:['📷 Yes, Send Photo','No Thanks','How to Send?'],hi:['📷 Haan, Bhejta Hoon','Nahi Ji','Kaise Bhejein?'],hinglish:['📷 Haan Bhejta Hoon','Nahi Yaar','Kaise Bhejein?'],ta:['📷 ஆம், படம் அனுப்புகிறேன்','வேண்டாம்','எப்படி அனுப்புவது?'],bn:['📷 হ্যাঁ, ছবি পাঠাই','না ধন্যবাদ','কীভাবে পাঠাবো?'],mr:['📷 हो, फोटो पाठवतो','नको जी','कसा पाठवायचा?'],te:['📷 అవును, ఫోటో పంపుతాను','వద్దు జీ','ఎలా పంపాలి?'],kn:['📷 ಹೌದು, ಫೋಟೋ ಕಳುಹಿಸುತ್ತೇನೆ','ಬೇಡ ಜೀ','ಹೇಗೆ ಕಳುಹಿಸಬೇಕು?'],gu:['📷 હા, ફોટો મોકલું','ના જી','કેવી રીતે મોકલવો?'],pa:['📷 ਹਾਂ, ਫੋਟੋ ਭੇਜਦਾ ਹਾਂ','ਨਹੀਂ ਜੀ','ਕਿਵੇਂ ਭੇਜਣਾ ਹੈ?']};
+      addBot(disp);
+      renderChips(photoChipSets[lang]||photoChipSets.en);
+    } else {
+      if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
+      if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
+      const parsed=parseChips(disp);
+      renderChips(parsed.chips);
+      addBot(parsed.text,{rx,connect});
+      if(connectShown&&patientEmail&&!consultationSaved){
+        consultationSaved=true;
+        fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:patientName,age:patientAge,gender:patientGender,email:patientEmail,messages:conv,sessionId:patientEmail+'_'+Date.now()})})
+        .then(()=>console.log('✅ Consultation saved')).catch(e=>console.log('Save error:',e));
+      }
+    }
   }catch{rmTyping();addBot('Oops! Something went wrong. Check your connection and try again.');}
 }
 
@@ -1992,8 +1990,20 @@ function renderChips(options){
     c.className='chip';
     c.textContent=opt.trim();
     c.onclick=()=>{
+      const isPhoto=/📷/.test(opt.trim());
+      const isSkip=/(Nahi Ji|No Thanks|না ধন্যবাদ|வேண்டாம்|नको|వద్దు|ಬೇಡ|ના જી|ਨਹੀਂ ਜੀ|Nahi Yaar|Not Now)/i.test(opt.trim());
+      const isHow=/(How to|Kaise|எப்படி|কীভাবে|कसा|ఎలా|ಹೇಗೆ|કેવી|ਕਿਵੇਂ)/i.test(opt.trim());
       const isOther=/(kuch aur|something else|other|aur kuch|இதர|অন্য|इतर|మరేదైనా|ಬೇರೆ|બીજું|ਕੁਝ ਹੋਰ)/i.test(opt.trim());
       renderChips([]);
+      if(isPhoto){document.getElementById('pb').click();return;}
+      if(isSkip){sendMsg('Photo nahi bhejna');return;}
+      if(isHow){
+        const guideMsg={en:'Sure! 😊 To send your photo:\n1️⃣ Go to good lighting\n2️⃣ Open mouth, show the tooth clearly\n3️⃣ Tap the 📷 button below — camera will open\n4️⃣ Click photo — analysis starts instantly!',hi:'Bilkul ji! 😊 Photo bhejne ke liye:\n1️⃣ Achhi roshni mein jaayein\n2️⃣ Muh khol ke daant clearly dikhayein\n3️⃣ Neeche 📷 button dabaayein\n4️⃣ Photo lo — turant analysis hoga!',hinglish:'Sure yaar! 😊\n1️⃣ Achhi light mein jao\n2️⃣ Muh khol ke daant dikhao\n3️⃣ Neeche 📷 tap karo\n4️⃣ Photo lo — done!',ta:'சரி! 😊\n1️⃣ நல்ல வெளிச்சத்தில் நில்லுங்கள்\n2️⃣ வாயை திறந்து பல்லை காட்டுங்கள்\n3️⃣ கீழே 📷 அழுத்துங்கள்\n4️⃣ படம் எடுங்கள்!',bn:'অবশ্যই! 😊\n1️⃣ ভালো আলোতে যান\n2️⃣ মুখ খুলে দাঁত দেখান\n3️⃣ নিচে 📷 বাটন চাপুন\n4️⃣ ছবি তুলুন!',mr:'नक्कीच! 😊\n1️⃣ चांगल्या प्रकाशात जा\n2️⃣ तोंड उघडून दात दाखवा\n3️⃣ खाली 📷 दाबा\n4️⃣ फोटो घ्या!',te:'తప్పకుండా! 😊\n1️⃣ మంచి వెలుతురులో నిలబడండి\n2️⃣ నోరు తెరచి దంతాలు చూపండి\n3️⃣ కింద 📷 నొక్కండి\n4️⃣ ఫోటో తీయండి!',kn:'ಖಂಡಿತ! 😊\n1️⃣ ಒಳ್ಳೆ ಬೆಳಕಿನಲ್ಲಿ ನಿಲ್ಲಿ\n2️⃣ ಬಾಯಿ ತೆರೆದು ಹಲ್ಲು ತೋರಿಸಿ\n3️⃣ ಕೆಳಗೆ 📷 ಒತ್ತಿ\n4️⃣ ಫೋಟೋ ತೆಗೆಯಿರಿ!',gu:'બિલકુલ! 😊\n1️⃣ સારા પ્રકાશમાં જાઓ\n2️⃣ મોં ખોલી દાંત બતાવો\n3️⃣ નીચે 📷 દબાવો\n4️⃣ ફોટો લો!',pa:'ਬਿਲਕੁਲ! 😊\n1️⃣ ਚੰਗੀ ਰੋਸ਼ਨੀ ਵਿੱਚ ਜਾਓ\n2️⃣ ਮੂੰਹ ਖੋਲ੍ਹੋ ਦੰਦ ਦਿਖਾਓ\n3️⃣ ਨੀਚੇ 📷 ਦਬਾਓ\n4️⃣ ਫੋਟੋ ਲਓ!'};
+        const clickNow={en:['📷 Click Now','Not Now'],hi:['📷 Abhi Click Karo','Baad Mein'],hinglish:['📷 Click Karo','Not Now'],ta:['📷 இப்போது எடு','பிறகு'],bn:['📷 এখনই ক্লিক করুন','পরে'],mr:['📷 आता क्लिक करा','नंतर'],te:['📷 ఇప్పుడు క్లిక్ చేయి','తర్వాత'],kn:['📷 ಈಗ ಕ್�ಿಕ್ ಮಾಡಿ','ನಂತರ'],gu:['📷 હમણાં ક્લિક કરો','પછી'],pa:['📷 ਹੁਣ ਕਲਿੱਕ ਕਰੋ','ਬਾਅਦ ਵਿੱਚ']};
+        addBot(guideMsg[lang]||guideMsg.en);
+        renderChips(clickNow[lang]||clickNow.en);
+        return;
+      }
       if(isOther){
         const ta=document.getElementById('cta');
         if(ta){
