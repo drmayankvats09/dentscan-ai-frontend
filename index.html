@@ -18,6 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -478,6 +479,53 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .is-priv{font-size:.65rem;color:#b0bac5;margin-top:.8rem;text-align:center;line-height:1.5}
   /* ── CHIPS ── */
 #chips-area{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 4px;background:#f5faf9;border-top:1px solid rgba(10,158,143,.08);flex-shrink:0}
+
+  /* ── LOGIN SCREEN ── */
+#login-screen{display:none;flex:1;background:var(--dark);align-items:flex-end;justify-content:center;position:relative;overflow:hidden;min-height:100%}
+#login-screen .ls-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(10,158,143,.12),transparent 70%)}
+#login-screen .ls-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(10,158,143,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(10,158,143,.04) 1px,transparent 1px);background-size:40px 40px}
+.ls-logo{text-align:center;margin-bottom:1.2rem}
+.ls-logo-icon{width:56px;height:56px;background:linear-gradient(135deg,#0a9e8f,#12c4b2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto .6rem;box-shadow:0 8px 24px rgba(10,158,143,.35)}
+.ls-logo-name{font-family:var(--fd);font-size:1.4rem;color:var(--dark2);letter-spacing:.04em}
+.ls-logo-name em{font-style:normal;color:var(--g)}
+.ls-logo-sub{font-size:.65rem;color:var(--muted);font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
+.ls-sheet{position:relative;z-index:1;background:white;border-radius:24px 24px 0 0;padding:2rem 1.5rem 1.5rem;width:100%;max-width:420px;box-shadow:0 -10px 60px rgba(0,0,0,.3);transform:translateY(100%);animation:sheetUp .5s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes sheetUp{to{transform:translateY(0)}}
+.ls-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1.5px solid var(--border);border-radius:12px;padding:12px;background:white;cursor:pointer;font-family:var(--fb);font-size:.86rem;font-weight:600;color:var(--dark2);transition:all .2s}
+.ls-google:hover{border-color:var(--g);background:var(--gp2)}
+.ls-or{display:flex;align-items:center;gap:.8rem;margin:.8rem 0}
+.ls-or span{font-size:.7rem;color:var(--muted);font-weight:500}
+.ls-or div{flex:1;height:1px;background:var(--border)}
+.ls-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);transition:border-color .2s;margin-bottom:.6rem;-webkit-appearance:none}
+.ls-input:focus{border-color:var(--g)}
+.ls-btn{width:100%;background:var(--g);color:white;border:none;border-radius:10px;padding:12px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .25s}
+.ls-btn:hover{background:var(--gd);transform:translateY(-1px)}
+.ls-btn-dark{background:var(--dark2)}
+.ls-btn-dark:hover{background:var(--dark3);transform:translateY(-1px)}
+.ls-link{font-size:.75rem;color:var(--g);text-decoration:none;font-weight:500;cursor:pointer}
+.ls-link:hover{text-decoration:underline}
+.ls-err{color:#dc2626;font-size:.74rem;margin-bottom:.6rem;display:none;text-align:center;background:#fef2f2;padding:6px 10px;border-radius:7px}
+.ls-footer{font-size:.63rem;color:#b0bac5;text-align:center;margin-top:.8rem;line-height:1.5}
+.ls-name-row{display:none;margin-bottom:.6rem}
+.ls-lang-row{display:none;margin-bottom:.6rem}
+/* ── HISTORY SCREEN ── */
+#history-screen{display:none;flex:1;flex-direction:column;background:var(--light);height:100%;overflow:hidden}
+.hs-header{background:linear-gradient(135deg,var(--dark2),var(--dark3));padding:1rem;display:flex;align-items:center;gap:.6rem}
+.hs-header h3{color:white;font-family:var(--fd);font-size:1rem;flex:1}
+.hs-new-btn{background:var(--g);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:var(--fb)}
+.hs-list{flex:1;overflow-y:auto;padding:1rem}
+.hs-card{background:white;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.hs-card:hover{border-color:var(--g);box-shadow:0 2px 12px rgba(10,158,143,.1)}
+.hs-card-date{font-size:.68rem;color:var(--muted)}
+.hs-card-complaint{font-size:.84rem;font-weight:600;color:var(--dark2);margin:4px 0}
+.hs-card-diag{font-size:.76rem;color:var(--muted)}
+.hs-card-urgency{display:inline-block;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:4px;margin-top:4px}
+.hs-card-urgency.emergency{background:#fef2f2;color:#dc2626}
+.hs-card-urgency.urgent{background:#fff7ed;color:#ea580c}
+.hs-card-urgency.routine{background:#f0fdf4;color:#16a34a}
+.hs-card-urgency.monitor{background:#eff6ff;color:#2563eb}
+.hs-empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:.85rem}
+ 
   /* ── LANG SELECTOR ── */
 .lang-opt{
   border:1.5px solid var(--border);border-radius:9px;padding:7px 10px;
@@ -1206,46 +1254,30 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
      CHAT — FULLY ISOLATED SCREEN
 ══════════════════════════════ -->
 <div id="pg-chat" class="pg">
-  <div id="login-screen" style="flex:1;background:var(--dark);display:none;align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(10,158,143,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(10,158,143,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none"></div>
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:350px;background:radial-gradient(ellipse,rgba(10,158,143,.08),transparent);filter:blur(40px);pointer-events:none"></div>
-  <div id="login-card" style="background:white;border-radius:24px;padding:2rem 1.8rem;max-width:400px;width:100%;position:relative;z-index:1;box-shadow:0 25px 80px rgba(0,0,0,.5);transform:translateY(30px);opacity:0;transition:all .6s cubic-bezier(.16,1,.3,1)">
-    <div style="text-align:center;margin-bottom:1.8rem">
-      <div style="width:56px;height:56px;background:linear-gradient(135deg,#0a9e8f,#12c4b2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto .8rem;box-shadow:0 8px 24px rgba(10,158,143,.35)">
-        <svg width="26" height="26" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div style="font-family:var(--fd);font-size:1.4rem;color:var(--dark2);letter-spacing:.04em">DATUN <span style="color:var(--g)">AI</span></div>
-      <div style="font-size:.65rem;color:var(--muted);font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-top:2px">24/7 Dental Assistant</div>
+  <div id="login-screen" style="display:none">
+  <div class="ls-bg"></div>
+  <div class="ls-grid"></div>
+  <div class="ls-sheet">
+    <div class="ls-logo">
+      <div class="ls-logo-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="ls-logo-name">DATUN <em>AI</em></div>
+      <div class="ls-logo-sub">24/7 Dental Assistant</div>
       <p style="font-size:.78rem;color:var(--muted);margin-top:.6rem;font-weight:300;line-height:1.5">India's free AI dental expert.<br/>Sign in to start your consultation.</p>
     </div>
-    <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1.5px solid var(--border);border-radius:12px;padding:11px;background:white;cursor:pointer;font-family:var(--fb);font-size:.86rem;font-weight:600;color:var(--dark2);transition:all .2s;margin-bottom:.8rem" onmouseover="this.style.borderColor='#0a9e8f';this.style.background='#f0fdf9'" onmouseout="this.style.borderColor='var(--border)';this.style.background='white'">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Continue with Google
-    </button>
-    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem">
-      <div style="flex:1;height:1px;background:var(--border)"></div>
-      <span style="font-size:.7rem;color:var(--muted);font-weight:500">or</span>
-      <div style="flex:1;height:1px;background:var(--border)"></div>
-    </div>
-    <div id="login-form-view">
-      <div style="margin-bottom:.7rem"><input id="l-name" type="text" placeholder="Full Name" autocomplete="name" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);-webkit-appearance:none;transition:border-color .2s" onfocus="this.style.borderColor='#0a9e8f'" onblur="this.style.borderColor='var(--border)'"/></div>
-      <div style="margin-bottom:.7rem"><input id="l-email" type="email" placeholder="Email Address" autocomplete="email" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);-webkit-appearance:none;transition:border-color .2s" onfocus="this.style.borderColor='#0a9e8f'" onblur="this.style.borderColor='var(--border)'"/></div>
-      <div style="margin-bottom:.4rem"><input id="l-pass" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);-webkit-appearance:none;transition:border-color .2s" onfocus="this.style.borderColor='#0a9e8f'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-      <div style="text-align:right;margin-bottom:.9rem"><a href="#" onclick="showResetPassword();return false" style="font-size:.72rem;color:var(--g);text-decoration:none;font-weight:500">Forgot Password?</a></div>
-      <div id="login-err" style="color:#dc2626;font-size:.74rem;margin-bottom:.6rem;display:none;text-align:center;background:#fef2f2;padding:6px 10px;border-radius:7px"></div>
-      <button onclick="doLogin()" id="login-btn" style="width:100%;background:var(--g);color:white;border:none;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .25s;margin-bottom:.6rem">Sign In →</button>
-      <button onclick="doSignup()" style="width:100%;background:var(--dark2);color:white;border:none;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .25s">Create Account →</button>
-    </div>
-    <div id="reset-view" style="display:none">
-      <p style="font-size:.8rem;color:var(--muted);margin-bottom:.8rem;text-align:center">Enter your email — we'll send a reset link.</p>
-      <input id="r-email" type="email" placeholder="Email Address" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.86rem;font-family:var(--fb);outline:none;color:var(--dark2);margin-bottom:.7rem;-webkit-appearance:none;transition:border-color .2s" onfocus="this.style.borderColor='#0a9e8f'" onblur="this.style.borderColor='var(--border)'"/>
-      <div id="reset-err" style="color:#dc2626;font-size:.74rem;margin-bottom:.6rem;display:none;text-align:center;background:#fef2f2;padding:6px 10px;border-radius:7px"></div>
-      <button onclick="doReset()" style="width:100%;background:var(--g);color:white;border:none;border-radius:10px;padding:11px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--fb);margin-bottom:.6rem">Send Reset Link</button>
-      <button onclick="showLoginForm()" style="width:100%;background:none;border:1.5px solid var(--border);border-radius:10px;padding:10px;font-size:.82rem;color:var(--muted);cursor:pointer;font-family:var(--fb)">← Back to Login</button>
-    </div>
-    <p style="font-size:.63rem;color:#b0bac5;text-align:center;margin-top:.8rem;line-height:1.5">🔒 DPDP Act 2023 · Your data is safe · No spam</p>
+    <button class="ls-google" onclick="loginWithGoogle()"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Continue with Google</button>
+    <div class="ls-or"><div></div><span>or</span><div></div></div>
+    <div id="ls-name-row" class="ls-name-row"><input id="ls-name" class="ls-input" type="text" placeholder="Full Name" autocomplete="name"/></div>
+    <input id="ls-email" class="ls-input" type="email" placeholder="Email Address" autocomplete="email"/>
+    <input id="ls-pass" class="ls-input" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doEmailAuth()"/>
+    <div style="text-align:right;margin-bottom:.7rem"><a class="ls-link" onclick="showForgotPassword()">Forgot Password?</a></div>
+    <div id="ls-lang-row" class="ls-lang-row"><select id="ls-lang" class="ls-input" style="margin-bottom:0"><option value="">Select Language / भाषा चुनें</option><option value="en">🇬🇧 English</option><option value="hi">🇮🇳 हिंदी Hindi</option><option value="hinglish">🤝 Hinglish</option><option value="ta">தமிழ் Tamil</option><option value="bn">বাংলা Bengali</option><option value="mr">मराठी Marathi</option><option value="te">తెలుగు Telugu</option><option value="kn">ಕನ್ನಡ Kannada</option><option value="gu">ગુજરાતી Gujarati</option><option value="pa">ਪੰਜਾਬੀ Punjabi</option></select></div>
+    <div id="ls-err" class="ls-err"></div>
+    <button class="ls-btn" onclick="doEmailAuth()" id="ls-btn">Continue →</button>
+    <div id="ls-forgot" style="display:none"><p style="font-size:.8rem;color:var(--muted);margin-bottom:.8rem;text-align:center">Enter your email — we'll send a reset link.</p><input id="ls-reset-email" class="ls-input" type="email" placeholder="Email Address"/><div id="ls-reset-err" class="ls-err"></div><button class="ls-btn" onclick="doForgotPassword()">Send Reset Link</button><button class="ls-btn ls-btn-dark" style="margin-top:.5rem" onclick="showLoginForm()">← Back to Login</button></div>
+    <p class="ls-footer">🔒 DPDP Act 2023 · Your data is safe · No spam</p>
   </div>
 </div>
+<div id="history-screen" style="display:none"><div class="hs-header"><button class="ch-back" onclick="goHome()" style="color:white;font-size:1rem">←</button><h3>My Consultations</h3><button class="hs-new-btn" onclick="startNewConsultation()">+ New</button></div><div id="hs-list" class="hs-list"></div></div>
   <div id="intake-screen">
     <div class="is-bg-g"></div><div class="is-bg-glow"></div>
     <div class="is-card">
@@ -1372,6 +1404,9 @@ if(cgEl)document.addEventListener('mousemove',e=>{cgEl.style.left=e.clientX+'px'
 function updateClock(){const d=new Date(),h=d.getHours()%12||12,m=d.getMinutes(),ap=d.getHours()>=12?'PM':'AM';const el=document.getElementById('hclock');if(el)el.textContent=h+':'+(m<10?'0':'')+m+' '+ap;}
 updateClock();setInterval(updateClock,1000);
 
+// ── INIT AUTH0 ON PAGE LOAD ──
+window.addEventListener('DOMContentLoaded',()=>{initAuth0();});
+  
 // Nav scroll — change hamburger color too
 window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('s',window.scrollY>20);});
 
@@ -1386,17 +1421,10 @@ function goPage(name){
   if(t)t.classList.add('on');
   if(name!=='chat')window.scrollTo({top:0,behavior:'instant'});
   if(name==='chat'){
-    const is=document.getElementById('intake-screen');
-    const cu=document.getElementById('chat-ui');
-    if(is)is.style.display='none';
-    showLoginScreen();
-    if(cu)cu.style.display='none';
-    ['p-name','p-age','p-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-    const pg=document.getElementById('p-gender');if(pg)pg.value='';
-    const err=document.getElementById('intake-err');if(err)err.style.display='none';
     conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
     patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
-    const pl=document.getElementById('p-lang');if(pl)pl.value='';
+    currentUserId=null;
+    showLoginScreen();
   }
 }
 function goHome(){goPage('home');}
@@ -1443,6 +1471,164 @@ const UI={
   pa:{ph:'ਆਪਣੀ ਸਮੱਸਿਆ ਦੱਸੋ...',get greet(){return `ਸਤ ਸ੍ਰੀ ਅਕਾਲ ${patientName?patientName.split(' ')[0]:''}! 👋 ਮੈਂ Datun AI — ਤੁਹਾਡਾ ਦੰਦਾਂ ਦਾ ਦੋਸਤ! 😊\n\nਸ਼ੁਰੂ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ — ਤੁਸੀਂ ਮਰਦ, ਔਰਤ ਜਾਂ other? [OPTIONS: ਮਰਦ|ਔਰਤ|Other]`;}}
 };
 
+// ── AUTH0 + LOGIN SYSTEM ──
+let auth0Client=null;
+let currentUserId=null;
+
+async function initAuth0(){
+  try{
+    auth0Client=await auth0.createAuth0Client({
+      domain:'datunai.us.auth0.com',
+      clientId:'Cb4hGvbPMVhovaQVeDXFlWCegBe5LyDI',
+      cacheLocation:'localstorage',
+      authorizationParams:{
+        redirect_uri:window.location.origin
+      }
+    });
+    if(window.location.search.includes('code=')){
+      await auth0Client.handleRedirectCallback();
+      window.history.replaceState({},document.title,window.location.pathname);
+      const user=await auth0Client.getUser();
+      if(user)await handleLoggedInUser(user);
+    }
+  }catch(e){console.error('Auth0 init error:',e);}
+}
+
+async function loginWithGoogle(){
+  if(!auth0Client)await initAuth0();
+  await auth0Client.loginWithRedirect({
+    authorizationParams:{connection:'google-oauth2',redirect_uri:window.location.origin}
+  });
+}
+
+async function doEmailAuth(){
+  const email=(document.getElementById('ls-email')||{}).value?.trim();
+  const pass=(document.getElementById('ls-pass')||{}).value?.trim();
+  const name=(document.getElementById('ls-name')||{}).value?.trim();
+  const langVal=(document.getElementById('ls-lang')||{}).value;
+  const err=document.getElementById('ls-err');
+  if(!email||!pass){err.textContent='Email aur password daalein.';err.style.display='block';return;}
+  if(!auth0Client)await initAuth0();
+  err.style.display='none';
+  try{
+    await auth0Client.loginWithRedirect({
+      authorizationParams:{
+        connection:'Username-Password-Authentication',
+        login_hint:email,
+        redirect_uri:window.location.origin
+      }
+    });
+  }catch(e){
+    if(e.error==='access_denied'||e.message?.includes('Wrong')){
+      err.textContent='Wrong email or password.';err.style.display='block';
+    }else{
+      document.getElementById('ls-name-row').style.display='block';
+      document.getElementById('ls-lang-row').style.display='block';
+      document.getElementById('ls-btn').textContent='Create Account →';
+      err.textContent='New user? Fill name & language, then click Create Account.';err.style.display='block';
+    }
+  }
+}
+
+async function handleLoggedInUser(user){
+  patientName=user.name||user.email.split('@')[0];
+  patientEmail=user.email||'';
+  try{
+    const token=await auth0Client.getTokenSilently();
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({preferred_language:selectedLang||'en'})
+    });
+    const data=await res.json();
+    if(data.userId)currentUserId=data.userId;
+    if(data.preferred_language)selectedLang=data.preferred_language;
+    lang=selectedLang||'en';
+  }catch(e){console.error('User save error:',e);}
+  await showHistoryScreen();
+}
+
+function showForgotPassword(){
+  document.getElementById('ls-btn').style.display='none';
+  document.getElementById('ls-email').style.display='none';
+  document.getElementById('ls-pass').style.display='none';
+  document.getElementById('ls-name-row').style.display='none';
+  document.getElementById('ls-lang-row').style.display='none';
+  document.querySelector('.ls-or').style.display='none';
+  document.querySelector('.ls-google').style.display='none';
+  document.querySelector('[onclick="showForgotPassword()"]').parentElement.style.display='none';
+  document.getElementById('ls-forgot').style.display='block';
+  document.getElementById('ls-err').style.display='none';
+}
+
+function showLoginForm(){
+  document.getElementById('ls-btn').style.display='block';
+  document.getElementById('ls-email').style.display='block';
+  document.getElementById('ls-pass').style.display='block';
+  document.querySelector('.ls-or').style.display='flex';
+  document.querySelector('.ls-google').style.display='flex';
+  document.querySelector('[onclick="showForgotPassword()"]').parentElement.style.display='block';
+  document.getElementById('ls-forgot').style.display='none';
+  document.getElementById('ls-err').style.display='none';
+  document.getElementById('ls-name-row').style.display='none';
+  document.getElementById('ls-lang-row').style.display='none';
+  document.getElementById('ls-btn').textContent='Continue →';
+}
+
+async function doForgotPassword(){
+  const email=(document.getElementById('ls-reset-email')||{}).value?.trim();
+  const err=document.getElementById('ls-reset-err');
+  if(!email){err.textContent='Email daalein.';err.style.display='block';return;}
+  if(!auth0Client)await initAuth0();
+  try{
+    await auth0Client.loginWithRedirect({
+      authorizationParams:{screen_hint:'reset',login_hint:email,redirect_uri:window.location.origin}
+    });
+  }catch(e){err.textContent='Reset link bhejne mein error aayi.';err.style.display='block';}
+}
+
+async function showHistoryScreen(){
+  const ls=document.getElementById('login-screen');if(ls)ls.style.display='none';
+  const is=document.getElementById('intake-screen');if(is)is.style.display='none';
+  const cu=document.getElementById('chat-ui');if(cu)cu.style.display='none';
+  const hs=document.getElementById('history-screen');if(hs)hs.style.display='flex';
+  const list=document.getElementById('hs-list');
+  list.innerHTML='<div class="hs-empty">Loading...</div>';
+  try{
+    const token=await auth0Client.getTokenSilently();
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const data=await res.json();
+    if(!data.consultations||!data.consultations.length){
+      list.innerHTML='<div class="hs-empty">No past consultations yet.<br/>Start your first one! 🦷</div>';
+      return;
+    }
+    list.innerHTML=data.consultations.map(c=>{
+      const d=new Date(c.timestamp).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      const u=(c.urgency||'routine').toLowerCase();
+      return `<div class="hs-card" onclick="startNewConsultation()"><div class="hs-card-date">${d}</div><div class="hs-card-complaint">${c.chief_complaint||'Consultation'}</div><div class="hs-card-diag">${c.diagnosis||''}</div><span class="hs-card-urgency ${u}">${(c.urgency||'').toUpperCase()}</span></div>`;
+    }).join('');
+  }catch(e){list.innerHTML='<div class="hs-empty">Could not load history.</div>';}
+}
+
+function startNewConsultation(){
+  const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
+  const is=document.getElementById('intake-screen');if(is)is.style.display='none';
+  const cu=document.getElementById('chat-ui');if(cu)cu.style.display='flex';
+  const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · Hi, '+patientName.split(' ')[0]+'!';
+  const ed=document.getElementById('email-display');if(ed)ed.textContent=patientEmail;
+  const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent=langNames[lang]||'English';
+  consultationSaved=false;
+  resetChat();
+}
+
+function showLoginScreen(){
+  const ls=document.getElementById('login-screen');if(ls)ls.style.display='flex';
+  const is=document.getElementById('intake-screen');if(is)is.style.display='none';
+  const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
+  const cu=document.getElementById('chat-ui');if(cu)cu.style.display='none';
+}
 // ── LANGUAGE SELECTOR ──
 let selectedLang='';
 const langNames={
@@ -2179,7 +2365,8 @@ async function sendPhoto(b64,mt,du){
       gender:patientGender,
       email:patientEmail,
       messages:conv,
-      sessionId:patientEmail+'_'+Date.now()
+      sessionId:patientEmail+'_'+Date.now(),
+      userId:currentUserId||null
     })
   }).then(()=>console.log('✅ Consultation saved'))
   .catch(e=>console.log('Save error:',e));
@@ -2215,7 +2402,8 @@ async function sendMsg(ov){
       gender:patientGender,
       email:patientEmail,
       messages:conv,
-      sessionId:patientEmail+'_'+Date.now()
+      sessionId:patientEmail+'_'+Date.now(),
+      userId:currentUserId||null
     })
   }).then(()=>console.log('✅ Consultation saved'))
   .catch(e=>console.log('Save error:',e));
