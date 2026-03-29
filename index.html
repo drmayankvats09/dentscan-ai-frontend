@@ -1645,7 +1645,7 @@ async function showHistoryScreen(){
   }catch(e){list.innerHTML='<div class="hs-empty">Could not load history.</div>';}
 }
 
-function startNewConsultation(){
+async function startNewConsultation(){
   const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
   const is=document.getElementById('intake-screen');if(is)is.style.display='none';
   const cu=document.getElementById('chat-ui');if(cu)cu.style.display='flex';
@@ -1653,7 +1653,38 @@ function startNewConsultation(){
   const ed=document.getElementById('email-display');if(ed)ed.textContent=patientEmail;
   const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent=langNames[lang]||'English';
   consultationSaved=false;
-  resetChat();
+  conv=[];rxShown=false;connectShown=false;photoReqShown=false;
+  const msgs=document.getElementById('msgs');if(msgs)msgs.innerHTML='';
+  renderChips([]);
+  try{
+    const token=await auth0Client.getTokenSilently();
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const data=await res.json();
+    if(data.consultations&&data.consultations.length>0){
+      const last=data.consultations[0];
+      patientAge=last.age||patientAge;
+      patientGender=last.gender||patientGender;
+      const complaint=last.chief_complaint||'dental issue';
+      const greetText=lang==='hi'||lang==='hinglish'
+        ?'Wapas aaye '+patientName.split(' ')[0]+' ji! 😊 Pichli baar '+complaint+' ki takleef thi — ab kaisa hai? [OPTIONS: Sahi hai ab|Abhi bhi hai|Aur badh gayi]'
+        :'Welcome back '+patientName.split(' ')[0]+'! 😊 Last time you had '+complaint+' — how is it now? [OPTIONS: Better now|Still there|Got worse]';
+      const parsed=parseChips(greetText);
+      renderChips(parsed.chips);
+      addBot(parsed.text);
+    }else{
+      const greetText=UI[lang]?UI[lang].greet:UI['en'].greet;
+      const parsed=parseChips(greetText);
+      renderChips(parsed.chips);
+      addBot(parsed.text);
+    }
+  }catch(e){
+    const greetText=UI[lang]?UI[lang].greet:UI['en'].greet;
+    const parsed=parseChips(greetText);
+    renderChips(parsed.chips);
+    addBot(parsed.text);
+  }
 }
 
 // ── SIDE DRAWER ──
@@ -2035,7 +2066,7 @@ PATIENT INFO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${info}
 NEVER ask name again — already collected.
-AGE & GENDER: NOT collected yet. You MUST ask these first before anything else.
+AGE & GENDER: If age="${patientAge}" and gender="${patientGender}" are already known (not empty), NEVER ask them again. Skip directly to chief complaint. If they are empty, ask gender first then age.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 WHO YOU ARE — PERSONALITY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
