@@ -1424,7 +1424,7 @@ function toggleMob(){document.getElementById('ndrawer').classList.toggle('open')
 function closeMob(){document.getElementById('ndrawer').classList.remove('open');}
 
 // Page routing
-function goPage(name){
+async function goPage(name){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   const t=document.getElementById('pg-'+name);
   if(t)t.classList.add('on');
@@ -1433,15 +1433,23 @@ function goPage(name){
     conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
     if(currentUserId&&patientName){
       startNewConsultation();
-    }else{
-      patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
-      currentUserId=null;
+     }else{
       const is=document.getElementById('intake-screen');if(is)is.style.display='none';
       const cu=document.getElementById('chat-ui');if(cu)cu.style.display='none';
       const ls=document.getElementById('login-screen');if(ls)ls.style.display='none';
-      if(!auth0Client){initAuth0().then(()=>{auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});});}
-      else{auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});}
+      if(!auth0Client)await initAuth0();
+      const isLoggedIn=await auth0Client.isAuthenticated();
+      if(isLoggedIn){
+        const user=await auth0Client.getUser();
+        document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+        document.getElementById('pg-chat').classList.add('on');
+        await handleLoggedInUser(user);
+      }else{
+        patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
+        currentUserId=null;
+        auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});
       }
+    }
   }
 }
 function goHome(){goPage('home');}
