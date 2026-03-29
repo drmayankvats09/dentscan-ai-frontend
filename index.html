@@ -1510,6 +1510,7 @@ async function initAuth0(){
       }
     });
     if(window.location.search.includes('code=')){
+      document.body.style.opacity='0';
       await auth0Client.handleRedirectCallback();
       window.history.replaceState({},document.title,window.location.pathname);
       const user=await auth0Client.getUser();
@@ -1518,8 +1519,9 @@ async function initAuth0(){
         document.getElementById('pg-chat').classList.add('on');
         await handleLoggedInUser(user);
       }
+      document.body.style.opacity='1';
     }
-  }catch(e){console.error('Auth0 init error:',e);}
+  }catch(e){console.error('Auth0 init error:',e);document.body.style.opacity='1';}
 }
 
 async function loginWithGoogle(){
