@@ -1436,10 +1436,10 @@ function goPage(name){
     }else{
       patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
       currentUserId=null;
-      showLoginScreen();
+      if(!auth0Client){initAuth0().then(()=>{auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});});}
+      else{auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});}
     }
   }
-}
 function goHome(){goPage('home');}
 
 // GSAP hero
