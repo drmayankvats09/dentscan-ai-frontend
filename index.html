@@ -1700,19 +1700,38 @@ async function loadConsultation(id){
     if(!data.consultation){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Could not load consultation.</div>';return;}
     const c=data.consultation;
     msgs.innerHTML='';
+    conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=true;
     const lines=(c.full_conversation||'').split('\n---\n');
     lines.forEach(line=>{
       if(line.startsWith('Patient: ')){
         addUser(line.replace('Patient: ',''));
       }else if(line.startsWith('Datun AI: ')){
-        const text=line.replace('Datun AI: ','');
-        const parsed=parseChips(text);
-        addBot(parsed.text);
+        let text=line.replace('Datun AI: ','');
+        let rx=null,connect=false,findings=null;
+        if(text.includes('[FINDINGS_START]')&&text.includes('[FINDINGS_END]')){
+          const m=text.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
+          if(m)findings=pFI(m[1]);
+          text=text.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();
+        }
+        if(text.includes('[RX_START]')&&text.includes('[RX_END]')){
+          const m=text.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
+          if(m)rx=pRX(m[1]);
+          text=text.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();
+        }
+        if(text.includes('[SHOW_CONNECT]')){
+          connect=true;
+          text=text.replace('[SHOW_CONNECT]','').trim();
+        }
+        if(text.includes('[REQUEST_PHOTO]')){
+          text=text.replace('[REQUEST_PHOTO]','').trim();
+        }
+        text=text.replace(/\[OPTIONS:[^\]]+\]/g,'').trim();
+        if(text||rx||connect||findings)addBot(text,{rx,connect,findings});
       }
     });
     renderChips([]);
     const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · '+(c.name||'Consultation');
-    const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent='Past';
+    const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent='Past Consultation';
   }catch(e){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Error loading consultation.</div>';}
 }
 function closeDrawer(){
