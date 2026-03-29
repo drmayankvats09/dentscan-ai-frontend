@@ -1436,12 +1436,15 @@ function goPage(name){
     }else{
       patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
       currentUserId=null;
+      const is=document.getElementById('intake-screen');if(is)is.style.display='none';
+      const cu=document.getElementById('chat-ui');if(cu)cu.style.display='none';
+      const ls=document.getElementById('login-screen');if(ls)ls.style.display='none';
       if(!auth0Client){initAuth0().then(()=>{auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});});}
       else{auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});}
     }
   }
 }
-function goHome(){goPage('home');}
+function goHome()
 // GSAP hero
 const tl=gsap.timeline({delay:.1});
 tl.from('#heroH',{y:50,opacity:0,duration:.9,ease:'power3.out'})
