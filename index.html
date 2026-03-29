@@ -1440,8 +1440,8 @@ function goPage(name){
       else{auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});}
     }
   }
+}
 function goHome(){goPage('home');}
-
 // GSAP hero
 const tl=gsap.timeline({delay:.1});
 tl.from('#heroH',{y:50,opacity:0,duration:.9,ease:'power3.out'})
