@@ -1672,7 +1672,7 @@ async function openDrawer(){
     list.innerHTML=data.consultations.map(c=>{
       const d=new Date(c.timestamp).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
       const u=(c.urgency||'routine').toLowerCase();
-      return '<div class="sd-card"><div class="sd-card-date">'+d+'</div><div class="sd-card-complaint">'+(c.chief_complaint||'Consultation')+'</div><div class="sd-card-diag">'+(c.diagnosis||'')+'</div><span class="sd-card-urgency '+u+'">'+(c.urgency||'').toUpperCase()+'</span></div>';
+      return '<div class="sd-card" onclick="loadConsultation('+c.id+')"><div class="sd-card-date">'+d+'</div><div class="sd-card-complaint">'+(c.chief_complaint||'Consultation')+'</div><div class="sd-card-diag">'+(c.diagnosis||'')+'</div><span class="sd-card-urgency '+u+'">'+(c.urgency||'').toUpperCase()+'</span></div>';
     }).join('');
   }catch(e){list.innerHTML='<div class="sd-empty">Could not load history.</div>';}
 }
@@ -1684,6 +1684,36 @@ async function doLogout(){
   }else{
     goPage('home');
   }
+}
+async function loadConsultation(id){
+  closeDrawer();
+  const msgs=document.getElementById('msgs');
+  if(msgs)msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Loading consultation...</div>';
+  const cu=document.getElementById('chat-ui');if(cu)cu.style.display='flex';
+  const is=document.getElementById('intake-screen');if(is)is.style.display='none';
+  try{
+    const token=await auth0Client.getTokenSilently();
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultation/'+id,{
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const data=await res.json();
+    if(!data.consultation){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Could not load consultation.</div>';return;}
+    const c=data.consultation;
+    msgs.innerHTML='';
+    const lines=(c.full_conversation||'').split('\n---\n');
+    lines.forEach(line=>{
+      if(line.startsWith('Patient: ')){
+        addUser(line.replace('Patient: ',''));
+      }else if(line.startsWith('Datun AI: ')){
+        const text=line.replace('Datun AI: ','');
+        const parsed=parseChips(text);
+        addBot(parsed.text);
+      }
+    });
+    renderChips([]);
+    const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · '+(c.name||'Consultation');
+    const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent='Past';
+  }catch(e){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Error loading consultation.</div>';}
 }
 function closeDrawer(){
   document.getElementById('side-drawer').classList.remove('open');
