@@ -1562,7 +1562,7 @@ async function handleLoggedInUser(user){
     });
     const data=await res.json();
     if(data.userId)currentUserId=data.userId;
-    if(data.preferred_language&&data.preferred_language!=='en'){
+    if(data.preferred_language&&data.preferred_language!==''){
       selectedLang=data.preferred_language;
       lang=selectedLang;
       startNewConsultation();
