@@ -1674,8 +1674,8 @@ async function startNewConsultation(){
     const data=await res.json();
     if(data.consultations&&data.consultations.length>0){
       const last=data.consultations[0];
-      patientAge=last.age||patientAge;
-      patientGender=last.gender||patientGender;
+      if(last.age)patientAge=last.age;
+      if(last.gender)patientGender=last.gender;
       const complaint=last.chief_complaint||'dental issue';
       const greetText=lang==='hi'||lang==='hinglish'
         ?'Wapas aaye '+patientName.split(' ')[0]+' ji! 😊 Pichli baar '+complaint+' ki takleef thi — ab kaisa hai? [OPTIONS: Sahi hai ab|Abhi bhi hai|Aur badh gayi]'
