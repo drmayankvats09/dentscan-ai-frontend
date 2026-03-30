@@ -1676,7 +1676,7 @@ async function startNewConsultation(){
       const last=data.consultations[0];
       if(last.age)patientAge=last.age;
       if(last.gender)patientGender=last.gender;
-      const complaint=last.diagnosis||last.chief_complaint||'dental issue';
+      const complaint=(last.diagnosis||last.chief_complaint||'dental issue').split('\n')[0].split('URGENCY')[0].trim();
       const greetText=lang==='hi'||lang==='hinglish'
         ?'Wapas aaye '+patientName.split(' ')[0]+' ji! 😊 Pichli baar '+complaint+' ki takleef thi — ab kaisa hai? [OPTIONS: Sahi hai ab|Abhi bhi hai|Aur badh gayi]'
         :'Welcome back '+patientName.split(' ')[0]+'! 😊 Last time you had '+complaint+' — how is it now? [OPTIONS: Better now|Still there|Got worse]';
