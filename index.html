@@ -582,8 +582,6 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .ch-bp{background:var(--light);position:relative}.ch-bp:hover{background:var(--gp);transform:translateY(-1px)}.ch-bp svg{width:16px;height:16px;stroke:#64748b;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}.ch-bp:hover svg{stroke:var(--g)}.ch-bp input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .ch-bs{background:linear-gradient(135deg,var(--g),var(--gl));box-shadow:0 2px 8px rgba(10,158,143,.3)}.ch-bs:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(10,158,143,.4)}.ch-bs:active{transform:translateY(0)}.ch-bs svg{width:14px;height:14px;fill:white}
 .ch-hint{font-size:.61rem;color:#b0bac5;margin-top:5px;text-align:center}
-.ld-opt{padding:6px 10px;font-size:.72rem;color:rgba(255,255,255,.8);cursor:pointer;border-radius:6px;transition:all .15s;white-space:nowrap}
-.ld-opt:hover{background:rgba(10,158,143,.2);color:white}
 
 /* ═══ LEGAL ═══ */
 .legal-pg{padding-top:var(--nh)}
@@ -1339,7 +1337,7 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
       <button class="ch-back" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
       <div class="ch-av"><svg width="16" height="16" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="ch-inf"><h4 id="ch-pname">Datun AI · Dental</h4><p><span class="ch-live"></span>Online · Voice &amp; Photo enabled</p></div>
-      <div class="ch-lang-wrap" style="position:relative;margin-left:auto;flex-shrink:0"><button id="ch-lang-badge" onclick="toggleLangDropdown()" style="background:rgba(10,158,143,.3);border:1px solid rgba(10,158,143,.4);border-radius:8px;padding:4px 8px;font-size:.65rem;font-weight:700;color:white;cursor:pointer;font-family:var(--fb);letter-spacing:.05em"></button><div id="lang-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:4px;background:#1a2332;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:4px;z-index:100;min-width:120px;box-shadow:0 8px 24px rgba(0,0,0,.4)"><div class="ld-opt" onclick="changeLang('en')">🇬🇧 English</div><div class="ld-opt" onclick="changeLang('hi')">🇮🇳 हिंदी</div><div class="ld-opt" onclick="changeLang('hinglish')">🤝 Hinglish</div><div class="ld-opt" onclick="changeLang('ta')">தமிழ்</div><div class="ld-opt" onclick="changeLang('bn')">বাংলা</div><div class="ld-opt" onclick="changeLang('mr')">मराठी</div><div class="ld-opt" onclick="changeLang('te')">తెలుగు</div><div class="ld-opt" onclick="changeLang('kn')">ಕನ್ನಡ</div><div class="ld-opt" onclick="changeLang('gu')">ગુજરાતી</div><div class="ld-opt" onclick="changeLang('pa')">ਪੰਜਾਬੀ</div></div></div></div><button class="ch-back" onclick="doLogout()" style="margin-left:6px;font-size:.6rem;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-family:var(--fb)">Logout</button><button class="ch-hamburger" onclick="openDrawer()" title="My Consultations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <div class="ch-lang" id="ch-lang-badge" style="background:rgba(10,158,143,.25);border-radius:15px;padding:4px 12px;font-size:.7rem;font-weight:600;color:white"></div><button class="ch-back" onclick="doLogout()" style="margin-left:6px;font-size:.6rem;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-family:var(--fb)">Logout</button><button class="ch-hamburger" onclick="openDrawer()" title="My Consultations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     </div>
     <div id="email-strip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#077a6e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Summary → <strong id="email-display" style="margin-left:2px"></strong></div>
     <div id="msgs"></div>
@@ -1787,38 +1785,6 @@ async function loadConsultation(id){
     const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent='Past Consultation';
   }catch(e){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Error loading consultation.</div>';}
 }
-  const langShortCodes={en:'EN',hi:'HI',hinglish:'HN',ta:'TA',bn:'BN',mr:'MR',te:'TE',kn:'KN',gu:'GU',pa:'PA'};
-
-function updateLangBadgeShort(){
-  const b=document.getElementById('ch-lang-badge');
-  if(b)b.textContent=langShortCodes[lang]||'EN';
-}
-
-function toggleLangDropdown(){
-  const dd=document.getElementById('lang-dropdown');
-  if(dd)dd.style.display=dd.style.display==='none'?'block':'none';
-}
-
-function changeLang(l){
-  lang=l;selectedLang=l;
-  updateLangBadgeShort();
-  document.getElementById('lang-dropdown').style.display='none';
-  const ta=document.getElementById('cta');if(ta)ta.placeholder=(UI[l]||UI['en']).ph;
-  if(auth0Client&&currentUserId){
-    auth0Client.getTokenSilently().then(token=>{
-      fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
-        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-        body:JSON.stringify({preferred_language:l})
-      }).catch(e=>console.log('Lang save error:',e));
-    }).catch(e=>console.log('Token error:',e));
-  }
-}
-
-document.addEventListener('click',function(e){
-  const wrap=document.querySelector('.ch-lang-wrap');
-  const dd=document.getElementById('lang-dropdown');
-  if(wrap&&dd&&!wrap.contains(e.target))dd.style.display='none';
-});
 function closeDrawer(){
   document.getElementById('side-drawer').classList.remove('open');
   document.getElementById('drawer-overlay').classList.remove('open');
