@@ -2546,7 +2546,10 @@ async function sendMsg(ov){
   const ta=document.getElementById('cta');
   const text=(ov||ta.value).trim();if(!text)return;
   if(!ov){ta.value='';ta.style.height='auto';}
-  addUser(text);conv.push({role:'user',content:text});showTyping();
+  addUser(text);conv.push({role:'user',content:text});
+  if(!patientGender&&/^(male|female|other|पुरुष|महिला|ಪುರುಷ|ಮಹಿಳೆ|পুরুষ|মহিলা|ஆண்|பெண்|పురుషుడు|స్త్రీ|પુરુષ|સ્ત્રી|ਮਰਦ|ਔਰਤ)$/i.test(text.trim()))patientGender=text.trim();
+  if(!patientAge&&/^\d{1,3}$/.test(text.trim())&&+text.trim()>0&&+text.trim()<120)patientAge=text.trim();
+  showTyping();
   try{
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildSP(),messages:conv})});
     const d=await res.json();rmTyping();
