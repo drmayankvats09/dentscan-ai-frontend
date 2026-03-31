@@ -1595,20 +1595,38 @@ async function handleLoggedInUser(user){
   patientEmail=user.email||'';
   try{
     const token=await auth0Client.getTokenSilently();
+    
+    // 1. User ko backend pe register/sync karo
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({preferred_language:selectedLang||''})
+      body:JSON.stringify({}) 
     });
     const data=await res.json();
-    if(data.userId)currentUserId=data.userId;
-    if(data.preferred_language&&data.preferred_language!==''){
-      selectedLang=data.preferred_language;
-      lang=selectedLang;
-      startNewConsultation();
-    }else{
+    if(data.userId) currentUserId=data.userId;
+    if(data.preferred_language && data.preferred_language!==''){
+      selectedLang = data.preferred_language;
+      lang = selectedLang;
+    }
+
+    // 2. Check karo kya is user ne pehle kabhi consultation li hai?
+    const histRes=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const histData=await histRes.json();
+
+    // 3. Smart Decision Logic
+    if(histData.consultations && histData.consultations.length > 0){
+      // ✅ RETURNING USER: Purani history mil gayi -> Age/Gender uthao aur Chat kholo
+      const last = histData.consultations[0];
+      if(last.age) patientAge = last.age;
+      if(last.gender) patientGender = last.gender;
+      startNewConsultation(); 
+    } else {
+      // 🆕 NEW USER: Koi purani chat nahi mili -> Form dikhao
       showIntakeForm();
     }
+    
   }catch(e){console.error('User save error:',e);showIntakeForm();}
 }
 
