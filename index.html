@@ -1511,6 +1511,7 @@ if(p3d){document.addEventListener('mousemove',e=>{const r=p3d.getBoundingClientR
 let lang='en',conv=[],rxShown=false,connectShown=false,photoReqShown=false,consultationSaved=false;
 let patientName='',patientAge='',patientGender='',patientEmail='';
 let isListening=false,recognition=null;
+let currentConsultationId = null;
 
 const UI={
   en:{ph:'Describe your dental concern...',get greet(){return `Hello ${patientName?patientName.split(' ')[0]:''}! 👋 I'm Datun AI — your personal dental assistant! 😊\n\nWhat dental issue are you facing today? [OPTIONS: Tooth Pain|Swelling|Bleeding Gums|Something else]`;}},
@@ -2601,11 +2602,35 @@ function bRX(rx){
 function bCN(){
   const L=getRxL();
   const wa=encodeURIComponent(lang==='hi'?'Namaste! Maine Datun AI se consult kiya hai. Appointment lena chahta hoon.':'Hi! I just consulted Datun AI and would like to book an appointment.');
-  const c=document.createElement('div');c.style.cssText='background:linear-gradient(135deg,#e8f9f7,#f0fdf9);border:1px solid rgba(10,158,143,.18);border-radius:12px;padding:12px;max-width:100%;margin-top:5px';
+  
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display:flex; flex-direction:column; gap:8px; margin-top:8px; max-width:100%;';
+
+  const pdfBtn = document.createElement('button');
+  pdfBtn.id = 'pdf-download-btn';
+  pdfBtn.style.cssText = 'display:none; width:100%; background:linear-gradient(135deg, #0a9e8f, #12c4b2); color:white; padding:12px; border:none; border-radius:12px; cursor:pointer; font-weight:700; font-size:.85rem; justify-content:center; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(10,158,143,0.25); transition:all 0.25s; font-family:inherit;';
+  pdfBtn.innerHTML = '📄 Download PDF Report';
+  pdfBtn.onclick = downloadReport;
+  pdfBtn.onmouseover = function() { this.style.transform = 'translateY(-2px)'; this.style.boxShadow = '0 6px 16px rgba(10,158,143,0.35)'; };
+  pdfBtn.onmouseout = function() { this.style.transform = 'translateY(0)'; this.style.boxShadow = '0 4px 12px rgba(10,158,143,0.25)'; };
+  
+  const c=document.createElement('div');
+  c.style.cssText='background:linear-gradient(135deg,#e8f9f7,#f0fdf9);border:1px solid rgba(10,158,143,.18);border-radius:12px;padding:12px;';
   c.innerHTML=`<h5 style="font-size:.8rem;font-weight:700;color:#077a6e;margin-bottom:8px"> ${L.connectTitle}</h5><div style="display:flex;flex-direction:column;gap:5px"><a href="https://wa.me/919953135340?text=${wa}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#25d366;color:white;font-size:.77rem;font-weight:600;text-decoration:none">💬 WhatsApp Dr. Mayank</a><a href="tel:+919953135340" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a9e8f;color:white;font-size:.77rem;font-weight:600;text-decoration:none">📞 Call · +91 99531 35340</a><a href="mailto:hello@datunai.com" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a0f1a;color:white;font-size:.77rem;font-weight:600;text-decoration:none">✉️ hello@datunai.com</a></div>`;
-  return c;
+  
+  wrapper.appendChild(pdfBtn);
+  wrapper.appendChild(c);
+  return wrapper;
 }
 
+function downloadReport() {
+  if (!currentConsultationId) {
+    alert("Please wait a moment. The report is still generating...");
+    return;
+  }
+  const backendUrl = 'https://dentscan-ai-backend-production.up.railway.app';
+  window.open(`${backendUrl}/api/consultations/${currentConsultationId}/pdf`, '_blank');
+}
 function handlePhotoUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const du=ev.target.result,b=du.split(',')[1],mt=f.type||'image/jpeg';addPhoto(du);sendPhoto(b,mt,du);};r.readAsDataURL(f);e.target.value='';}
 
 async function sendPhoto(b64,mt,du){
@@ -2623,23 +2648,35 @@ async function sendPhoto(b64,mt,du){
     const parsed=parseChips(disp);
     renderChips(parsed.chips);
     addBot(parsed.text,{findings,imgSrc:du,rx,connect});
+    
+    // 👇 CORRECTED SAVE LOGIC 👇
     if(connectShown && patientEmail && !consultationSaved){
-  consultationSaved=true;
-  fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      name:patientName,
-      age:patientAge,
-      gender:patientGender,
-      email:patientEmail,
-      messages:conv,
-      sessionId:patientEmail+'_'+Date.now(),
-      userId:currentUserId||null
-    })
-  }).then(()=>console.log('✅ Consultation saved'))
-  .catch(e=>console.log('Save error:',e));
-}
+      consultationSaved=true;
+      fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          name:patientName,
+          age:patientAge,
+          gender:patientGender,
+          email:patientEmail,
+          messages:conv,
+          sessionId:patientEmail+'_'+Date.now(),
+          userId:currentUserId||null
+        })
+      }) // 
+      .then(res => res.json())
+      .then(data => {
+        console.log('✅ Consultation saved');
+        if (data.consultationId) {
+          currentConsultationId = data.consultationId; 
+          const pdfBtn = document.getElementById('pdf-download-btn');
+          if (pdfBtn) pdfBtn.style.display = 'flex'; 
+        }
+      })
+      .catch(e=>console.log('Save error:',e));
+    } // <-- Yeh bracket bhi missing tha!
+    
   }catch{rmTyping();addBot('Sorry, photo analysis failed. Please try again.');}
 }
 
@@ -2663,23 +2700,34 @@ async function sendMsg(ov){
     const parsed=parseChips(disp);
     renderChips(parsed.chips);
     addBot(parsed.text,{rx,connect});
+    
     if(connectShown && patientEmail && !consultationSaved){
-  consultationSaved=true;
-  fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      name:patientName,
-      age:patientAge,
-      gender:patientGender,
-      email:patientEmail,
-      messages:conv,
-      sessionId:patientEmail+'_'+Date.now(),
-      userId:currentUserId||null
-    })
-  }).then(()=>console.log('✅ Consultation saved'))
-  .catch(e=>console.log('Save error:',e));
-}
+      consultationSaved=true;
+      fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          name:patientName,
+          age:patientAge,
+          gender:patientGender,
+          email:patientEmail,
+          messages:conv,
+          sessionId:patientEmail+'_'+Date.now(),
+          userId:currentUserId||null
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log('✅ Consultation saved');
+        if (data.consultationId) {
+          currentConsultationId = data.consultationId; 
+          const pdfBtn = document.getElementById('pdf-download-btn');
+          if (pdfBtn) pdfBtn.style.display = 'flex'; 
+        }
+      })
+      .catch(e=>console.log('Save error:',e));
+    }
+    
   }catch{rmTyping();addBot('Oops! Something went wrong. Check your connection and try again.');}
 }
 
