@@ -548,7 +548,11 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .chip{display:inline-flex;align-items:center;background:white;border:1.5px solid rgba(10,158,143,.35);border-radius:20px;padding:6px 13px;font-size:.8rem;font-weight:500;color:#0a9e8f;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:var(--fb);box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .chip:hover{background:#0a9e8f;color:white;border-color:#0a9e8f;transform:translateY(-1px)}
 .chip:active{transform:translateY(0);background:#077a6e;border-color:#077a6e;color:white}
-
+  
+/* ── NAYA DROPDOWN CSS ── */
+.ld-opt { width: 100%; text-align: left; background: none; border: none; padding: 7px 10px; font-size: .75rem; color: rgba(255,255,255,.8); border-radius: 6px; cursor: pointer; font-family: var(--fb); transition: all .2s; }
+.ld-opt:hover { background: rgba(10,158,143,.2); color: white; }
+  
 /* ═══ PREMIUM CHAT UI ═══ */
 #chat-ui{flex:1;display:none;flex-direction:column;background:var(--light);height:100%;overflow:hidden}
 .ch-hd{background:linear-gradient(135deg,#0d1520,#152030,#0d1a28);padding:.85rem 1rem;display:flex;align-items:center;gap:.6rem;flex-shrink:0;position:relative;overflow:hidden}
@@ -1337,7 +1341,23 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
       <button class="ch-back" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
       <div class="ch-av"><svg width="16" height="16" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="ch-inf"><h4 id="ch-pname">Datun AI · Dental</h4><p><span class="ch-live"></span>Online · Voice &amp; Photo enabled</p></div>
-      <div class="ch-lang" id="ch-lang-badge" style="background:rgba(10,158,143,.25);border-radius:15px;padding:4px 12px;font-size:.7rem;font-weight:600;color:white"></div><button class="ch-back" onclick="doLogout()" style="margin-left:6px;font-size:.6rem;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-family:var(--fb)">Logout</button><button class="ch-hamburger" onclick="openDrawer()" title="My Consultations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <div style="position:relative; margin-left:auto; flex-shrink:0;">
+  <div class="ch-lang" id="ch-lang-badge" onclick="toggleLangDropdown()" style="background:rgba(10,158,143,.25);border-radius:15px;padding:4px 12px;font-size:.7rem;font-weight:600;color:white;cursor:pointer;display:flex;align-items:center;gap:4px;">
+    EN <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  </div>
+  <div id="lang-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:5px;background:var(--dark2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:6px;z-index:1000;width:120px;box-shadow:0 10px 25px rgba(0,0,0,.5);">
+    <button class="ld-opt" onclick="changeLang('en')">English</button>
+    <button class="ld-opt" onclick="changeLang('hi')">हिंदी</button>
+    <button class="ld-opt" onclick="changeLang('hinglish')">Hinglish</button>
+    <button class="ld-opt" onclick="changeLang('ta')">தமிழ்</button>
+    <button class="ld-opt" onclick="changeLang('bn')">বাংলা</button>
+    <button class="ld-opt" onclick="changeLang('mr')">मराठी</button>
+    <button class="ld-opt" onclick="changeLang('te')">తెలుగు</button>
+    <button class="ld-opt" onclick="changeLang('kn')">ಕನ್ನಡ</button>
+    <button class="ld-opt" onclick="changeLang('gu')">ગુજરાતી</button>
+    <button class="ld-opt" onclick="changeLang('pa')">ਪੰਜਾਬੀ</button>
+  </div>
+</div><button class="ch-back" onclick="doLogout()" style="margin-left:6px;font-size:.6rem;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-family:var(--fb)">Logout</button><button class="ch-hamburger" onclick="openDrawer()" title="My Consultations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     </div>
     <div id="email-strip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#077a6e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Summary → <strong id="email-display" style="margin-left:2px"></strong></div>
     <div id="msgs"></div>
@@ -2051,16 +2071,77 @@ function startConsult(){
   resetChat();
 }
 
-function setLang(l){
-  lang=l;
-  updateLangBadge();
-  const ta=document.getElementById('cta');if(ta)ta.placeholder=(UI[l]||UI['en']).ph;
-  resetChat();
+// ==========================================
+// LANGUAGE SELECTION & BACKEND SYNC
+// ==========================================
+
+const langShortCodes = {
+  en: 'EN', hi: 'HI', hinglish: 'HN', ta: 'TA', 
+  bn: 'BN', mr: 'MR', te: 'TE', kn: 'KN', gu: 'GU', pa: 'PA'
+};
+
+function updateLangBadgeShort() {
+  const badge = document.getElementById('ch-lang-badge');
+  if (badge) {
+    badge.innerHTML = (langShortCodes[lang] || 'EN') + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+  }
 }
-function updateLangBadge(){
-  const badge=document.getElementById('ch-lang-badge');
-  if(badge)badge.textContent=langNames[lang]||'English';
+
+function toggleLangDropdown() {
+  const dropdown = document.getElementById('lang-dropdown');
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+  }
 }
+
+function changeLang(selectedLanguage) {
+  // Update local state
+  lang = selectedLanguage;
+  selectedLang = selectedLanguage;
+  
+  // Update UI components
+  updateLangBadgeShort();
+  document.getElementById('lang-dropdown').style.display = 'none';
+  
+  const chatInput = document.getElementById('cta');
+  if (chatInput) {
+    chatInput.placeholder = (UI[selectedLanguage] || UI['en']).ph;
+  }
+
+  // Persist language preference to database via Auth0 token
+  if (auth0Client && currentUserId) {
+    auth0Client.getTokenSilently()
+      .then(token => {
+        fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ preferred_language: selectedLanguage })
+        })
+        .then(res => res.json())
+        .then(data => console.log('✅ Language preference persisted:', data.preferred_language))
+        .catch(error => console.error('Failed to save language preference:', error));
+      })
+      .catch(error => console.error('Token retrieval failed:', error));
+  }
+  
+  // Re-initialize chat with new language context
+  resetChat(); 
+}
+
+// Close language dropdown when clicking outside
+document.addEventListener('click', function(event) {
+  const badge = document.getElementById('ch-lang-badge');
+  const dropdown = document.getElementById('lang-dropdown');
+  
+  if (dropdown && dropdown.style.display === 'block') {
+    if (!badge.contains(event.target) && !dropdown.contains(event.target)) {
+      dropdown.style.display = 'none';
+    }
+  }
+});
 
 function buildSP(){
   const info=`Patient: ${patientName}, Age: ${patientAge}, Gender: ${patientGender}`;
