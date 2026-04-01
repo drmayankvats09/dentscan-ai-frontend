@@ -2483,19 +2483,23 @@ ${langInstructions[lang]||'Respond ONLY in English.'}
 EVERY response, EVERY [OPTIONS: chip1|chip2], EVERY acknowledgment — MUST be in ${langNames[lang]||'English'} ONLY.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `;}
-function buildPSP(){return `You are Datun AI analyzing a dental photo. Built by a real doctor.
+function buildPSP() {
+  return `You are Datun AI analyzing a dental photo. Built by a real doctor.
 LANGUAGE: Match patient's language.
 Examine for: Caries, Gum issues, Calculus, Fractures, Abscess, Discolouration, Soft tissue.
+
 [FINDINGS_START]
 OVERALL_QUALITY:(good/fair/poor)
 SUMMARY:(1-2 sentence impression)
 FINDING_1:name="..."|location="..."|severity="(mild/moderate/severe/noted)"|icon="..."|detail="..."
 [FINDINGS_END]
+
 Warm plain-language explanation.
+
 [RX_START]
 DIAGNOSIS:... URGENCY:... CARE_DO:✅...✅...✅... CARE_DONT:❌...❌...❌... MEDICINE:... NOTE:...
 [RX_END]
-[SHOW_CONNECT]`;}
+[SHOW_CONNECT]
 
 AT THE VERY END, output hidden JSON data exactly like this:
 [DATA_START]
@@ -2513,7 +2517,7 @@ AT THE VERY END, output hidden JSON data exactly like this:
   "dos_and_donts": "do's and don'ts",
   "red_flags": "warning signs"
 }
-[DATA_END]`;
+[DATA_END]`; 
 }
 
 const gT=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
