@@ -2427,6 +2427,23 @@ After [RX_END]:
 - Make patient feel confident and prepared — not scared
 - Briefly tell them what to expect — "Ghabraiye mat, yeh bahut common hai aur bilkul theek ho jaata hai 😊"
 - End EXACTLY with: [SHOW_CONNECT]
+- AT THE VERY END of the consultation, you MUST output a hidden JSON data block exactly like this format. Fill it with the collected data. If something is unknown, write "Not reported":
+[DATA_START]
+{
+  "location": "specific tooth number or area",
+  "pain_scale": "pain score out of 10",
+  "medical_history": "any systemic diseases",
+  "allergies": "any allergies reported",
+  "dental_history": "past dental treatments",
+  "provisional_diagnosis": "your clinical diagnosis",
+  "investigations": "suggested tests or xrays",
+  "treatment_plan": "definitive treatment plan",
+  "medications": "suggested medications",
+  "home_remedies": "suggested home care",
+  "dos_and_donts": "do's and don'ts",
+  "red_flags": "warning signs"
+}
+[DATA_END]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RETURNING PATIENT PROTOCOL
@@ -2479,6 +2496,24 @@ Warm plain-language explanation.
 DIAGNOSIS:... URGENCY:... CARE_DO:✅...✅...✅... CARE_DONT:❌...❌...❌... MEDICINE:... NOTE:...
 [RX_END]
 [SHOW_CONNECT]`;}
+
+AT THE VERY END, output hidden JSON data exactly like this:
+[DATA_START]
+{
+  "location": "specific tooth number or area",
+  "pain_scale": "pain score out of 10",
+  "medical_history": "any systemic diseases",
+  "allergies": "any allergies reported",
+  "dental_history": "past dental treatments",
+  "provisional_diagnosis": "your clinical diagnosis",
+  "investigations": "suggested tests or xrays",
+  "treatment_plan": "definitive treatment plan",
+  "medications": "suggested medications",
+  "home_remedies": "suggested home care",
+  "dos_and_donts": "do's and don'ts",
+  "red_flags": "warning signs"
+}
+[DATA_END]`;}
 
 const gT=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,92)+'px';}
@@ -2641,7 +2676,14 @@ async function sendPhoto(b64,mt,du){
     const d=await res.json();rmTyping();
     let r=d.content?.map(b=>b.text||'').join('')||'Could not analyze. Please try again.';
     conv.push(im);conv.push({role:'assistant',content:r});
-    let findings=null,rx=null,connect=false,disp=r;
+    let findings=null,rx=null,connect=false,disp=r,extractedPdfData={};
+    if(disp.includes('[DATA_START]') && disp.includes('[DATA_END]')){
+      const m = disp.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
+      if(m) {
+        try { extractedPdfData = JSON.parse(m[1].trim()); } catch(e){}
+      }
+      disp = disp.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
+    }
     if(r.includes('[FINDINGS_START]')&&r.includes('[FINDINGS_END]')){const m=r.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);if(m)findings=pFI(m[1]);disp=disp.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();}
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
@@ -2662,7 +2704,8 @@ async function sendPhoto(b64,mt,du){
           email:patientEmail,
           messages:conv,
           sessionId:patientEmail+'_'+Date.now(),
-          userId:currentUserId||null
+          userId:currentUserId||null,
+          ...extractedPdfData // 
         })
       }) // 
       .then(res => res.json())
@@ -2693,7 +2736,15 @@ async function sendMsg(ov){
     const d=await res.json();rmTyping();
     let r=d.content?.map(b=>b.text||'').join('')||'Something went wrong. Please try again.';
     conv.push({role:'assistant',content:r});
-    let rx=null,connect=false,disp=r;
+    let rx=null,connect=false,disp=r,extractedPdfData={};
+    // Extract hidden PDF data
+    if(disp.includes('[DATA_START]') && disp.includes('[DATA_END]')){
+      const m = disp.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
+      if(m) {
+        try { extractedPdfData = JSON.parse(m[1].trim()); } catch(e){ console.error("JSON Parse Error:", e); }
+      }
+      disp = disp.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
+    }
     if(r.includes('[REQUEST_PHOTO]')&&!photoReqShown){photoReqShown=true;disp=disp.replace('[REQUEST_PHOTO]','').trim();const pb=document.getElementById('pb');if(pb){pb.style.background='rgba(10,158,143,.12)';pb.querySelector('svg').style.stroke='#0a9e8f';setTimeout(()=>{if(pb){pb.style.background='';pb.querySelector('svg').style.stroke='';}},8000);}}
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
@@ -2713,7 +2764,8 @@ async function sendMsg(ov){
           email:patientEmail,
           messages:conv,
           sessionId:patientEmail+'_'+Date.now(),
-          userId:currentUserId||null
+          userId:currentUserId||null,
+          ...extractedPdfData // 
         })
       })
       .then(res => res.json())
