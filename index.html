@@ -1800,6 +1800,7 @@ async function loadConsultation(id){
         addUser(line.replace('Patient: ',''));
       }else if(line.startsWith('Datun AI: ')){
         let text=line.replace('Datun AI: ','');
+        text=text.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
         let rx=null,connect=false,findings=null;
         if(text.includes('[FINDINGS_START]')&&text.includes('[FINDINGS_END]')){
           const m=text.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
