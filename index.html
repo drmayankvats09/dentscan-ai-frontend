@@ -2698,14 +2698,12 @@ async function sendPhoto(b64,mt,du){
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildPSP(),messages:[...conv,im]})});
     const d=await res.json();rmTyping();
     let r=d.content?.map(b=>b.text||'').join('')||'Could not analyze. Please try again.';
-    conv.push(im);conv.push({role:'assistant',content:r});
-    let findings=null,rx=null,connect=false,disp=r,extractedPdfData={};
-    if(disp.includes('[DATA_START]') && disp.includes('[DATA_END]')){
-      const m = disp.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
-      if(m) {
-        try { extractedPdfData = JSON.parse(m[1].trim()); } catch(e){}
-      }
-      disp = disp.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
+    let cleanR=r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
+    conv.push(im);conv.push({role:'assistant',content:cleanR});
+    let findings=null,rx=null,connect=false,disp=cleanR,extractedPdfData={};
+    if(r.includes('[DATA_START]')&&r.includes('[DATA_END]')){
+      const m=r.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
+      if(m){try{extractedPdfData=JSON.parse(m[1].trim());}catch(e){}}
     }
     if(r.includes('[FINDINGS_START]')&&r.includes('[FINDINGS_END]')){const m=r.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);if(m)findings=pFI(m[1]);disp=disp.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();}
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
@@ -2764,15 +2762,12 @@ async function sendMsg(ov){
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildSP(),messages:conv})});
     const d=await res.json();rmTyping();
     let r=d.content?.map(b=>b.text||'').join('')||'Something went wrong. Please try again.';
-    conv.push({role:'assistant',content:r});
-    let rx=null,connect=false,disp=r,extractedPdfData={};
-    // Extract hidden PDF data
-    if(disp.includes('[DATA_START]') && disp.includes('[DATA_END]')){
-      const m = disp.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
-      if(m) {
-        try { extractedPdfData = JSON.parse(m[1].trim()); } catch(e){ console.error("JSON Parse Error:", e); }
-      }
-      disp = disp.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
+    let cleanR=r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
+    conv.push({role:'assistant',content:cleanR});
+    let rx=null,connect=false,disp=cleanR,extractedPdfData={};
+    if(r.includes('[DATA_START]')&&r.includes('[DATA_END]')){
+      const m=r.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
+      if(m){try{extractedPdfData=JSON.parse(m[1].trim());}catch(e){}}
     }
     if(r.includes('[REQUEST_PHOTO]')&&!photoReqShown){photoReqShown=true;disp=disp.replace('[REQUEST_PHOTO]','').trim();const pb=document.getElementById('pb');if(pb){pb.style.background='rgba(10,158,143,.12)';pb.querySelector('svg').style.stroke='#0a9e8f';setTimeout(()=>{if(pb){pb.style.background='';pb.querySelector('svg').style.stroke='';}},8000);}}
     if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
