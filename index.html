@@ -2562,6 +2562,20 @@ function rmTyping(){const t=document.getElementById('typ');if(t)t.remove();}
 
 function pFI(blk){const lines=blk.split('\n').map(l=>l.trim()).filter(Boolean);let s='',q='',fi=[];for(const l of lines){if(l.startsWith('OVERALL_QUALITY:'))q=l.replace('OVERALL_QUALITY:','').trim();else if(l.startsWith('SUMMARY:'))s=l.replace('SUMMARY:','').trim();else if(/^FINDING_\d+:/.test(l)){const p=l.replace(/^FINDING_\d+:\s*/,'');const o={};p.split('|').forEach(pt=>{const eq=pt.indexOf('=');if(eq>-1)o[pt.slice(0,eq).trim()]=pt.slice(eq+1).trim().replace(/^"|"$/g,'');});if(o.name)fi.push(o);}}return{s,q,fi};}
 function pRX(blk){const g=k=>{const r=new RegExp(k+':\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|\\[RX_END\\]|$)');const m=blk.match(r);return m?m[1].trim():'';};return{d:g('DIAGNOSIS'),u:g('URGENCY'),cd:g('CARE_DO'),cn:g('CARE_DONT'),hr:g('HOME_REMEDY'),med:g('MEDICINE'),xray:g('XRAY'),tp:g('TREATMENT_PATH'),n:g('NOTE')};}
+function rxToPdfData(rx){
+  if(!rx)return{};
+  var dos=rx.cd||'';var donts=rx.cn||'';
+  var combined=dos.split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(l){return'✅ '+l.replace(/^✅\s*/,'');}).join('\n')
+    +'\n'+donts.split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(l){return'❌ '+l.replace(/^❌\s*/,'');}).join('\n');
+  return{
+    provisional_diagnosis:rx.d||'',
+    medications:rx.med||'',
+    home_remedies:rx.hr||'',
+    dos_and_donts:combined,
+    treatment_plan:rx.tp||'',
+    investigations:rx.xray||''
+  };
+}
 function bFC(fd,imgSrc){
   const sc={mild:'#fffbeb',moderate:'#fff7ed',severe:'#fef2f2',noted:'#f0fdf4'};const tc={mild:'#92400e',moderate:'#9a3412',severe:'#991b1b',noted:'#065f46'};
   const c=document.createElement('div');c.style.cssText='background:white;border:1px solid rgba(10,158,143,.18);border-radius:13px;overflow:hidden;max-width:100%;margin-top:6px';
@@ -2696,9 +2710,16 @@ async function sendPhoto(b64,mt,du){
     renderChips(parsed.chips);
     addBot(parsed.text,{findings,imgSrc:du,rx,connect});
     
-    // 👇 CORRECTED SAVE LOGIC 👇
     if(connectShown && patientEmail && !consultationSaved){
       consultationSaved=true;
+      var rxData=rxToPdfData(rx||{});
+      var mergedData={};
+      var keys=['provisional_diagnosis','medications','home_remedies','dos_and_donts','treatment_plan','investigations','location','pain_scale','medical_history','allergies','dental_history','red_flags'];
+      keys.forEach(function(k){
+        var rxVal=rxData[k]||'';
+        var aiVal=extractedPdfData[k]||'';
+        mergedData[k]=rxVal.length>aiVal.length?rxVal:aiVal;
+      });
       fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -2710,12 +2731,12 @@ async function sendPhoto(b64,mt,du){
           messages:conv,
           sessionId:patientEmail+'_'+Date.now(),
           userId:currentUserId||null,
-          ...extractedPdfData // 
+          ...mergedData
         })
-      }) // 
+      })
       .then(res => res.json())
       .then(data => {
-        console.log('✅ Consultation saved');
+        console.log('✅ Consultation saved with detailed RX data');
         if (data.consultationId) {
           currentConsultationId = data.consultationId; 
           const pdfBtn = document.getElementById('pdf-download-btn');
@@ -2723,11 +2744,10 @@ async function sendPhoto(b64,mt,du){
         }
       })
       .catch(e=>console.log('Save error:',e));
-    } // <-- Yeh bracket bhi missing tha!
+    }
     
   }catch{rmTyping();addBot('Sorry, photo analysis failed. Please try again.');}
 }
-
 async function sendMsg(ov){
   const ta=document.getElementById('cta');
   const text=(ov||ta.value).trim();if(!text)return;
@@ -2759,6 +2779,14 @@ async function sendMsg(ov){
     
     if(connectShown && patientEmail && !consultationSaved){
       consultationSaved=true;
+      var rxData=rxToPdfData(rx||{});
+      var mergedData={};
+      var keys=['provisional_diagnosis','medications','home_remedies','dos_and_donts','treatment_plan','investigations','location','pain_scale','medical_history','allergies','dental_history','red_flags'];
+      keys.forEach(function(k){
+        var rxVal=rxData[k]||'';
+        var aiVal=extractedPdfData[k]||'';
+        mergedData[k]=rxVal.length>aiVal.length?rxVal:aiVal;
+      });
       fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -2770,12 +2798,12 @@ async function sendMsg(ov){
           messages:conv,
           sessionId:patientEmail+'_'+Date.now(),
           userId:currentUserId||null,
-          ...extractedPdfData // 
+          ...mergedData
         })
       })
       .then(res => res.json())
       .then(data => {
-        console.log('✅ Consultation saved');
+        console.log('✅ Consultation saved with detailed RX data');
         if (data.consultationId) {
           currentConsultationId = data.consultationId; 
           const pdfBtn = document.getElementById('pdf-download-btn');
@@ -2787,7 +2815,6 @@ async function sendMsg(ov){
     
   }catch{rmTyping();addBot('Oops! Something went wrong. Check your connection and try again.');}
 }
-
   // ── CHIPS ──
 function renderChips(options){
   const area=document.getElementById('chips-area');
