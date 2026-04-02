@@ -1793,7 +1793,7 @@ async function loadConsultation(id){
     if(!data.consultation){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Could not load consultation.</div>';return;}
     const c=data.consultation;
     msgs.innerHTML='';
-    conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=true;
+    conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=true;currentConsultationId=c.id;
     const lines=(c.full_conversation||'').split('\n---\n');
     lines.forEach(line=>{
       if(line.startsWith('Patient: ')){
@@ -1814,6 +1814,10 @@ async function loadConsultation(id){
         if(text.includes('[SHOW_CONNECT]')){
           connect=true;
           text=text.replace('[SHOW_CONNECT]','').trim();
+          setTimeout(function(){
+            var pdfBtn=document.getElementById('pdf-download-btn');
+            if(pdfBtn)pdfBtn.style.display='flex';
+          },500);
         }
         if(text.includes('[REQUEST_PHOTO]')){
           text=text.replace('[REQUEST_PHOTO]','').trim();
