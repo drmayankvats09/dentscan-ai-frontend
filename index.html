@@ -2720,7 +2720,6 @@ async function sendPhoto(b64,mt,du){
         var aiVal=extractedPdfData[k]||'';
         mergedData[k]=rxVal.length>aiVal.length?rxVal:aiVal;
       });
-      console.log('PDF DATA BEING SENT:',JSON.stringify(mergedData,null,2));
       fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -2788,7 +2787,6 @@ async function sendMsg(ov){
         var aiVal=extractedPdfData[k]||'';
         mergedData[k]=rxVal.length>aiVal.length?rxVal:aiVal;
       });
-      console.log('PDF DATA BEING SENT:',JSON.stringify(mergedData,null,2));
       fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
