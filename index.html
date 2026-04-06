@@ -2092,7 +2092,7 @@ function startConsult(){
   errEl.style.display='none';
   lang=selectedLang;
   const countryCode=(document.getElementById('p-country-code')||{value:'91'}).value;
-  patientName=name; patientAge=age; patientGender=gender; patientEmail=email; patientPhone=countryCode+phone;
+  patientName=name; patientAge=age; patientGender=gender; patientPhone=countryCode+phone;
   
   if(auth0Client&&currentUserId){
     auth0Client.getTokenSilently().then(token=>{
@@ -2107,7 +2107,7 @@ function startConsult(){
   document.getElementById('intake-screen').style.display='none';
   const cu=document.getElementById('chat-ui');cu.style.display='flex';
   const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · Hi, '+name.split(' ')[0]+'!';
-  const ed=document.getElementById('email-display');if(ed)ed.textContent=email;
+  const ed=document.getElementById('email-display');if(ed)ed.textContent=patientEmail||'';
   const lb=document.getElementById('ch-lang-badge');if(lb)lb.innerHTML=(langShortCodes[lang]||'EN') + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
   
   consultationSaved=false;
