@@ -25,7 +25,7 @@
 <meta name="twitter:description" content="AI dental triage for 600M Indians. 24/7. Hindi & English."/>
 <meta name="twitter:image" content="https://www.datunai.com/og-image.jpg"/>
 <link rel="canonical" href="https://www.datunai.com/" />
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
@@ -555,7 +555,7 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .lang-opt:hover{border-color:var(--g);color:var(--g)}
 .lang-opt.selected{background:var(--g);color:white;border-color:var(--g);font-weight:600}
 #chips-area:empty{display:none}
-.chip{display:inline-flex;align-items:center;background:white;border:1.5px solid rgba(10,158,143,.35);border-radius:20px;padding:6px 13px;font-size:.8rem;font-weight:500;color:#0a9e8f;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:var(--fb);box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.chip{display:inline-flex;align-items:center;background:white;border:1.5px solid rgba(10,158,143,.35);border-radius:22px;padding:9px 16px;font-size:.9rem;font-weight:500;color:#0a9e8f;cursor:pointer;transition:all .18s;white-space:nowrap;font-family:var(--fb);box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .chip:hover{background:#0a9e8f;color:white;border-color:#0a9e8f;transform:translateY(-1px)}
 .chip:active{transform:translateY(0);background:#077a6e;border-color:#077a6e;color:white}
   
@@ -2769,13 +2769,13 @@ const gT=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,92)+'px';}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
 function scrollTop(){const m=document.getElementById('msgs');setTimeout(()=>{const all=m.querySelectorAll(':scope > div');if(all.length)all[all.length-1].scrollIntoView({behavior:'smooth',block:'start'});},80);}
-function fmt(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br/>');}
+function fmt(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong style="color:#0a0f1a;font-weight:700">$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br/>');}
 function mkB(){const d=document.createElement('div');d.style.cssText='width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#0a9e8f,#12c4b2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px';d.innerHTML='<svg width="11" height="11" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/></svg>';return d;}
 function mkU(){const d=document.createElement('div');d.style.cssText='width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0a0f1a,#1e2a3a);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;box-shadow:0 2px 6px rgba(0,0,0,.15)';d.textContent=patientName?patientName.charAt(0).toUpperCase():'U';return d;}
 function addBot(text,ex){
   const m=document.getElementById('msgs');const w=document.createElement('div');w.style.cssText='display:flex;gap:8px;animation:msgIn .4s cubic-bezier(.16,1,.3,1)';
   const ct=document.createElement('div');ct.style.maxWidth='84%';
-  if(text){const b=document.createElement('div');b.style.cssText='background:linear-gradient(135deg,#ffffff,#f8fffe);border:1px solid rgba(10,158,143,.08);border-radius:16px;border-top-left-radius:4px;padding:10px 13px;font-size:.84rem;line-height:1.6;box-shadow:0 2px 8px rgba(0,0,0,.04),0 0 0 1px rgba(10,158,143,.03);transition:box-shadow .2s';b.innerHTML=fmt(text);ct.appendChild(b);}
+  if(text){const b=document.createElement('div');b.style.cssText='background:linear-gradient(135deg,#ffffff,#f8fffe);border:1px solid rgba(10,158,143,.08);border-radius:16px;border-top-left-radius:4px;padding:12px 15px;font-size:.95rem;line-height:1.75;box-shadow:0 2px 8px rgba(0,0,0,.04),0 0 0 1px rgba(10,158,143,.03);transition:box-shadow .2s;font-family:Inter,system-ui,sans-serif;color:#1a1a2e';b.innerHTML=fmt(text);ct.appendChild(b);}
   const tm=document.createElement('span');tm.style.cssText='font-size:.62rem;color:#94a3b8;margin-top:2px;display:block';tm.textContent=gT();ct.appendChild(tm);
   if(ex?.findings)ct.appendChild(bFC(ex.findings,ex.imgSrc));
   if(ex?.rx)ct.appendChild(bRX(ex.rx));
@@ -2785,7 +2785,7 @@ function addBot(text,ex){
 function addUser(text){
   const m=document.getElementById('msgs');const w=document.createElement('div');w.style.cssText='display:flex;gap:8px;flex-direction:row-reverse;animation:msgIn .4s cubic-bezier(.16,1,.3,1)';
   const ct=document.createElement('div');ct.style.maxWidth='84%';
-  const b=document.createElement('div');b.style.cssText='background:linear-gradient(135deg,#0a9e8f,#0bb5a5);color:white;border-radius:16px;border-top-right-radius:4px;padding:10px 13px;font-size:.84rem;line-height:1.6;box-shadow:0 2px 8px rgba(10,158,143,.25)';b.innerHTML=fmt(text);
+  const b=document.createElement('div');b.style.cssText='background:linear-gradient(135deg,#0a9e8f,#0bb5a5);color:white;border-radius:16px;border-top-right-radius:4px;padding:12px 15px;font-size:.95rem;line-height:1.75;box-shadow:0 2px 8px rgba(10,158,143,.25);font-family:Inter,system-ui,sans-serif';b.innerHTML=fmt(text);
   const tm=document.createElement('span');tm.style.cssText='font-size:.62rem;color:#94a3b8;margin-top:2px;display:block;text-align:right';tm.textContent=gT();
   ct.appendChild(b);ct.appendChild(tm);w.appendChild(mkU());w.appendChild(ct);m.appendChild(w);scrollTop();
 }
