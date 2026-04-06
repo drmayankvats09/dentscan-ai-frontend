@@ -1470,7 +1470,7 @@ async function goPage(name){
   if(t)t.classList.add('on');
   if(name!=='chat')window.scrollTo({top:0,behavior:'instant'});
   if(name==='chat'){
-    conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
+    conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;pendingFindings=null;pendingFindingsImg=null;pendingVFString='';
     if(currentUserId&&patientName){
       startNewConsultation();
      }else{
@@ -1519,6 +1519,7 @@ if(p3d){document.addEventListener('mousemove',e=>{const r=p3d.getBoundingClientR
 
 // ── CHAT STATE ──
 let lang='en',conv=[],rxShown=false,connectShown=false,photoReqShown=false,consultationSaved=false;
+let pendingFindings=null,pendingFindingsImg=null,pendingVFString='';
 let patientName='',patientAge='',patientGender='',patientEmail='',patientPhone='';
 let isListening=false,recognition=null;
 let currentConsultationId = null;
@@ -1721,7 +1722,7 @@ async function startNewConsultation(){
   const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · Hi, '+patientName.split(' ')[0]+'!';
   const ed=document.getElementById('email-display');if(ed)ed.textContent=patientEmail;
   const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent=langNames[lang]||'English';
-  consultationSaved=false;
+  consultationSaved=false;pendingFindings=null;pendingFindingsImg=null;pendingVFString='';
   conv=[];rxShown=false;connectShown=false;photoReqShown=false;
   const msgs=document.getElementById('msgs');if(msgs)msgs.innerHTML='';
   renderChips([]);
@@ -1804,6 +1805,11 @@ async function loadConsultation(id){
         let text=line.replace('Datun AI: ','');
         text=text.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
         let rx=null,connect=false,findings=null;
+        if(text.includes('[PHOTO_FINDINGS_START]')&&text.includes('[PHOTO_FINDINGS_END]')){
+          const m=text.match(/\[PHOTO_FINDINGS_START\]([\s\S]*?)\[PHOTO_FINDINGS_END\]/);
+          if(m)findings=pFI(m[1]);
+          text=text.replace(/\[PHOTO_FINDINGS_START\][\s\S]*?\[PHOTO_FINDINGS_END\]/,'').trim();
+        }
         if(text.includes('[FINDINGS_START]')&&text.includes('[FINDINGS_END]')){
           const m=text.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
           if(m)findings=pFI(m[1]);
@@ -2696,57 +2702,58 @@ ${langInstructions[lang]||'Respond ONLY in English.'}
 EVERY response, EVERY [OPTIONS: chip1|chip2], EVERY acknowledgment — MUST be in ${langNames[lang]||'English'} ONLY.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `;}
-
 function buildPSP() {
   const info=`Patient: ${patientName}, Age: ${patientAge}, Gender: ${patientGender}`;
   const history=conv.filter(m=>typeof m.content==='string')
     .map(m=>`${m.role==='user'?'Patient':'Datun AI'}: ${m.content}`)
     .join('\n').slice(0,3000);
-  return `You are Datun AI analyzing a dental photo.
-LANGUAGE: ${langNames[lang]||'English'} — every word in this language only.
+  return `You are Datun AI analyzing a dental photo as part of a consultation.
+LANGUAGE: ${langNames[lang]||'English'} — ${langInstructions[lang]||'Respond ONLY in English.'} Every single word MUST be in ${langNames[lang]||'English'} using its native script.
 PATIENT INFO: ${info}
-CONVERSATION SO FAR: ${history||'No prior conversation.'}
 
-YOUR JOB — STRICTLY 2 STEPS ONLY:
+CONVERSATION SO FAR:
+${history||'No prior conversation — patient sent photo directly.'}
 
-STEP 1 — ANALYZE PHOTO SILENTLY:
-Examine carefully for ALL visible findings:
-- Caries, Gum issues, Calculus, Fractures, Abscess
-- Discolouration, Soft tissue issues, Wear patterns
-- Missing teeth, Restorations, Orthodontic concerns
-- Cosmetic concerns, Any other visible finding
-Only report ACTUALLY visible findings — never fabricate.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR JOB — STRICTLY 2 STEPS ONLY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-OUTPUT findings in this EXACT format:
-[FINDINGS_START]
+STEP 1 — ANALYZE PHOTO (output hidden findings):
+Examine carefully — ONLY report what is CLEARLY visible:
+Caries, Gum issues, Calculus, Fractures, Abscess, Discolouration, Soft tissue, Wear, Missing teeth, Restorations, Orthodontic concerns, Cosmetic concerns etc.
+If photo quality is poor → mention it but give best assessment.
+Never fabricate findings. If unsure → say "possible".
+
+OUTPUT in this EXACT format:
+[PHOTO_FINDINGS_START]
 OVERALL_QUALITY:(good/fair/poor)
-SUMMARY:(1-2 sentence overall impression)
+SUMMARY:(1-2 sentence clinical impression)
 FINDING_1:name="..."|location="..."|severity="(mild/moderate/severe/noted)"|icon="..."|detail="..."
 FINDING_2:name="..."|location="..."|severity="..."|icon="..."|detail="..."
-(add all genuine findings)
-[FINDINGS_END]
+(add all genuine findings — only what is visible)
+[PHOTO_FINDINGS_END]
 
-STEP 2 — WARM ACKNOWLEDGMENT + HAND BACK TO HISTORY:
-After [FINDINGS_END]:
-- Write 2-3 warm lines acknowledging photo received
-- Say findings note kar liye hain — ab thodi history lenge for complete assessment
-- Naturally mention: "Datun AI ki photo analysis + aapki history — dono mila ke sabse accurate assessment milegi 😊"
-- Ask FIRST and ONLY question about pain/complaint — in patient's selected language
-- Add chips in patient's selected language — max 4
-- Example Hindi: "Koi dard ya takleef bhi hai?" [OPTIONS: Haan dard hai|Nahi sirf cosmetic|Sensitivity hai|Kuch aur]
-- Example English: "Do you have any pain or discomfort?" [OPTIONS: Yes pain|No cosmetic only|Sensitivity|Something else]
-- Example Tamil: patient ki language mein same question
-- ALWAYS match patient's selected language: ${langNames[lang]||'English'}
-- ONE question only — STOP here
+STEP 2 — WARM MESSAGE + FIRST QUESTION:
+After [PHOTO_FINDINGS_END]:
+- 2-3 warm lines: "Photo mil gayi ji! Kuch important cheezein notice ki hain — ab thodi history lenge toh sabse accurate assessment de paunga 😊"
+- Naturally mention: "Datun AI ki photo analysis + aapki history — dono milake best result milega!"
+- Ask ONE question relevant to what you see in photo — in patient's language
+- Add chips: [OPTIONS: ...] — max 4, in patient's language
+- "Pata nahi" BANNED — use "Yaad nahi" etc.
 
 CRITICAL RULES:
-- DO NOT generate RX card — buildSP will handle that
-- DO NOT ask more than ONE question
-- ALWAYS add chips after question
-- Emergency exception ONLY: abscess/severe swelling/oral cancer → immediate RX + [SHOW_CONNECT]
-- "Pata nahi" BANNED from chips
+❌ DO NOT generate [RX_START] — history questions will follow, RX comes at the end
+❌ DO NOT ask more than ONE question
+❌ DO NOT show findings to patient — [PHOTO_FINDINGS_START] is hidden, frontend stores it
+✅ ALWAYS add [OPTIONS: chips] after your question
+✅ If conversation history shows questions were already asked → still ask at least 1 relevant question based on photo findings
 
-LANGUAGE REMINDER: ${langNames[lang]||'English'} ONLY. Every word.`;
+EMERGENCY EXCEPTION ONLY:
+If photo shows severe abscess / spreading infection / oral cancer suspicion:
+→ Skip history → Generate immediate [RX_START]...[RX_END] + [SHOW_CONNECT]
+→ Include [PHOTO_FINDINGS_START]...[PHOTO_FINDINGS_END] before RX
+
+LANGUAGE: ${langNames[lang]||'English'} ONLY. Every word.`;
 }
 const gT=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,92)+'px';}
@@ -2920,7 +2927,8 @@ function downloadReport() {
 function handlePhotoUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const du=ev.target.result,b=du.split(',')[1],mt=f.type||'image/jpeg';addPhoto(du);sendPhoto(b,mt,du);};r.readAsDataURL(f);e.target.value='';}
 
 async function sendPhoto(b64,mt,du){
-  addBot(lang==='hi'?'📷 Photo mil gayi! Analyze kar raha hoon...':'📷 Photo received! Analyzing now...');showTyping();
+  const analyzeMsg={en:'📷 Photo received! Analyzing now...',hi:'📷 Photo mil gayi! Analyze kar raha hoon...',hinglish:'📷 Photo mil gayi! Analyze karta hoon...',ta:'📷 படம் வந்தது! பகுப்பாய்வு செய்கிறேன்...',bn:'📷 ছবি পেয়েছি! বিশ্লেষণ করছি...',mr:'📷 फोटो मिला! विश्लेषण करतो...',te:'📷 ఫోటో వచ్చింది! విశ్లేషిస్తున్నాను...',kn:'📷 ಫೋಟೋ ಬಂತು! ವಿಶ್ಲೇಷಿಸುತ್ತಿದ್ದೇನೆ...',gu:'📷 ફોટો મળ્યો! વિશ્લેષણ કરું છું...',pa:'📷 ਫੋਟੋ ਮਿਲੀ! ਵਿਸ਼ਲੇਸ਼ਣ ਕਰ ਰਿਹਾ ਹਾਂ...'};
+  addBot(analyzeMsg[lang]||analyzeMsg.en);showTyping();
   const im={role:'user',content:[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:lang==='hi'?'Yeh meri dental photo hai.':'This is my dental photo. Evaluate carefully.'}]};
   try{
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildPSP(),messages:[...conv,im]})});
@@ -2928,28 +2936,73 @@ async function sendPhoto(b64,mt,du){
     let r=d.content?.map(b=>b.text||'').join('')||'Could not analyze. Please try again.';
     let cleanR=r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
     conv.push(im);conv.push({role:'assistant',content:cleanR});
-    let findings=null,rx=null,connect=false,disp=cleanR,extractedPdfData={};
+    let rx=null,connect=false,disp=cleanR,extractedPdfData={};
+
+    // Extract AI JSON data if present
     if(r.includes('[DATA_START]')&&r.includes('[DATA_END]')){
       const m=r.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
       if(m){try{extractedPdfData=JSON.parse(m[1].trim());}catch(e){}}
     }
-    if(r.includes('[FINDINGS_START]')&&r.includes('[FINDINGS_END]')){const m=r.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);if(m)findings=pFI(m[1]);disp=disp.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();}
-    if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){rxShown=true;const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);if(m)rx=pRX(m[1]);disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();}
-    if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
+
+    // PHOTO FINDINGS → STORE silently, render NAHI karna
+    if(r.includes('[PHOTO_FINDINGS_START]')&&r.includes('[PHOTO_FINDINGS_END]')){
+      const m=r.match(/\[PHOTO_FINDINGS_START\]([\s\S]*?)\[PHOTO_FINDINGS_END\]/);
+      if(m){
+        pendingFindings=pFI(m[1]);
+        pendingFindingsImg=du;
+        if(pendingFindings.fi&&pendingFindings.fi.length){
+          pendingVFString=pendingFindings.fi.map(function(f){
+            return (f.name||'Unknown')+' | '+(f.location||'—')+' | '+(f.severity||'noted');
+          }).join('\n');
+        }
+      }
+      disp=disp.replace(/\[PHOTO_FINDINGS_START\][\s\S]*?\[PHOTO_FINDINGS_END\]/,'').trim();
+    }
+    // Backward compat — old [FINDINGS_START] tag bhi handle karo
+    if(r.includes('[FINDINGS_START]')&&r.includes('[FINDINGS_END]')){
+      const m=r.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
+      if(m){
+        pendingFindings=pFI(m[1]);
+        pendingFindingsImg=du;
+        if(pendingFindings.fi&&pendingFindings.fi.length){
+          pendingVFString=pendingFindings.fi.map(function(f){
+            return (f.name||'Unknown')+' | '+(f.location||'—')+' | '+(f.severity||'noted');
+          }).join('\n');
+        }
+      }
+      disp=disp.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();
+    }
+
+    // EMERGENCY CASE — RX aaya sendPhoto mein hi (abscess/cancer)
+    if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){
+      rxShown=true;
+      const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
+      if(m)rx=pRX(m[1]);
+      disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();
+    }
+    if(r.includes('[SHOW_CONNECT]')&&!connectShown){
+      connect=true;connectShown=true;
+      disp=disp.replace('[SHOW_CONNECT]','').trim();
+    }
+    if(r.includes('[REQUEST_PHOTO]')){
+      disp=disp.replace('[REQUEST_PHOTO]','').trim();
+    }
+
     const parsed=parseChips(disp);
     renderChips(parsed.chips);
-    addBot(parsed.text,{findings,imgSrc:du,rx,connect});
 
-    // Visual findings string banao directly from parsed findings
-    if(findings && findings.fi && findings.fi.length){
-      var vfString = findings.fi.map(function(f){
-        return (f.name||'Unknown') + ' | ' + (f.location||'—') + ' | ' + (f.severity||'noted');
-      }).join('\n');
-      if(!extractedPdfData.visual_findings || extractedPdfData.visual_findings.length < vfString.length){
-        extractedPdfData.visual_findings = vfString;
-      }
+    // NORMAL CASE: Findings stored, sirf text + question dikhao (no findings card)
+    // EMERGENCY CASE: RX aaya → findings + RX dono dikhao
+    if(rx && pendingFindings){
+      // Emergency — show findings + RX together
+      addBot(parsed.text,{findings:pendingFindings,imgSrc:pendingFindingsImg,rx,connect});
+      pendingFindings=null;pendingFindingsImg=null;
+    } else {
+      // Normal — sirf question dikhao, findings stored for later
+      addBot(parsed.text,{rx,connect});
     }
-    
+
+    // SAVE — sirf emergency case mein (jab SHOW_CONNECT aaya sendPhoto mein)
     if(connectShown && patientEmail && !consultationSaved){
       consultationSaved=true;
       var rxData=rxToPdfData(rx||{});
@@ -2960,34 +3013,32 @@ async function sendPhoto(b64,mt,du){
         var aiVal=extractedPdfData[k]||'';
         mergedData[k]=rxVal.length>aiVal.length?rxVal:aiVal;
       });
+      if(pendingVFString&&(!mergedData.visual_findings||mergedData.visual_findings.length<pendingVFString.length)){
+        mergedData.visual_findings=pendingVFString;
+      }
       fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
-          name:patientName,
-          age:patientAge,
-          gender:patientGender,
-          email:patientEmail,
-          messages:conv,
-          sessionId:patientEmail+'_'+Date.now(),
-          userId:currentUserId||null,
-          phoneNumber:patientPhone||'',
+          name:patientName,age:patientAge,gender:patientGender,email:patientEmail,
+          messages:conv,sessionId:patientEmail+'_'+Date.now(),
+          userId:currentUserId||null,phoneNumber:patientPhone||'',
           ...mergedData
         })
       })
-      .then(res => res.json())
-      .then(data => {
-        console.log('✅ Consultation saved with visual analysis and complete RX data', mergedData.visual_findings);
-        if (data.consultationId) {
-          currentConsultationId = data.consultationId; 
-          const pdfBtn = document.getElementById('pdf-download-btn');
-          if (pdfBtn) pdfBtn.style.display = 'flex'; 
+      .then(res=>res.json())
+      .then(data=>{
+        console.log('✅ Consultation saved (photo emergency)');
+        if(data.consultationId){
+          currentConsultationId=data.consultationId;
+          var pdfBtn=document.getElementById('pdf-download-btn');
+          if(pdfBtn)pdfBtn.style.display='flex';
         }
       })
       .catch(e=>console.log('Save error:',e));
     }
-    
-  }catch{rmTyping();addBot('Sorry, photo analysis failed. Please try again.');}
+
+  }catch(e){rmTyping();addBot('Sorry, photo analysis failed. Please try again.');}
 }
 async function sendMsg(ov){
   const ta=document.getElementById('cta');
@@ -3013,7 +3064,15 @@ async function sendMsg(ov){
     if(r.includes('[SHOW_CONNECT]')&&!connectShown){connect=true;connectShown=true;disp=disp.replace('[SHOW_CONNECT]','').trim();}
     const parsed=parseChips(disp);
     renderChips(parsed.chips);
-    addBot(parsed.text,{rx,connect});
+    
+    // Jab RX aaye + pendingFindings stored hain → dono ek saath dikhao
+    var showFindings=null,showFindingsImg=null;
+    if(rx && pendingFindings){
+      showFindings=pendingFindings;
+      showFindingsImg=pendingFindingsImg;
+      pendingFindings=null;pendingFindingsImg=null;
+    }
+    addBot(parsed.text,{rx,connect,findings:showFindings,imgSrc:showFindingsImg});
     
     if(connectShown && patientEmail && !consultationSaved){
       consultationSaved=true;
@@ -3025,6 +3084,10 @@ async function sendMsg(ov){
         var aiVal=extractedPdfData[k]||'';
         mergedData[k]=rxVal.length>aiVal.length?rxVal:aiVal;
       });
+      // Photo findings bhi add karo DB mein
+      if(pendingVFString&&(!mergedData.visual_findings||mergedData.visual_findings.length<pendingVFString.length)){
+        mergedData.visual_findings=pendingVFString;
+      }
       fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -3091,7 +3154,7 @@ function parseChips(text){
 }
 function resetChat(){
   const m=document.getElementById('msgs');if(m)m.innerHTML='';
-  conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;
+  conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;pendingFindings=null;pendingFindingsImg=null;pendingVFString='';
   const ta=document.getElementById('cta');if(ta){ta.value='';ta.style.height='auto';}
   renderChips([]);
   const greetText=UI[lang]?UI[lang].greet:UI['en'].greet;
