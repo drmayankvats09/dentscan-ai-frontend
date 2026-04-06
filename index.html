@@ -3004,7 +3004,7 @@ async function sendPhoto(b64,mt,du){
       consultationSaved=true;
       var rxData=rxToPdfData(rx||{});
       var mergedData={};
-      var keys=['provisional_diagnosis','medications','home_remedies','dos_and_donts','treatment_plan','investigations','location','pain_scale','medical_history','allergies','dental_history','red_flags'];
+      var keys=['provisional_diagnosis','medications','home_remedies','dos_and_donts','treatment_plan','investigations','location','pain_scale','medical_history','allergies','dental_history','red_flags','visual_findings'];
       keys.forEach(function(k){
         var rxVal=rxData[k]||'';
         var aiVal=extractedPdfData[k]||'';
@@ -3069,7 +3069,7 @@ async function sendMsg(ov){
       consultationSaved=true;
       var rxData=rxToPdfData(rx||{});
       var mergedData={};
-      var keys=['provisional_diagnosis','medications','home_remedies','dos_and_donts','treatment_plan','investigations','location','pain_scale','medical_history','allergies','dental_history','red_flags'];
+      var keys=['provisional_diagnosis','medications','home_remedies','dos_and_donts','treatment_plan','investigations','location','pain_scale','medical_history','allergies','dental_history','red_flags','visual_findings'];
       keys.forEach(function(k){
         var rxVal=rxData[k]||'';
         var aiVal=extractedPdfData[k]||'';
