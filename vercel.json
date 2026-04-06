@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/report/:id",
+      "destination": "https://dentscan-ai-backend-production.up.railway.app/api/consultations/:id/pdf",
+      "permanent": false
+    }
+  ]
+}
