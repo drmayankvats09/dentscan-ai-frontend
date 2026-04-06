@@ -565,7 +565,7 @@ footer{background:var(--dark);padding:52px 5% 28px}
   
 /* ═══ PREMIUM CHAT UI ═══ */
 #chat-ui{flex:1;display:none;flex-direction:column;background:var(--light);height:100%;overflow:hidden}
-.ch-hd{background:linear-gradient(135deg,#0d1520,#152030,#0d1a28);padding:.85rem 1rem;display:flex;align-items:center;gap:.6rem;flex-shrink:0;position:relative;overflow:visible}
+.ch-hd{background:linear-gradient(135deg,#0d1520,#152030,#0d1a28);padding:.85rem .6rem;display:flex;align-items:center;gap:.4rem;flex-shrink:0;position:relative;overflow:visible;flex-wrap:nowrap;max-width:100vw;box-sizing:border-box}
 .ch-hd::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,transparent,rgba(10,158,143,.06),transparent);animation:headerShimmer 4s ease-in-out infinite}
 @keyframes headerShimmer{0%,100%{opacity:0}50%{opacity:1}}
 .ch-back{background:rgba(255,255,255,.08);border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .25s;backdrop-filter:blur(4px)}
@@ -573,8 +573,9 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .ch-av{width:36px;height:36px;background:linear-gradient(135deg,rgba(10,158,143,.3),rgba(18,196,178,.2));border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;box-shadow:0 0 0 2px rgba(10,158,143,.15)}
 .ch-av::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1.5px solid rgba(10,158,143,.25);animation:avPulse 3s ease-in-out infinite}
 @keyframes avPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.8;transform:scale(1.08)}}
-.ch-inf h4{font-weight:600;font-size:.83rem;color:white;font-family:var(--fd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
-@media(min-width:400px){.ch-inf h4{max-width:200px}}
+.ch-inf h4{font-weight:600;font-size:.83rem;color:white;font-family:var(--fd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;flex-shrink:1;min-width:0}
+@media(min-width:400px){.ch-inf h4{max-width:150px}}
+@media(min-width:500px){.ch-inf h4{max-width:200px}}
 .ch-inf p{font-size:.66rem;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:4px;margin-top:1px}
 .ch-live{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:livePulse 2s infinite;box-shadow:0 0 6px rgba(74,222,128,.5)}
 @keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 6px rgba(74,222,128,.5)}50%{opacity:.6;box-shadow:0 0 12px rgba(74,222,128,.8)}}
@@ -827,9 +828,18 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
 /* Chat messages — better spacing on small screens */
 @media(max-width:480px){
   #msgs{padding:.75rem!important}
-  .ch-hd{padding:.7rem .85rem!important}
+  .ch-hd{padding:.7rem .5rem!important}
   .ch-ft{padding:.65rem .75rem!important}
 }
+
+/* Zoom / Large Font fix — prevent overflow */
+#pg-chat,#chat-ui,.ch-hd,.ch-ft,#msgs,#chips-area,.ch-ir{max-width:100vw!important;box-sizing:border-box!important;overflow-x:hidden!important}
+.ch-hd *{flex-shrink:1;min-width:0}
+.ch-hamburger{flex-shrink:0!important;min-width:32px!important}
+.ch-back{flex-shrink:0!important;min-width:32px!important}
+.ch-av{flex-shrink:0!important;min-width:36px!important}
+.ch-lang{flex-shrink:1!important;min-width:0!important;font-size:.65rem!important}
+.ch-inf{flex-shrink:1;min-width:0;overflow:hidden}
 
 /* Vis stats mobile */
 @media(max-width:480px){
