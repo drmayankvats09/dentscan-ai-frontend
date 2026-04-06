@@ -2998,6 +2998,16 @@ async function sendPhoto(b64,mt,du){
     const parsed=parseChips(disp);
     renderChips(parsed.chips);
     addBot(parsed.text,{findings,imgSrc:du,rx,connect});
+
+    // Visual findings string banao directly from parsed findings
+    if(findings && findings.fi && findings.fi.length){
+      var vfString = findings.fi.map(function(f){
+        return (f.name||'Unknown') + ' | ' + (f.location||'—') + ' | ' + (f.severity||'noted');
+      }).join('\n');
+      if(!extractedPdfData.visual_findings || extractedPdfData.visual_findings.length < vfString.length){
+        extractedPdfData.visual_findings = vfString;
+      }
+    }
     
     if(connectShown && patientEmail && !consultationSaved){
       consultationSaved=true;
@@ -3026,7 +3036,7 @@ async function sendPhoto(b64,mt,du){
       })
       .then(res => res.json())
       .then(data => {
-        console.log('✅ Consultation saved with detailed RX data');
+        console.log('✅ Consultation saved with visual analysis and complete RX data', mergedData.visual_findings);
         if (data.consultationId) {
           currentConsultationId = data.consultationId; 
           const pdfBtn = document.getElementById('pdf-download-btn');
