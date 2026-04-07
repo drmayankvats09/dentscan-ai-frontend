@@ -542,6 +542,27 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .sd-card-urgency.routine{background:rgba(22,163,74,.2);color:#86efac}
 .sd-card-urgency.monitor{background:rgba(37,99,235,.2);color:#93c5fd}
 .sd-empty{text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.4);font-size:.8rem}
+/* ── DRAWER LOGOUT BUTTON ── */
+.sd-logout-btn {
+  margin: 0 1rem 1rem 1rem; 
+  background: rgba(220, 38, 38, 0.15); 
+  color: #ef4444; 
+  border: 1px solid rgba(220, 38, 38, 0.3); 
+  border-radius: 10px;
+  padding: 10px;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--fb);
+  transition: all .2s;
+  flex-shrink: 0; 
+}
+
+.sd-logout-btn:hover {
+  background: rgba(220, 38, 38, 0.3);
+  color: #f87171;
+  border-color: rgba(220, 38, 38, 0.5);
+}
 .ch-hamburger{background:rgba(255,255,255,.08);border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .25s;backdrop-filter:blur(4px);margin-left:4px;position:relative;z-index:10}
 .ch-hamburger:hover{background:rgba(255,255,255,.15);transform:scale(1.05)}
 .ch-hamburger:hover{background:rgba(255,255,255,.18)}
@@ -1361,26 +1382,34 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
   </div>
   <div id="chat-ui">
     <div class="ch-hd">
-      <button class="ch-back" onclick="goHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+      <button class="ch-back" onclick="goPage('home')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+      
       <div class="ch-av"><svg width="16" height="16" viewBox="0 0 34 34" fill="none"><path d="M17 28C10.5 22 9 14 17 7.5C25 14 23.5 22 17 28Z" fill="white"/><polyline points="9.5,18.5 12,18.5 14.5,12.5 17,22 19.5,11 22,18.5 24.5,18.5" fill="none" stroke="rgba(10,158,143,.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      
       <div class="ch-inf"><h4 id="ch-pname">Datun AI · Dental</h4><p><span class="ch-live"></span>Online · Voice &amp; Photo enabled</p></div>
-      <div style="position:relative; margin-left:auto; flex-shrink:0;">
-  <div class="ch-lang" id="ch-lang-badge" onclick="toggleLangDropdown()" style="background:rgba(10,158,143,.25);border-radius:15px;padding:4px 12px;font-size:.7rem;font-weight:600;color:white;cursor:pointer;display:flex;align-items:center;gap:4px;">
-    EN <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-  </div>
-  <div id="lang-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:5px;background:var(--dark2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:6px;z-index:1000;width:120px;box-shadow:0 10px 25px rgba(0,0,0,.5);">
-    <button class="ld-opt" onclick="changeLang('en')">English</button>
-    <button class="ld-opt" onclick="changeLang('hi')">हिंदी</button>
-    <button class="ld-opt" onclick="changeLang('hinglish')">Hinglish</button>
-    <button class="ld-opt" onclick="changeLang('ta')">தமிழ்</button>
-    <button class="ld-opt" onclick="changeLang('bn')">বাংলা</button>
-    <button class="ld-opt" onclick="changeLang('mr')">मराठी</button>
-    <button class="ld-opt" onclick="changeLang('te')">తెలుగు</button>
-    <button class="ld-opt" onclick="changeLang('kn')">ಕನ್ನಡ</button>
-    <button class="ld-opt" onclick="changeLang('gu')">ગુજરાતી</button>
-    <button class="ld-opt" onclick="changeLang('pa')">ਪੰਜਾਬੀ</button>
-  </div>
-</div><button class="ch-back" onclick="doLogout()" style="margin-left:6px;font-size:.6rem;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-family:var(--fb)">Logout</button><button class="ch-hamburger" onclick="openDrawer()" title="My Consultations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      
+      <div style="position:relative; margin-left:auto; flex-shrink:0; display:flex; align-items:center;">
+        <div class="ch-lang" id="ch-lang-badge" onclick="toggleLangDropdown()" style="background:rgba(10,158,143,.25);border-radius:15px;padding:4px 12px;font-size:.7rem;font-weight:600;color:white;cursor:pointer;display:flex;align-items:center;gap:4px;margin-right:10px;">
+          EN <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        
+        <div id="lang-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:5px;background:var(--dark2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:6px;z-index:1000;width:120px;box-shadow:0 10px 25px rgba(0,0,0,.5);">
+          <button class="ld-opt" onclick="changeLang('en')">English</button>
+          <button class="ld-opt" onclick="changeLang('hi')">हिंदी</button>
+          <button class="ld-opt" onclick="changeLang('hinglish')">Hinglish</button>
+          <button class="ld-opt" onclick="changeLang('ta')">தமிழ்</button>
+          <button class="ld-opt" onclick="changeLang('bn')">বাংলা</button>
+          <button class="ld-opt" onclick="changeLang('mr')">मराठी</button>
+          <button class="ld-opt" onclick="changeLang('te')">తెలుగు</button>
+          <button class="ld-opt" onclick="changeLang('kn')">ಕನ್ನಡ</button>
+          <button class="ld-opt" onclick="changeLang('gu')">ગુજરાતી</button>
+          <button class="ld-opt" onclick="changeLang('pa')">ਪੰਜਾਬੀ</button>
+        </div>
+
+        <button onclick="goPage('home')" style="background:transparent; border:none; font-size:20px; cursor:pointer; margin-right:5px; padding:5px;" title="Go to Home">🏠</button>
+        
+        <button class="ch-hamburger" onclick="openDrawer()" title="My Consultations"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      </div>
     </div>
     <div id="email-strip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#077a6e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Summary → <strong id="email-display" style="margin-left:2px"></strong></div>
     <div id="msgs"></div>
@@ -1463,18 +1492,22 @@ if(cgEl)document.addEventListener('mousemove',e=>{cgEl.style.left=e.clientX+'px'
 function updateClock(){const d=new Date(),h=d.getHours()%12||12,m=d.getMinutes(),ap=d.getHours()>=12?'PM':'AM';const el=document.getElementById('hclock');if(el)el.textContent=h+':'+(m<10?'0':'')+m+' '+ap;}
 updateClock();setInterval(updateClock,1000);
 
-// ── INIT AUTH0 ON PAGE LOAD ──
+// ── INIT AUTH0 & ROUTING ON PAGE LOAD ──
 window.addEventListener('DOMContentLoaded', async () => {
+  // ⚡ CTO FIX: Bina time waste kiye user ko wahi page dikhao jahan wo tha
+  const lastPage = sessionStorage.getItem('datun_current_page') || 'home';
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  const targetPage = document.getElementById('pg-' + lastPage);
+  if (targetPage) targetPage.classList.add('on');
+
+  // Background mein silently Auth0 start karo
   await initAuth0();
-  // Agar login process nahi chal raha hai, toh pichla page restore karo
+  
+  // Agar normal refresh hai (login se wapas nahi aaya), toh properly states set karo
   if (!window.location.search.includes('code=')) {
-    const lastPage = localStorage.getItem('datun_current_page');
-    if (lastPage && lastPage !== 'home') {
-      goPage(lastPage);
-    }
+    goPage(lastPage);
   }
 });
-  
 // Nav scroll — change hamburger color too
 window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('s',window.scrollY>20);});
 
@@ -1484,8 +1517,8 @@ function closeMob(){document.getElementById('ndrawer').classList.remove('open');
 
 // Page routing
 async function goPage(name){
-  // ⚡ YEH NAYI LINE ADD KI HAI - Taki browser page yaad rakhe
-  localStorage.setItem('datun_current_page', name); 
+  // ⚡ CTO FIX: Page ki memory save karo (sirf current tab ke liye)
+  sessionStorage.setItem('datun_current_page', name); 
 
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   const t=document.getElementById('pg-'+name);
@@ -1976,6 +2009,9 @@ function closeDrawer(){
 }
 
 async function doLogout(){
+  // ⚡ CTO FIX: Logout karte hi browser ki memory completely saaf kar do
+  sessionStorage.removeItem('datun_current_page');
+
   currentUserId=null;patientName='';patientEmail='';patientAge='';patientGender='';selectedLang='';
   if(auth0Client){
     await auth0Client.logout({logoutParams:{returnTo:window.location.origin}});
@@ -3423,6 +3459,7 @@ const xs=document.createElement('style');xs.textContent='@keyframes tB{0%,60%,10
   <div class="sd-header"><h3>My Consultations</h3><button class="sd-close" onclick="closeDrawer()">✕</button></div>
   <button class="sd-new-btn" onclick="closeDrawer();startNewConsultation()">+ New Consultation</button>
   <div id="sd-list" class="sd-list"></div>
+  <button class="sd-logout-btn" onclick="doLogout()">Logout</button>
 </div>
 </body>
 </html>
