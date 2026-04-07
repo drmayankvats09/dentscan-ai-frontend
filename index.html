@@ -1529,6 +1529,117 @@ if(p3d){document.addEventListener('mousemove',e=>{const r=p3d.getBoundingClientR
 
 // ── CHAT STATE ──
 let lang='en',conv=[],rxShown=false,connectShown=false,photoReqShown=false,consultationSaved=false;
+  // ═══════════════════════════════════════════════
+// V2 STATE — incremental consultation tracking
+// ═══════════════════════════════════════════════
+let activeConsultId = null;
+let activeClientUuid = null;
+let v2MessageQueue = [];
+let v2QueueFlushing = false;
+
+function v2SaveActive(id, uuid) {
+  activeConsultId = id;
+  activeClientUuid = uuid;
+  if (id) localStorage.setItem('datun_active_id', String(id));
+  if (uuid) localStorage.setItem('datun_active_uuid', uuid);
+}
+function v2LoadActive() {
+  activeConsultId = localStorage.getItem('datun_active_id') || null;
+  activeClientUuid = localStorage.getItem('datun_active_uuid') || null;
+}
+function v2ClearActive() {
+  activeConsultId = null;
+  activeClientUuid = null;
+  localStorage.removeItem('datun_active_id');
+  localStorage.removeItem('datun_active_uuid');
+}
+
+async function v2GetToken() {
+  try { return await auth0Client.getTokenSilently(); } catch(e) { return null; }
+}
+
+// Pehla message bhejne pe consultation start karo
+async function v2EnsureConsultationStarted() {
+  if (activeConsultId) return activeConsultId;
+  const token = await v2GetToken();
+  if (!token) return null;
+  try {
+    const uuid = (crypto.randomUUID ? crypto.randomUUID() : (Date.now()+''+Math.random()));
+    const r = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/consultations/start', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({ client_uuid: uuid })
+    });
+    const d = await r.json();
+    if (d.consultationId) {
+      v2SaveActive(d.consultationId, uuid);
+      return d.consultationId;
+    }
+  } catch(e) { console.warn('v2 start failed:', e); }
+  return null;
+}
+
+// Har message ko queue mein daal, background mein flush
+function v2AppendMessage(role, content) {
+  if (!activeConsultId) return;
+  v2MessageQueue.push({ role, content });
+  v2FlushQueue();
+}
+
+let v2FlushTimer = null;
+function v2FlushQueue() {
+  if (v2FlushTimer) clearTimeout(v2FlushTimer);
+  v2FlushTimer = setTimeout(async () => {
+    if (v2QueueFlushing || v2MessageQueue.length === 0 || !activeConsultId) return;
+    v2QueueFlushing = true;
+    const batch = v2MessageQueue.splice(0, v2MessageQueue.length);
+    const token = await v2GetToken();
+    if (!token) { v2MessageQueue.unshift(...batch); v2QueueFlushing = false; return; }
+    try {
+      for (const msg of batch) {
+        await fetch('https://dentscan-ai-backend-production.up.railway.app/api/consultations/'+activeConsultId+'/message', {
+          method: 'PATCH',
+          headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+          body: JSON.stringify(msg)
+        });
+      }
+    } catch(e) { 
+      console.warn('v2 flush failed:', e);
+      v2MessageQueue.unshift(...batch);
+    }
+    v2QueueFlushing = false;
+  }, 400);
+}
+
+async function v2CompleteConsultation() {
+  if (!activeConsultId) return;
+  const token = await v2GetToken();
+  if (!token) return;
+  try {
+    await fetch('https://dentscan-ai-backend-production.up.railway.app/api/consultations/'+activeConsultId+'/complete', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+token}
+    });
+  } catch(e) { console.warn('v2 complete failed:', e); }
+  v2ClearActive();
+}
+
+// Tab band hone se pehle pending messages flush
+window.addEventListener('beforeunload', () => {
+  if (v2MessageQueue.length > 0 && activeConsultId) {
+    // Best-effort: synchronous attempt
+    try {
+      const token = localStorage.getItem('datun_last_token');
+      if (token) {
+        for (const msg of v2MessageQueue) {
+          const blob = new Blob([JSON.stringify(msg)], {type:'application/json'});
+          navigator.sendBeacon &&
+            navigator.sendBeacon('https://dentscan-ai-backend-production.up.railway.app/api/consultations/'+activeConsultId+'/message', blob);
+        }
+      }
+    } catch(e) {}
+  }
+});
 let pendingFindings=null,pendingFindingsImg=null,pendingVFString='';
 let patientName='',patientAge='',patientGender='',patientEmail='',patientPhone='';
 let isListening=false,recognition=null;
@@ -1615,10 +1726,12 @@ async function doEmailAuth(){
 async function handleLoggedInUser(user){
   patientName=user.name||user.email.split('@')[0];
   patientEmail=user.email||'';
+  v2LoadActive();
   try{
     const token=await auth0Client.getTokenSilently();
+    try { localStorage.setItem('datun_last_token', token); } catch(e) {}
     
-    // 1. User ko backend pe register/sync karo
+    // 1. Backend sync — user pakka DB mein save
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
@@ -1630,26 +1743,62 @@ async function handleLoggedInUser(user){
       selectedLang = data.preferred_language;
       lang = selectedLang;
     }
-
-    // 2. Check karo kya is user ne pehle kabhi consultation li hai?
-    const histRes=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
-      headers:{'Authorization':'Bearer '+token}
-    });
-    const histData=await histRes.json();
-
-    // 3. Smart Decision Logic
-    if(histData.consultations && histData.consultations.length > 0){
-      // ✅ RETURNING USER: Purani history mil gayi -> Age/Gender uthao aur Chat kholo
-      const last = histData.consultations[0];
-      if(last.age) patientAge = last.age;
-      if(last.gender) patientGender = last.gender;
-      startNewConsultation(); 
-    } else {
-      // 🆕 NEW USER: Koi purani chat nahi mili -> Form dikhao
+    
+    // 2. Profile fields backend se uthao (returning user case)
+    if(data.full_name) patientName = data.full_name;
+    if(data.age) patientAge = data.age;
+    if(data.gender) patientGender = data.gender;
+    if(data.phone_number) patientPhone = data.phone_number;
+    
+    // 3. Smart routing
+    if(!data.profile_completed){
+      // 🆕 NAYA USER — intake form dikhao
       showIntakeForm();
+      return;
     }
     
-  }catch(e){console.error('User save error:',e);showIntakeForm();}
+    // ✅ RETURNING USER — profile complete hai
+    // Check: in-progress consultation hai kya?
+    if(data.resume_consultation && data.resume_consultation.id){
+      // Resume banner dikhao
+      showResumeBanner(data.resume_consultation.id, data.resume_consultation.msg_count || 0);
+      return;
+    }
+    
+    // Direct chat kholo
+    startNewConsultation();
+    
+  }catch(e){console.error('User sync error:',e);showIntakeForm();}
+}
+
+// Resume banner — adhuri chat continue karne ka option
+function showResumeBanner(consultId, msgCount){
+  // Pehle se ek banner hai to remove karo
+  const old = document.getElementById('v2-resume-banner');
+  if(old) old.remove();
+  
+  const banner = document.createElement('div');
+  banner.id = 'v2-resume-banner';
+  banner.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#0a9e8f,#14b8a6);color:#fff;padding:24px 28px;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.5);z-index:999999;max-width:90%;width:360px;text-align:center;font-family:inherit;';
+  banner.innerHTML = 
+    '<div style="font-size:32px;margin-bottom:8px;">📋</div>'+
+    '<div style="font-size:17px;font-weight:600;margin-bottom:6px;">Aapki pichli baatcheet adhuri thi</div>'+
+    '<div style="font-size:13px;opacity:.85;margin-bottom:18px;">'+msgCount+' messages saved · wahi se aage badhein?</div>'+
+    '<div style="display:flex;gap:10px;justify-content:center;">'+
+      '<button id="v2-resume-yes" style="background:#fff;color:#0a9e8f;border:none;padding:11px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">Continue →</button>'+
+      '<button id="v2-resume-no" style="background:transparent;color:#fff;border:1.5px solid #fff;padding:11px 22px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;">New Chat</button>'+
+    '</div>';
+  document.body.appendChild(banner);
+  
+  document.getElementById('v2-resume-yes').onclick = function(){
+    banner.remove();
+    loadConsultation(consultId, true);
+  };
+  document.getElementById('v2-resume-no').onclick = function(){
+    banner.remove();
+    v2ClearActive();
+    startNewConsultation();
+  };
 }
 
 function showIntakeForm(){
@@ -1778,7 +1927,12 @@ async function openDrawer(){
     list.innerHTML=data.consultations.map(c=>{
       const d=new Date(c.timestamp).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
       const u=(c.urgency||'routine').toLowerCase();
-      return '<div class="sd-card" onclick="loadConsultation('+c.id+')"><div class="sd-card-date">'+d+'</div><div class="sd-card-complaint">'+(c.chief_complaint||'Consultation')+'</div><div class="sd-card-diag">'+(c.diagnosis||'')+'</div><span class="sd-card-urgency '+u+'">'+(c.urgency||'').toUpperCase()+'</span></div>';
+      const isInProg = c.status === 'in_progress';
+      const badge = isInProg 
+        ? '<span style="background:#0a9e8f;color:#fff;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;">● CONTINUE</span>'
+        : '<span class="sd-card-urgency '+u+'">'+(c.urgency||'').toUpperCase()+'</span>';
+      const title = isInProg ? 'Adhuri chat ('+(c.msg_count||0)+' msgs)' : (c.chief_complaint||'Consultation');
+      return '<div class="sd-card" style="'+(isInProg?'border-left:3px solid #0a9e8f;':'')+'" onclick="loadConsultation('+c.id+','+isInProg+')"><div class="sd-card-date">'+d+'</div><div class="sd-card-complaint">'+title+'</div><div class="sd-card-diag">'+(c.diagnosis||'')+'</div>'+badge+'</div>';
     }).join('');
   }catch(e){list.innerHTML='<div class="sd-empty">Could not load history.</div>';}
 }
@@ -1791,12 +1945,13 @@ async function doLogout(){
     goPage('home');
   }
 }
-async function loadConsultation(id){
+async function loadConsultation(id, isResume){
   closeDrawer();
   const msgs=document.getElementById('msgs');
   if(msgs)msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Loading consultation...</div>';
   const cu=document.getElementById('chat-ui');if(cu)cu.style.display='flex';
   const is=document.getElementById('intake-screen');if(is)is.style.display='none';
+  const ls=document.getElementById('login-screen');if(ls)ls.style.display='none';
   try{
     const token=await auth0Client.getTokenSilently();
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultation/'+id,{
@@ -1806,59 +1961,81 @@ async function loadConsultation(id){
     if(!data.consultation){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Could not load consultation.</div>';return;}
     const c=data.consultation;
     msgs.innerHTML='';
-    conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=true;currentConsultationId=c.id;
-    const lines=(c.full_conversation||'').split('\n---\n');
-    lines.forEach(line=>{
-      if(line.startsWith('Patient: ')){
-        addUser(line.replace('Patient: ',''));
-      }else if(line.startsWith('Datun AI: ')){
-        let text=line.replace('Datun AI: ','');
-        text=text.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
+    conv=[];rxShown=false;connectShown=false;photoReqShown=false;
+    currentConsultationId=c.id;
+    
+    // V2: Try messages_json first (naya format), fallback to full_conversation (purana format)
+    let msgArr = [];
+    if(c.messages_json && Array.isArray(c.messages_json) && c.messages_json.length > 0){
+      msgArr = c.messages_json;
+    } else if(c.full_conversation){
+      // Purana format parse karo
+      const lines=(c.full_conversation||'').split('\n---\n');
+      lines.forEach(line=>{
+        if(line.startsWith('Patient: ')) msgArr.push({role:'user',content:line.replace('Patient: ','')});
+        else if(line.startsWith('Datun AI: ')) msgArr.push({role:'assistant',content:line.replace('Datun AI: ','')});
+      });
+    }
+    
+    // Render saare messages
+    msgArr.forEach(m=>{
+      if(m.role === 'user'){
+        addUser(m.content);
+        conv.push({role:'user',content:m.content});
+      } else if(m.role === 'assistant'){
+        let text = m.content || '';
+        text = text.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
         let rx=null,connect=false,findings=null;
         if(text.includes('[PHOTO_FINDINGS_START]')&&text.includes('[PHOTO_FINDINGS_END]')){
-          const m=text.match(/\[PHOTO_FINDINGS_START\]([\s\S]*?)\[PHOTO_FINDINGS_END\]/);
-          if(m)findings=pFI(m[1]);
+          const mm=text.match(/\[PHOTO_FINDINGS_START\]([\s\S]*?)\[PHOTO_FINDINGS_END\]/);
+          if(mm)findings=pFI(mm[1]);
           text=text.replace(/\[PHOTO_FINDINGS_START\][\s\S]*?\[PHOTO_FINDINGS_END\]/,'').trim();
         }
         if(text.includes('[FINDINGS_START]')&&text.includes('[FINDINGS_END]')){
-          const m=text.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
-          if(m)findings=pFI(m[1]);
+          const mm=text.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
+          if(mm)findings=pFI(mm[1]);
           text=text.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();
         }
         if(text.includes('[RX_START]')&&text.includes('[RX_END]')){
-          const m=text.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
-          if(m)rx=pRX(m[1]);
+          const mm=text.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
+          if(mm){rx=pRX(mm[1]);rxShown=true;}
           text=text.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();
         }
         if(text.includes('[SHOW_CONNECT]')){
-          connect=true;
+          connect=true;connectShown=true;
           text=text.replace('[SHOW_CONNECT]','').trim();
           setTimeout(function(){
             var pdfBtn=document.getElementById('pdf-download-btn');
             if(pdfBtn)pdfBtn.style.display='flex';
           },500);
         }
-        if(text.includes('[REQUEST_PHOTO]')){
-          text=text.replace('[REQUEST_PHOTO]','').trim();
-        }
+        if(text.includes('[REQUEST_PHOTO]')) text=text.replace('[REQUEST_PHOTO]','').trim();
         text=text.replace(/\[OPTIONS:[^\]]+\]/g,'').trim();
-        if(text||rx||connect||findings)addBot(text,{rx,connect,findings});
+        if(text||rx||connect||findings) addBot(text,{rx,connect,findings});
+        conv.push({role:'assistant',content:m.content});
       }
     });
     renderChips([]);
-    const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · '+(c.name||'Consultation');
-    const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent='Past Consultation';
-  }catch(e){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Error loading consultation.</div>';}
-}
-function closeDrawer(){
-  document.getElementById('side-drawer').classList.remove('open');
-  document.getElementById('drawer-overlay').classList.remove('open');
-}
-function showLoginScreen(){
-  const ls=document.getElementById('login-screen');if(ls)ls.style.display='flex';
-  const is=document.getElementById('intake-screen');if(is)is.style.display='none';
-  const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
-  const cu=document.getElementById('chat-ui');if(cu)cu.style.display='none';
+    
+    // V2: Resume mode — agar in_progress hai, active set kar do, continue kar sakte hain
+    if(c.status === 'in_progress' || isResume){
+      v2SaveActive(c.id, c.client_uuid || ('resume_'+c.id));
+      consultationSaved = false;
+      const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · Continuing...';
+      const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent='In Progress';
+      // Input enabled rahega
+      const cta=document.getElementById('cta');if(cta)cta.disabled=false;
+    } else {
+      // Completed — read only
+      v2ClearActive();
+      consultationSaved = true;
+      const ne=document.getElementById('ch-pname');if(ne)ne.textContent='DATUN AI · '+(c.name||'Consultation');
+      const lb=document.getElementById('ch-lang-badge');if(lb)lb.textContent='Past Consultation';
+    }
+  }catch(e){
+    console.error('loadConsultation error:',e);
+    msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Error loading consultation.</div>';
+  }
 }
 // ── LANGUAGE SELECTOR ──
 let selectedLang='';
@@ -2102,14 +2279,23 @@ function startConsult(){
   const countryCode=(document.getElementById('p-country-code')||{value:'91'}).value;
   patientName=name; patientAge=age; patientGender=gender; patientPhone=countryCode+phone;
   
-  if(auth0Client&&currentUserId){
+  // V2: Profile ko backend pe SAVE karo (consultation se decoupled)
+  if(auth0Client){
     auth0Client.getTokenSilently().then(token=>{
-      fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
-        method:'POST',
+      fetch('https://dentscan-ai-backend-production.up.railway.app/api/profile',{
+        method:'PATCH',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-        body:JSON.stringify({preferred_language:selectedLang})
-      }).catch(e=>console.log('Lang save error:',e));
-    }).catch(e=>console.log('Token error:',e));
+        body:JSON.stringify({
+          full_name: name,
+          age: age,
+          gender: gender,
+          phone_number: patientPhone,
+          preferred_language: selectedLang
+        })
+      }).then(r=>r.json()).then(d=>{
+        console.log('✅ Profile saved to backend');
+      }).catch(e=>console.warn('Profile save error:',e));
+    }).catch(e=>console.warn('Token error:',e));
   }
   
   document.getElementById('intake-screen').style.display='none';
@@ -2119,6 +2305,7 @@ function startConsult(){
   const lb=document.getElementById('ch-lang-badge');if(lb)lb.innerHTML=(langShortCodes[lang]||'EN') + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
   
   consultationSaved=false;
+  v2ClearActive();
   resetChat();
 }
 
@@ -3055,6 +3242,8 @@ async function sendMsg(ov){
   const text=(ov||ta.value).trim();if(!text)return;
   if(!ov){ta.value='';ta.style.height='auto';}
   addUser(text);conv.push({role:'user',content:text});
+  // V2: ensure consultation started + append user message
+  v2EnsureConsultationStarted().then(()=>v2AppendMessage('user', text));
   if(!patientGender&&/^(male|female|other|पुरुष|महिला|ಪುರುಷ|ಮಹಿಳೆ|পুরুষ|মহিলা|ஆண்|பெண்|పురుషుడు|స్త్రీ|પુરુષ|સ્ત્રી|ਮਰਦ|ਔਰਤ)$/i.test(text.trim()))patientGender=text.trim();
   if(!patientAge&&/^\d{1,3}$/.test(text.trim())&&+text.trim()>0&&+text.trim()<120)patientAge=text.trim();
   showTyping();
@@ -3064,6 +3253,10 @@ async function sendMsg(ov){
     let r=d.content?.map(b=>b.text||'').join('')||'Something went wrong. Please try again.';
     let cleanR=r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
     conv.push({role:'assistant',content:cleanR});
+    // V2: append assistant message
+    v2AppendMessage('assistant', cleanR);
+    // V2: agar RX_END aaya to consultation complete kar do
+    if(r.includes('[RX_END]')){ setTimeout(()=>v2CompleteConsultation(), 1500); }
     let rx=null,connect=false,disp=cleanR,extractedPdfData={};
     if(r.includes('[DATA_START]')&&r.includes('[DATA_END]')){
       const m=r.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
