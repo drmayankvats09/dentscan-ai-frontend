@@ -1464,7 +1464,16 @@ function updateClock(){const d=new Date(),h=d.getHours()%12||12,m=d.getMinutes()
 updateClock();setInterval(updateClock,1000);
 
 // ── INIT AUTH0 ON PAGE LOAD ──
-window.addEventListener('DOMContentLoaded',()=>{initAuth0();});
+window.addEventListener('DOMContentLoaded', async () => {
+  await initAuth0();
+  // Agar login process nahi chal raha hai, toh pichla page restore karo
+  if (!window.location.search.includes('code=')) {
+    const lastPage = localStorage.getItem('datun_current_page');
+    if (lastPage && lastPage !== 'home') {
+      goPage(lastPage);
+    }
+  }
+});
   
 // Nav scroll — change hamburger color too
 window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('s',window.scrollY>20);});
@@ -1475,10 +1484,14 @@ function closeMob(){document.getElementById('ndrawer').classList.remove('open');
 
 // Page routing
 async function goPage(name){
+  // ⚡ YEH NAYI LINE ADD KI HAI - Taki browser page yaad rakhe
+  localStorage.setItem('datun_current_page', name); 
+
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   const t=document.getElementById('pg-'+name);
   if(t)t.classList.add('on');
   if(name!=='chat')window.scrollTo({top:0,behavior:'instant'});
+  
   if(name==='chat'){
     conv=[];rxShown=false;connectShown=false;photoReqShown=false;consultationSaved=false;pendingFindings=null;pendingFindingsImg=null;pendingVFString='';
     if(currentUserId&&patientName){
