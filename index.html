@@ -1869,8 +1869,12 @@ async function showHistoryScreen(){
     list.innerHTML=data.consultations.map(c=>{
       const d=new Date(c.timestamp).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
       const u=(c.urgency||'routine').toLowerCase();
-      return `<div class="hs-card" onclick="startNewConsultation()"><div class="hs-card-date">${d}</div><div class="hs-card-complaint">${c.chief_complaint||'Consultation'}</div><div class="hs-card-diag">${c.diagnosis||''}</div><span class="hs-card-urgency ${u}">${(c.urgency||'').toUpperCase()}</span></div>`;
-    }).join('');
+      const isInProg = c.status === 'in_progress';
+      const badge = isInProg 
+        ? '<span style="background:#0a9e8f;color:#fff;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;">● CONTINUE</span>'
+        : '<span class="sd-card-urgency '+u+'">'+(c.urgency||'').toUpperCase()+'</span>';
+      const title = isInProg ? 'Adhuri chat ('+(c.msg_count||0)+' msgs)' : (c.chief_complaint||'Consultation');
+      return '<div class="sd-card" style="'+(isInProg?'border-left:3px solid #0a9e8f;':'')+'" onclick="loadConsultation('+c.id+','+isInProg+')"><div class="sd-card-date">'+d+'</div><div class="sd-card-complaint">'+title+'</div><div class="sd-card-diag">'+(c.diagnosis||'')+'</div>'+badge+'</div>';    }).join('');
   }catch(e){list.innerHTML='<div class="hs-empty">Could not load history.</div>';}
 }
 
