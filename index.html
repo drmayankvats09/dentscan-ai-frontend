@@ -1936,6 +1936,13 @@ async function openDrawer(){
   }catch(e){list.innerHTML='<div class="sd-empty">Could not load history.</div>';}
 }
 
+function closeDrawer(){
+  const sd = document.getElementById('side-drawer');
+  const ov = document.getElementById('drawer-overlay');
+  if(sd) sd.classList.remove('open');
+  if(ov) ov.classList.remove('open');
+}
+
 async function doLogout(){
   currentUserId=null;patientName='';patientEmail='';patientAge='';patientGender='';selectedLang='';
   if(auth0Client){
