@@ -1776,18 +1776,38 @@ function showResumeBanner(consultId, msgCount){
   // Pehle se ek banner hai to remove karo
   const old = document.getElementById('v2-resume-banner');
   if(old) old.remove();
-  
+
+  // Har bhasha ke liye banner translations (Message count hata diya)
+  const resUI = {
+    en: { t: "Your previous consultation is incomplete", s: "Continue from where you left off?", y: "Continue →", n: "New Chat" },
+    hi: { t: "आपकी पिछली बातचीत अधूरी थी", s: "क्या वहीं से आगे बढ़ें?", y: "जारी रखें →", n: "नई चैट" },
+    hinglish: { t: "Aapki pichli baatcheet adhuri thi", s: "Wahi se aage badhein?", y: "Continue →", n: "New Chat" },
+    ta: { t: "உங்கள் முந்தைய ஆலோசனை முழுமையடையவில்லை", s: "விட்ட இடத்திலிருந்து தொடரவா?", y: "தொடரவும் →", n: "புதிய சாட்" },
+    bn: { t: "আপনার আগের আলোচনা অসম্পূর্ণ", s: "যেখান থেকে ছেড়েছিলেন সেখান থেকে চালিয়ে যান?", y: "চালিয়ে যান →", n: "নতুন চ্যাট" },
+    mr: { t: "तुमचा मागील संवाद अपूर्ण आहे", s: "तिथूनच पुढे चालू ठेवायचे?", y: "पुढे चालू ठेवा →", n: "नवीन चॅट" },
+    te: { t: "మీ మునుపటి సంప్రదింపు అసంపూర్తిగా ఉంది", s: "అక్కడి నుండే కొనసాగించాలా?", y: "కొనసాగించు →", n: "కొత్త చాట్" },
+    kn: { t: "ನಿಮ್ಮ ಹಿಂದಿನ ಸಂವಾದ ಅಪೂರ್ಣವಾಗಿದೆ", s: "ಅಲ್ಲಿಂದಲೇ ಮುಂದುವರಿಸಬೇಕೇ?", y: "ಮುಂದುವರಿಸಿ →", n: "ಹೊಸ ಚಾಟ್" },
+    gu: { t: "તમારી અગાઉની વાતચીત અધૂરી હતી", s: "ત્યાંથી જ આગળ ચાલુ રાખવું છે?", y: "ચાલુ રાખો →", n: "નવી ચેટ" },
+    pa: { t: "ਤੁਹਾਡੀ ਪਿਛਲੀ ਗੱਲਬਾਤ ਅਧੂਰੀ ਸੀ", s: "ਉੱਥੋਂ ਹੀ ਜਾਰੀ ਰੱਖੀਏ?", y: "ਜਾਰੀ ਰੱਖੋ →", n: "ਨਵੀਂ ਚੈਟ" }
+  };
+
+  // User ki current language uthao, agar nahi mili toh default English (en) set karo
+  const l = resUI[lang] ? resUI[lang] : resUI['en'];
+
   const banner = document.createElement('div');
   banner.id = 'v2-resume-banner';
   banner.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#0a9e8f,#14b8a6);color:#fff;padding:24px 28px;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.5);z-index:999999;max-width:90%;width:360px;text-align:center;font-family:inherit;';
+  
+  // msgCount variable ko HTML string se nikal diya hai
   banner.innerHTML = 
     '<div style="font-size:32px;margin-bottom:8px;">📋</div>'+
-    '<div style="font-size:17px;font-weight:600;margin-bottom:6px;">Aapki pichli baatcheet adhuri thi</div>'+
-    '<div style="font-size:13px;opacity:.85;margin-bottom:18px;">'+msgCount+' messages saved · wahi se aage badhein?</div>'+
+    '<div style="font-size:17px;font-weight:600;margin-bottom:6px;">' + l.t + '</div>'+
+    '<div style="font-size:13px;opacity:.85;margin-bottom:18px;">' + l.s + '</div>'+
     '<div style="display:flex;gap:10px;justify-content:center;">'+
-      '<button id="v2-resume-yes" style="background:#fff;color:#0a9e8f;border:none;padding:11px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">Continue →</button>'+
-      '<button id="v2-resume-no" style="background:transparent;color:#fff;border:1.5px solid #fff;padding:11px 22px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;">New Chat</button>'+
+      '<button id="v2-resume-yes" style="background:#fff;color:#0a9e8f;border:none;padding:11px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">' + l.y + '</button>'+
+      '<button id="v2-resume-no" style="background:transparent;color:#fff;border:1.5px solid #fff;padding:11px 22px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;">' + l.n + '</button>'+
     '</div>';
+    
   document.body.appendChild(banner);
   
   document.getElementById('v2-resume-yes').onclick = function(){
@@ -1800,7 +1820,6 @@ function showResumeBanner(consultId, msgCount){
     startNewConsultation();
   };
 }
-
 function showIntakeForm(){
   const ls=document.getElementById('login-screen');if(ls)ls.style.display='none';
   const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
