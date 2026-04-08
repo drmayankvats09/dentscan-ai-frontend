@@ -3480,6 +3480,7 @@ async function sendPhoto(b64,mt,du){
           name:patientName,age:patientAge,gender:patientGender,email:patientEmail,
           messages:conv,sessionId:patientEmail+'_'+Date.now(),
           userId:currentUserId||null,phoneNumber:patientPhone||'',
+          activeConsultId: activeConsultId,
           ...mergedData
         })
       })
@@ -3565,6 +3566,7 @@ async function sendMsg(ov){
           sessionId:patientEmail+'_'+Date.now(),
           userId:currentUserId||null,
           phoneNumber:patientPhone||'',
+          activeConsultId: activeConsultId,
           ...mergedData
         })
       })
