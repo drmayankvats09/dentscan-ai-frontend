@@ -1539,12 +1539,7 @@ async function goPage(name){
         const user=await auth0Client.getUser();
         document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
         document.getElementById('pg-chat').classList.add('on');
-        // CTO FIX: User already loaded hai toh sync mat karo, seedha chat dikhao
-        if(currentUserId && patientName){
-          startNewConsultation();
-        } else {
-          await handleLoggedInUser(user);
-        }
+        await handleLoggedInUser(user);
       }else{
         patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
         currentUserId=null;
@@ -1709,12 +1704,9 @@ const UI={
   pa:{ph:'ਆਪਣੀ ਸਮੱਸਿਆ ਦੱਸੋ...',get greet(){return `ਸਤ ਸ੍ਰੀ ਅਕਾਲ ${patientName?patientName.split(' ')[0]:''}! 👋 ਮੈਂ Datun AI! 😊\n\nਅੱਜ ਤੁਹਾਨੂੰ ਦੰਦਾਂ ਦੀ ਕੀ ਸਮੱਸਿਆ ਹੈ? [OPTIONS: ਦੰਦ ਦਾ ਦਰਦ|ਸੋਜ|ਖੂਨ ਆਉਣਾ|ਕੁਝ ਹੋਰ]`;}}
 };
 
-
+// ── AUTH0 + LOGIN SYSTEM ──
+let auth0Client=null;
 let currentUserId=null;
-// FAANG-grade auth state management
-let _userSyncInProgress=false; // Mutex: prevents parallel calls
-let _lastUserSyncTime=0; // Throttle: 60 sec cooldown between syncs
-let _cachedAuthData=null; // Last successful sync response
 
 async function initAuth0(){
   try{
@@ -1726,7 +1718,6 @@ async function initAuth0(){
       useRefreshTokensFallback:true,
       authorizationParams:{
         redirect_uri:window.location.origin,
-        audience:'https://api.datunai.com',
         scope:'openid profile email offline_access'
       }
     });
@@ -1782,55 +1773,20 @@ async function doEmailAuth(){
 }
 
 async function handleLoggedInUser(user){
-  // CTO FIX: Dedup guard — 30 sec ke andar dobara call mat karo
-  const now = Date.now();
-  if(_userSyncInProgress){
-    console.log('handleLoggedInUser already in progress, skipping');
-    return;
-  }
-  if(now - _lastUserSyncTime < 30000 && currentUserId){
-    console.log('handleLoggedInUser called too recently, skipping');
-    return;
-  }
-  _userSyncInProgress = true;
-  
+  patientName=user.name||user.email.split('@')[0];
+  patientEmail=user.email||'';
+  v2LoadActive();
   try{
-    patientName=user.name||user.email.split('@')[0];
-    patientEmail=user.email||'';
-    v2LoadActive();
-    
     const token=await auth0Client.getTokenSilently();
     try { localStorage.setItem('datun_last_token', token); } catch(e) {}
     
-    // 1. Backend sync with retry-on-429
-    let res, attempts = 0;
-    while(attempts < 3){
-      res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-        body:JSON.stringify({}) 
-      });
-      
-      if(res.ok) break;
-      
-      if(res.status === 429){
-        attempts++;
-        const waitMs = 1500 * attempts; // 1.5s, 3s, 4.5s
-        console.warn(`Backend rate limited (429), retry ${attempts}/3 in ${waitMs}ms`);
-        await new Promise(r => setTimeout(r, waitMs));
-        continue;
-      }
-      
-      // Non-429 error — break and handle below
-      break;
-    }
-    
-    if(!res || !res.ok){
-      throw new Error('Auth sync failed: HTTP ' + (res ? res.status : 'no response'));
-    }
-    
-    const data = await res.json();
-    
+    // 1. Backend sync — user pakka DB mein save
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({}) 
+    });
+    const data=await res.json();
     if(data.userId) currentUserId=data.userId;
     if(data.preferred_language && data.preferred_language!==''){
       selectedLang = data.preferred_language;
@@ -1843,18 +1799,17 @@ async function handleLoggedInUser(user){
     if(data.gender) patientGender = data.gender;
     if(data.phone_number) patientPhone = data.phone_number;
     
-    _lastUserSyncTime = Date.now();
-    
     // 3. Smart routing
     if(!data.profile_completed){
-      // NAYA USER — intake form dikhao
+      // 🆕 NAYA USER — intake form dikhao
       showIntakeForm();
       return;
     }
     
-    // RETURNING USER — profile complete hai
+    // ✅ RETURNING USER — profile complete hai
     // Check: in-progress consultation hai kya?
     if(data.resume_consultation && data.resume_consultation.id){
+      // Resume banner dikhao
       showResumeBanner(data.resume_consultation.id, data.resume_consultation.msg_count || 0);
       return;
     }
@@ -1864,16 +1819,8 @@ async function handleLoggedInUser(user){
     
   }catch(e){
     console.error('User sync error:',e);
-    
-    // CTO FIX: 429 ke case me showIntakeForm MAT karo
-    if(e && e.message && (e.message.includes('429') || e.message.includes('rate'))){
-      console.warn('Rate limited — showing wait message');
-      alert('Server thoda busy hai ji 😊 1 minute me page reload karein.');
-      return;
-    }
-    
-    // CTO FIX: Token expire / sync fail = silent re-auth, NOT form
-    currentUserId = null;
+    // CTO FIX: Token expire hone par form mat dikhao — silently re-authenticate karo
+    currentUserId=null;
     if(auth0Client){
       try{
         await auth0Client.loginWithRedirect({
@@ -1881,13 +1828,11 @@ async function handleLoggedInUser(user){
         });
       }catch(redirectErr){
         console.error('Redirect failed:',redirectErr);
-        showIntakeForm(); // Last resort fallback only
+        showIntakeForm(); // Last resort fallback
       }
     }else{
       showIntakeForm();
     }
-  } finally {
-    _userSyncInProgress = false;
   }
 }
 
@@ -2018,7 +1963,7 @@ async function showHistoryScreen(){
 }
 
 async function startNewConsultation(){
-  v2ClearActive(); // CTO FIX: Purani in-progress ID clear karo, warna naya msg purani me jaayega
+  v2ClearActive();  // ← yeh add
   const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
   const is=document.getElementById('intake-screen');if(is)is.style.display='none';
   const cu=document.getElementById('chat-ui');if(cu)cu.style.display='flex';
@@ -2034,15 +1979,6 @@ async function startNewConsultation(){
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
       headers:{'Authorization':'Bearer '+token}
     });
-    if(!res.ok){
-      // 429 ya koi error — chup chap greet karo, history skip karo
-      console.warn('History fetch failed: ' + res.status);
-      const greetText=UI[lang]?UI[lang].greet:UI['en'].greet;
-      const parsed=parseChips(greetText);
-      renderChips(parsed.chips);
-      addBot(parsed.text);
-      return;
-    }
     const data=await res.json();
     if(data.consultations&&data.consultations.length>0){
       const last=data.consultations[0];
@@ -2072,14 +2008,6 @@ async function openDrawer(){
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
       headers:{'Authorization':'Bearer '+token}
     });
-    if(!res.ok){
-      if(res.status===429){
-        list.innerHTML='<div class="sd-empty">Server busy hai, ek second...</div>';
-        setTimeout(()=>openDrawer(), 2000);
-        return;
-      }
-      throw new Error('HTTP ' + res.status);
-    }
     const data=await res.json();
     if(!data.consultations||!data.consultations.length){
       list.innerHTML='<div class="sd-empty">No past consultations yet. 🦷</div>';
