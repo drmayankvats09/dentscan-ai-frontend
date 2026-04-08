@@ -583,6 +583,30 @@ footer{background:var(--dark);padding:52px 5% 28px}
 /* ── NAYA DROPDOWN CSS ── */
 .ld-opt { width: 100%; text-align: left; background: none; border: none; padding: 7px 10px; font-size: .75rem; color: rgba(255,255,255,.8); border-radius: 6px; cursor: pointer; font-family: var(--fb); transition: all .2s; }
 .ld-opt:hover { background: rgba(10,158,143,.2); color: white; }
+#lang-dropdown{
+  display:none;
+  position:fixed !important;
+  top:55px !important;
+  right:12px !important;
+  background:#0d1520 !important;
+  border:1px solid rgba(255,255,255,.15) !important;
+  border-radius:12px !important;
+  padding:6px !important;
+  z-index:999999 !important;
+  min-width:140px !important;
+  box-shadow:0 15px 40px rgba(0,0,0,.7), 0 0 0 1px rgba(10,158,143,.2) !important;
+  max-height:70vh !important;
+  overflow-y:auto !important;
+}
+#lang-dropdown.show{display:block !important}
+.ld-opt{
+  width:100%;display:block;text-align:left;
+  background:none;border:none;padding:10px 14px;
+  font-size:.82rem;color:rgba(255,255,255,.85);
+  border-radius:8px;cursor:pointer;font-family:inherit;
+  transition:all .15s;
+}
+.ld-opt:hover{background:rgba(10,158,143,.25);color:#fff}
   
 /* ═══ PREMIUM CHAT UI ═══ */
 #chat-ui{flex:1;display:none;flex-direction:column;background:var(--light);height:100%;overflow:hidden}
@@ -1393,7 +1417,7 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
           EN <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </div>
         
-        <div id="lang-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:5px;background:var(--dark2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:6px;z-index:1000;width:120px;box-shadow:0 10px 25px rgba(0,0,0,.5);">
+        <div id="lang-dropdown"
           <button class="ld-opt" onclick="changeLang('en')">English</button>
           <button class="ld-opt" onclick="changeLang('hi')">हिंदी</button>
           <button class="ld-opt" onclick="changeLang('hinglish')">Hinglish</button>
@@ -1924,28 +1948,89 @@ async function handleLoggedInUser(user){
 // Routes user to correct screen based on cached backend response
 function routeAfterAuth(){
   const data = _cachedAuthData;
-  if(!data){
-    console.warn('[Route] No cached data, showing form');
-    showIntakeForm();
-    return;
-  }
+  if(!data){ showIntakeForm(); return; }
   
-  // NEW USER — never filled the intake form
   if(!data.profile_completed){
     console.log('[Route] New user, showing intake form');
     showIntakeForm();
     return;
   }
   
-  // RETURNING USER with in-progress consultation
-  if(data.resume_consultation && data.resume_consultation.id){
-    console.log('[Route] Resuming consultation ' + data.resume_consultation.id);
-    showResumeBanner(data.resume_consultation.id, data.resume_consultation.msg_count || 0);
+  // Multiple pending — show picker
+  if(data.pending_consultations && data.pending_consultations.length > 0){
+    console.log('[Route] ' + data.pending_consultations.length + ' pending consultations');
+    showResumePicker(data.pending_consultations);
     return;
   }
   
-  // RETURNING USER — go straight to chat
   console.log('[Route] Returning user, opening fresh chat');
+  startNewConsultation();
+}
+
+function showResumePicker(consultations){
+  // Hide all screens first
+  ['intake-screen','chat-ui','login-screen','history-screen'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+  
+  const old = document.getElementById('v2-resume-banner');
+  if(old) old.remove();
+
+  const titles = {
+    en: { header: 'Continue where you left off?', sub: 'You have unfinished consultations', newBtn: 'Start New Chat' },
+    hi: { header: 'Kya pichli baatcheet continue karein?', sub: 'Aapki kuch adhuri consultations hain', newBtn: 'Nayi Chat Shuru Karein' },
+    hinglish: { header: 'Continue previous chat?', sub: 'Aapki kuch adhuri consultations hain', newBtn: 'Start New Chat' }
+  };
+  const t = titles[lang] || titles.en;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'v2-resume-banner';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,26,.92);backdrop-filter:blur(8px);z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:Inter,system-ui,sans-serif';
+  
+  let cardsHTML = '';
+  consultations.forEach((c, idx) => {
+    const preview = c.first_user_msg ? c.first_user_msg.substring(0, 60) + (c.first_user_msg.length > 60 ? '...' : '') : c.preview;
+    const timeAgo = new Date(c.updated_at).toLocaleString('en-IN', { 
+      timeZone: 'Asia/Kolkata', 
+      day: 'numeric', month: 'short', 
+      hour: 'numeric', minute: 'numeric', hour12: true 
+    });
+    cardsHTML += `
+      <div onclick="resumeThis(${c.id})" style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .2s;border:2px solid transparent" onmouseover="this.style.borderColor='#0a9e8f';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='transparent';this.style.transform='translateY(0)'">
+        <div style="font-size:.75rem;color:#64748b;margin-bottom:4px">💬 ${c.msg_count} messages · ${timeAgo}</div>
+        <div style="font-size:.92rem;color:#0a0f1a;font-weight:500;line-height:1.4">${preview}</div>
+        <div style="font-size:.72rem;color:#0a9e8f;margin-top:6px;font-weight:600">Continue →</div>
+      </div>
+    `;
+  });
+
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0a9e8f,#14b8a6);border-radius:20px;padding:24px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:36px;margin-bottom:4px">📋</div>
+        <div style="font-size:1.1rem;color:#fff;font-weight:700;margin-bottom:4px">${t.header}</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.8)">${t.sub}</div>
+      </div>
+      <div style="max-height:60vh;overflow-y:auto;margin-bottom:14px">
+        ${cardsHTML}
+      </div>
+      <button onclick="startFreshFromPicker()" style="width:100%;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4);padding:12px;border-radius:12px;font-weight:600;cursor:pointer;font-size:.88rem;font-family:inherit">✨ ${t.newBtn}</button>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+}
+
+function resumeThis(id){
+  const banner = document.getElementById('v2-resume-banner');
+  if(banner) banner.remove();
+  loadConsultation(id, true);
+}
+
+function startFreshFromPicker(){
+  const banner = document.getElementById('v2-resume-banner');
+  if(banner) banner.remove();
   startNewConsultation();
 }
 
@@ -2593,9 +2678,8 @@ function updateLangBadgeShort() {
 
 function toggleLangDropdown() {
   const dropdown = document.getElementById('lang-dropdown');
-  if (dropdown) {
-    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-  }
+  if (!dropdown) return;
+  dropdown.classList.toggle('show');
 }
 
 function changeLang(selectedLanguage) {
