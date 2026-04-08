@@ -1494,19 +1494,14 @@ updateClock();setInterval(updateClock,1000);
 
 // ── INIT AUTH0 & ROUTING ON PAGE LOAD ──
 window.addEventListener('DOMContentLoaded', async () => {
-  // ⚡ CTO FIX: Bina time waste kiye user ko wahi page dikhao jahan wo tha
-  const lastPage = localStorage.getItem('datun_current_page') || 'home';
+  // CTO RULE: Fresh visit pe HAMESHA homepage. Sirf Auth0 callback (?code=) chat pe le jayega.
+  // Returning user ko bhi pehle homepage dikhega, unhe khud Start Consultation click karna hoga.
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-  const targetPage = document.getElementById('pg-' + lastPage);
-  if (targetPage) targetPage.classList.add('on');
-
-  // Background mein silently Auth0 start karo
-  await initAuth0();
+  document.getElementById('pg-home').classList.add('on');
   
-  // Agar normal refresh hai (login se wapas nahi aaya), toh properly states set karo
-  if (!window.location.search.includes('code=')) {
-    goPage(lastPage);
-  }
+  // Background mein Auth0 init karo (silent — homepage dikhta rahega)
+  // Agar ?code= URL mein hai, initAuth0 internally chat pe switch kar dega
+  await initAuth0();
 });
 // Nav scroll — change hamburger color too
 window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('s',window.scrollY>20);});
@@ -1518,7 +1513,6 @@ function closeMob(){document.getElementById('ndrawer').classList.remove('open');
 // Page routing
 async function goPage(name){
   // ⚡ CTO FIX: Page ki memory save karo (sirf current tab ke liye)
-  localStorage.setItem('datun_current_page', name); 
 
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   const t=document.getElementById('pg-'+name);
@@ -1732,6 +1726,20 @@ async function initAuth0(){
         scope:'openid profile email offline_access'
       }
     });
+    // Handle Auth0 errors in URL (prevents infinite redirect loop)
+    if(window.location.search.includes('error=')){
+      const params = new URLSearchParams(window.location.search);
+      const errDesc = params.get('error_description') || params.get('error');
+      console.error('[Auth0 Error]:', errDesc);
+  // Clean the URL immediately
+  window.history.replaceState({}, document.title, window.location.pathname);
+  // Reset to home and show error
+  localStorage.removeItem('datun_current_page');
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.getElementById('pg-home').classList.add('on');
+  alert('Login mein dikkat aayi: ' + errDesc + '\n\nPage refresh karein aur dobara try karein.');
+  return; // Don't continue Auth0 init with broken state
+}
     if(window.location.search.includes('code=')){
       document.body.style.opacity='0';
       await auth0Client.handleRedirectCallback();
@@ -2054,6 +2062,30 @@ async function showHistoryScreen(){
 }
 
 async function startNewConsultation(){
+    // Guard: Auth0 client ready hona chahiye
+  if(!auth0Client){
+    console.warn('[startNewConsultation] auth0Client null — initializing');
+    await initAuth0();
+    if(!auth0Client){
+      alert('Login required. Please refresh and try again.');
+      goPage('home');
+      return;
+    }
+  }
+  
+  // Guard: User authenticated hona chahiye
+  const isAuth = await auth0Client.isAuthenticated();
+  if(!isAuth){
+    console.warn('[startNewConsultation] User not authenticated — redirecting to login');
+    auth0Client.loginWithRedirect({
+      authorizationParams: { 
+        redirect_uri: window.location.origin,
+        audience: 'https://api.datunai.com',
+        scope: 'openid profile email offline_access'
+      }
+    });
+    return;
+  }
   v2ClearActive(); // FIX: Clear stale in-progress consultation ID before starting new one
   const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
   const is=document.getElementById('intake-screen');if(is)is.style.display='none';
