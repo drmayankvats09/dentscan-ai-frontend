@@ -1417,7 +1417,7 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
           EN <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </div>
         
-        <div id="lang-dropdown"
+        <div id="lang-dropdown">
           <button class="ld-opt" onclick="changeLang('en')">English</button>
           <button class="ld-opt" onclick="changeLang('hi')">हिंदी</button>
           <button class="ld-opt" onclick="changeLang('hinglish')">Hinglish</button>
@@ -1836,7 +1836,6 @@ async function handleLoggedInUser(user){
   
   _userSyncInProgress = true;
 
-  try{
   // CRITICAL FIX: Hide all screens immediately to prevent overlap
   const isScreen = document.getElementById('intake-screen');
   const chatUI = document.getElementById('chat-ui');
