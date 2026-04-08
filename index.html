@@ -1811,6 +1811,20 @@ async function handleLoggedInUser(user){
   }
   
   _userSyncInProgress = true;
+
+  try{
+  // CRITICAL FIX: Hide all screens immediately to prevent overlap
+  const isScreen = document.getElementById('intake-screen');
+  const chatUI = document.getElementById('chat-ui');
+  const loginScreen = document.getElementById('login-screen');
+  const histScreen = document.getElementById('history-screen');
+  if(isScreen) isScreen.style.display = 'none';
+  if(chatUI) chatUI.style.display = 'none';
+  if(loginScreen) loginScreen.style.display = 'none';
+  if(histScreen) histScreen.style.display = 'none';
+  
+  // Show a clean loading state while we figure out where to route
+  document.body.style.background = '#0a0f1a';
   
   try{
     // Pre-populate from Auth0 ID token (we always have this)
@@ -1937,6 +1951,13 @@ function routeAfterAuth(){
 
 // Resume banner — adhuri chat continue karne ka option
 function showResumeBanner(consultId, msgCount){
+  // Pehle sab hide karo — clean overlay guarantee
+  const isScreen = document.getElementById('intake-screen');
+  const chatUI = document.getElementById('chat-ui');
+  const loginScreen = document.getElementById('login-screen');
+  if(isScreen) isScreen.style.display = 'none';
+  if(chatUI) chatUI.style.display = 'none';
+  if(loginScreen) loginScreen.style.display = 'none';
   // Pehle se ek banner hai to remove karo
   const old = document.getElementById('v2-resume-banner');
   if(old) old.remove();
