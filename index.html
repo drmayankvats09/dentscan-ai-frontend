@@ -1539,7 +1539,13 @@ async function goPage(name){
         const user=await auth0Client.getUser();
         document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
         document.getElementById('pg-chat').classList.add('on');
-        await handleLoggedInUser(user);
+        // FAANG-grade dedup: if user is fully loaded and synced recently, skip backend call
+        if(currentUserId && _cachedAuthData && (Date.now() - _lastUserSyncTime) < 60000){
+          console.log('[goPage] Using cached state, no re-sync');
+          routeAfterAuth();
+        } else {
+          await handleLoggedInUser(user);
+        }
       }else{
         patientName='';patientAge='';patientGender='';patientEmail='';selectedLang='';
         currentUserId=null;
@@ -1707,6 +1713,10 @@ const UI={
 // ── AUTH0 + LOGIN SYSTEM ──
 let auth0Client=null;
 let currentUserId=null;
+// FAANG-grade auth state management
+let _userSyncInProgress=false; // Mutex: prevents parallel calls
+let _lastUserSyncTime=0; // Throttle: 60 sec cooldown between syncs
+let _cachedAuthData=null; // Last successful sync response
 
 async function initAuth0(){
   try{
@@ -1718,6 +1728,7 @@ async function initAuth0(){
       useRefreshTokensFallback:true,
       authorizationParams:{
         redirect_uri:window.location.origin,
+        audience:'https://api.datunai.com',
         scope:'openid profile email offline_access'
       }
     });
@@ -1773,67 +1784,147 @@ async function doEmailAuth(){
 }
 
 async function handleLoggedInUser(user){
-  patientName=user.name||user.email.split('@')[0];
-  patientEmail=user.email||'';
-  v2LoadActive();
+  // ═══════════════════════════════════════════════════════════
+  // FAANG-grade auth handler with dedup, throttle, retry, no-form-on-error
+  // ═══════════════════════════════════════════════════════════
+  
+  // GUARD 1: Mutex — don't run twice in parallel
+  if(_userSyncInProgress){
+    console.log('[Auth] Sync already in progress, skipping duplicate call');
+    return;
+  }
+  
+  // GUARD 2: Throttle — if synced within last 60 sec and we have user state, just route
+  const now = Date.now();
+  if(currentUserId && _cachedAuthData && (now - _lastUserSyncTime) < 60000){
+    console.log('[Auth] Using cached user state (synced ' + Math.round((now-_lastUserSyncTime)/1000) + 's ago)');
+    routeAfterAuth();
+    return;
+  }
+  
+  _userSyncInProgress = true;
+  
   try{
-    const token=await auth0Client.getTokenSilently();
+    // Pre-populate from Auth0 ID token (we always have this)
+    patientName = user.name || (user.email ? user.email.split('@')[0] : 'User');
+    patientEmail = user.email || '';
+    v2LoadActive();
+    
+    // Get JWT access token (now signed for our API audience)
+    const token = await auth0Client.getTokenSilently();
     try { localStorage.setItem('datun_last_token', token); } catch(e) {}
     
-    // 1. Backend sync — user pakka DB mein save
-    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({}) 
-    });
-    const data=await res.json();
-    if(data.userId) currentUserId=data.userId;
-    if(data.preferred_language && data.preferred_language!==''){
+    // Sync with backend — send profile in body since backend won't call /userinfo anymore
+    let res, attempts = 0;
+    while(attempts < 3){
+      res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          name: user.name || '',
+          email: user.email || '',
+          picture: user.picture || ''
+        })
+      });
+      
+      if(res.ok) break;
+      
+      if(res.status === 429){
+        attempts++;
+        const waitMs = 1500 * attempts; // 1.5s, 3s, 4.5s
+        console.warn('[Auth] Rate limited, retry ' + attempts + '/3 in ' + waitMs + 'ms');
+        await new Promise(r => setTimeout(r, waitMs));
+        continue;
+      }
+      
+      // Non-429 error — break and handle below
+      break;
+    }
+    
+    if(!res || !res.ok){
+      throw new Error('Auth sync failed: HTTP ' + (res ? res.status : 'no response'));
+    }
+    
+    const data = await res.json();
+    
+    // Update local state from backend response (source of truth)
+    if(data.userId) currentUserId = data.userId;
+    if(data.preferred_language){
       selectedLang = data.preferred_language;
       lang = selectedLang;
     }
-    
-    // 2. Profile fields backend se uthao (returning user case)
     if(data.full_name) patientName = data.full_name;
     if(data.age) patientAge = data.age;
     if(data.gender) patientGender = data.gender;
     if(data.phone_number) patientPhone = data.phone_number;
     
-    // 3. Smart routing
-    if(!data.profile_completed){
-      // 🆕 NAYA USER — intake form dikhao
-      showIntakeForm();
-      return;
-    }
+    // Cache for future calls within 60 sec
+    _lastUserSyncTime = Date.now();
+    _cachedAuthData = data;
     
-    // ✅ RETURNING USER — profile complete hai
-    // Check: in-progress consultation hai kya?
-    if(data.resume_consultation && data.resume_consultation.id){
-      // Resume banner dikhao
-      showResumeBanner(data.resume_consultation.id, data.resume_consultation.msg_count || 0);
-      return;
-    }
+    // Route to correct screen based on backend's response
+    routeAfterAuth();
     
-    // Direct chat kholo
-    startNewConsultation();
+  } catch(e) {
+    console.error('[Auth] Sync error:', e);
     
-  }catch(e){
-    console.error('User sync error:',e);
-    // CTO FIX: Token expire hone par form mat dikhao — silently re-authenticate karo
-    currentUserId=null;
+    // CRITICAL: NEVER show form on error. Force re-authentication instead.
+    // This is the chat 14 bug fix — token expiry/sync failure should NOT
+    // show intake form to a returning user.
+    currentUserId = null;
+    _cachedAuthData = null;
+    
     if(auth0Client){
-      try{
+      try {
         await auth0Client.loginWithRedirect({
-          authorizationParams:{redirect_uri:window.location.origin}
+          authorizationParams: { 
+            redirect_uri: window.location.origin,
+            audience: 'https://api.datunai.com',
+            scope: 'openid profile email offline_access'
+          }
         });
-      }catch(redirectErr){
-        console.error('Redirect failed:',redirectErr);
-        showIntakeForm(); // Last resort fallback
+      } catch(redirectErr) {
+        console.error('[Auth] Re-auth redirect failed:', redirectErr);
+        // Last resort fallback only after redirect itself fails
+        showIntakeForm();
       }
-    }else{
+    } else {
       showIntakeForm();
     }
+  } finally {
+    _userSyncInProgress = false;
   }
+}
+
+// Routes user to correct screen based on cached backend response
+function routeAfterAuth(){
+  const data = _cachedAuthData;
+  if(!data){
+    console.warn('[Route] No cached data, showing form');
+    showIntakeForm();
+    return;
+  }
+  
+  // NEW USER — never filled the intake form
+  if(!data.profile_completed){
+    console.log('[Route] New user, showing intake form');
+    showIntakeForm();
+    return;
+  }
+  
+  // RETURNING USER with in-progress consultation
+  if(data.resume_consultation && data.resume_consultation.id){
+    console.log('[Route] Resuming consultation ' + data.resume_consultation.id);
+    showResumeBanner(data.resume_consultation.id, data.resume_consultation.msg_count || 0);
+    return;
+  }
+  
+  // RETURNING USER — go straight to chat
+  console.log('[Route] Returning user, opening fresh chat');
+  startNewConsultation();
 }
 
 // Resume banner — adhuri chat continue karne ka option
@@ -1963,7 +2054,7 @@ async function showHistoryScreen(){
 }
 
 async function startNewConsultation(){
-  v2ClearActive();  // ← yeh add
+  v2ClearActive(); // FIX: Clear stale in-progress consultation ID before starting new one
   const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
   const is=document.getElementById('intake-screen');if(is)is.style.display='none';
   const cu=document.getElementById('chat-ui');if(cu)cu.style.display='flex';
@@ -1979,6 +2070,15 @@ async function startNewConsultation(){
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
       headers:{'Authorization':'Bearer '+token}
     });
+    if(!res.ok){
+      console.warn('[startNewConsultation] History fetch failed: ' + res.status);
+      // Skip history hydration, just greet
+      const greetText=UI[lang]?UI[lang].greet:UI['en'].greet;
+      const parsed=parseChips(greetText);
+      renderChips(parsed.chips);
+      addBot(parsed.text);
+      return;
+    }
     const data=await res.json();
     if(data.consultations&&data.consultations.length>0){
       const last=data.consultations[0];
@@ -1990,6 +2090,7 @@ async function startNewConsultation(){
     renderChips(parsed.chips);
     addBot(parsed.text);
   }catch(e){
+    console.error('[startNewConsultation] Error:', e);
     const greetText=UI[lang]?UI[lang].greet:UI['en'].greet;
     const parsed=parseChips(greetText);
     renderChips(parsed.chips);
@@ -2008,6 +2109,11 @@ async function openDrawer(){
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultations',{
       headers:{'Authorization':'Bearer '+token}
     });
+    if(!res.ok){
+      console.warn('[openDrawer] Fetch failed: ' + res.status);
+      list.innerHTML='<div class="sd-empty">Could not load history. Please try again.</div>';
+      return;
+    }
     const data=await res.json();
     if(!data.consultations||!data.consultations.length){
       list.innerHTML='<div class="sd-empty">No past consultations yet. 🦷</div>';
@@ -2029,10 +2135,18 @@ function closeDrawer(){
 }
 
 async function doLogout(){
-  // ⚡ CTO FIX: Logout karte hi browser ki memory completely saaf kar do
+  // Clear all auth state
   localStorage.removeItem('datun_current_page');
-
-  currentUserId=null;patientName='';patientEmail='';patientAge='';patientGender='';selectedLang='';
+  localStorage.removeItem('datun_last_token');
+  v2ClearActive();
+  
+  currentUserId=null;
+  patientName='';patientEmail='';patientAge='';patientGender='';
+  patientPhone='';selectedLang='';
+  _userSyncInProgress=false;
+  _lastUserSyncTime=0;
+  _cachedAuthData=null;
+  
   if(auth0Client){
     await auth0Client.logout({logoutParams:{returnTo:window.location.origin}});
   }else{
@@ -2051,6 +2165,11 @@ async function loadConsultation(id, isResume){
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultation/'+id,{
       headers:{'Authorization':'Bearer '+token}
     });
+    if(!res.ok){
+      console.warn('[loadConsultation] Fetch failed: ' + res.status);
+      msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Could not load consultation. Please try again.</div>';
+      return;
+    }
     const data=await res.json();
     if(!data.consultation){msgs.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Could not load consultation.</div>';return;}
     const c=data.consultation;
@@ -2440,23 +2559,35 @@ function changeLang(selectedLanguage) {
     chatInput.placeholder = (UI[selectedLanguage] || UI['en']).ph;
   }
 
-  // Persist language preference to database via Auth0 token
+
+  // Persist language preference to database
   if (auth0Client && currentUserId) {
     auth0Client.getTokenSilently()
       .then(token => {
-        fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user', {
+        return fetch('https://dentscan-ai-backend-production.up.railway.app/api/auth/user', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ preferred_language: selectedLanguage })
-        })
-        .then(res => res.json())
-        .then(data => console.log('✅ Language preference persisted:', data.preferred_language))
-        .catch(error => console.error('Failed to save language preference:', error));
+          body: JSON.stringify({ 
+            name: patientName || '',
+            email: patientEmail || '',
+            picture: '',
+            preferred_language: selectedLanguage 
+          })
+        });
       })
-      .catch(error => console.error('Token retrieval failed:', error));
+      .then(res => {
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        console.log('Language preference persisted:', data.preferred_language);
+        // Update cached data
+        if(_cachedAuthData) _cachedAuthData.preferred_language = selectedLanguage;
+      })
+      .catch(error => console.error('Failed to save language preference:', error));
   }
   
   // Re-initialize chat with new language context
