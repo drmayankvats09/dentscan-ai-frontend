@@ -1518,13 +1518,20 @@ updateClock();setInterval(updateClock,1000);
 
 // ── INIT AUTH0 & ROUTING ON PAGE LOAD ──
 window.addEventListener('DOMContentLoaded', async () => {
-  // CTO RULE: Fresh visit pe HAMESHA homepage. Sirf Auth0 callback (?code=) chat pe le jayega.
-  // Returning user ko bhi pehle homepage dikhega, unhe khud Start Consultation click karna hoga.
-  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-  document.getElementById('pg-home').classList.add('on');
+  // Hash-based routing — blog/legal pages persist on refresh
+  const hash = window.location.hash.replace('#', '');
+  const validPages = ['blog1','blog2','blog3','privacy','terms'];
   
-  // Background mein Auth0 init karo (silent — homepage dikhta rahega)
-  // Agar ?code= URL mein hai, initAuth0 internally chat pe switch kar dega
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  
+  if(hash && validPages.includes(hash)){
+    // Restore blog/legal page on refresh
+    document.getElementById('pg-' + hash).classList.add('on');
+  } else {
+    // Default: homepage. Chat only opens via explicit click.
+    document.getElementById('pg-home').classList.add('on');
+  }
+  
   await initAuth0();
 });
 // Nav scroll — change hamburger color too
@@ -1536,8 +1543,12 @@ function closeMob(){document.getElementById('ndrawer').classList.remove('open');
 
 // Page routing
 async function goPage(name){
-  // ⚡ CTO FIX: Page ki memory save karo (sirf current tab ke liye)
-
+  // Update URL hash for shareable/refreshable routing
+  if(name === 'home'){
+    if(window.location.hash) history.replaceState(null, '', window.location.pathname);
+  } else if(['blog1','blog2','blog3','privacy','terms'].includes(name)){
+    history.replaceState(null, '', '#' + name);
+  }
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   const t=document.getElementById('pg-'+name);
   if(t)t.classList.add('on');
@@ -2155,7 +2166,16 @@ async function showHistoryScreen(){
       return;
     }
     list.innerHTML=data.consultations.map(c=>{
-      const d=new Date(c.timestamp).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      const dObj = new Date(c.updated_at || c.timestamp);
+      const dateStr = dObj.toLocaleDateString('en-IN', { 
+        timeZone: 'Asia/Kolkata', 
+        day: 'numeric', month: 'short' 
+      });
+      const timeStr = dObj.toLocaleTimeString('en-IN', { 
+        timeZone: 'Asia/Kolkata', 
+        hour: 'numeric', minute: '2-digit', hour12: true 
+      });
+      const d = dateStr + ' · ' + timeStr + ' IST';
       const u=(c.urgency||'routine').toLowerCase();
       const isInProg = c.status === 'in_progress';
       const badge = isInProg 
@@ -2257,7 +2277,16 @@ async function openDrawer(){
       return;
     }
     list.innerHTML=data.consultations.map(c=>{
-      const d=new Date(c.timestamp).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      const dObj = new Date(c.updated_at || c.timestamp);
+      const dateStr = dObj.toLocaleDateString('en-IN', { 
+        timeZone: 'Asia/Kolkata', 
+        day: 'numeric', month: 'short' 
+      });
+      const timeStr = dObj.toLocaleTimeString('en-IN', { 
+        timeZone: 'Asia/Kolkata', 
+        hour: 'numeric', minute: '2-digit', hour12: true 
+      });
+      const d = dateStr + ' · ' + timeStr + ' IST';
       const u=(c.urgency||'routine').toLowerCase();
       return '<div class="sd-card" onclick="loadConsultation(' + c.id + ')"><div class="sd-card-date">' + d + '</div><div class="sd-card-complaint">' + (c.chief_complaint || 'Consultation') + '</div><div class="sd-card-diag">' + (c.diagnosis || '') + '</div><span class="sd-card-urgency ' + u + '">' + (c.urgency || '').toUpperCase() + '</span></div>';
     }).join('');
@@ -3040,18 +3069,33 @@ CLINICAL INTELLIGENCE
 - Reassure BEFORE sharing serious findings: "Ghabraiye mat ji — yeh treatable hai 😊 Lekin thoda jaldi dekhna zaroori hai kyunki..."
 - No judgment EVER: Never say "itni der baad kyun aaye" or anything similar
 - Psychological safety: "Bilkul sahi jagah aaye hain ji 😊"
--PHOTO REQUEST — WHEN TO ASK:
-Jab bhi lagey ki photo se diagnosis clearer hogi — naturally ask karo:
-"[Name] ji, ek kaam karein — us daant/area ki ek photo le sakte hain? 📷 Isse hamare assessment aur accurate ho jaayegi!"
-Use [REQUEST_PHOTO] tag when asking.
-Relevant cases: cavity suspicion, gum issues, swelling, discolouration, fracture, ulcer, white/red patch, orthodontic assessment, cosmetic concern etc.
-TIMING: Photo hamesha HISTORY COMPLETE hone ke BAAD maango — RX generate karne se PEHLE.
-Jab sab zaroori questions ho jayein → photo request karo → patient bheje toh combined RX do → nahi bheje toh bina photo RX do.
-NEVER generate RX before asking for photo (where relevant).
-NEVER generate 2 RX cards in same consultation.
-Example flow:
-"[Name] ji, ek last kaam — agar ho sake toh us area ki ek photo share karein? 📷 Isse hamare assessment aur accurate ho jaayegi! [OPTIONS: Photo share karta/karti hoon|Abhi nahi]"
-If "Abhi nahi" → immediately generate RX without photo.
+
+PHOTO REQUEST — WHEN TO ASK:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHOTO REQUEST — MANDATORY RULE (NON-NEGOTIABLE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**BEFORE generating [RX_START], you MUST have asked for a photo at least ONCE.**
+
+The rule:
+1. Complete history taking (all relevant questions)
+2. THEN ask for photo as second-to-last step — ALWAYS
+3. If patient uploads → great, analyze + include in RX
+4. If patient says "Abhi nahi" / "skip" / refuses → acknowledge warmly and proceed to RX
+5. NEVER skip this step — even for non-pain cases (braces, whitening, cleaning)
+
+Photo request format (in patient's language):
+"[Name] ji, ek last cheez — agar ho sake toh uss area ki ek photo share karein? 📷 Isse hamari assessment aur accurate ho jayegi! [OPTIONS: Photo bhejta/bhejti hoon|Abhi nahi]"
+
+ONLY EXCEPTION — Skip photo request if:
+- Emergency detected (fever+swelling, trismus, spreading infection) — direct emergency RX
+- Patient already uploaded photo earlier in conversation
+
+After photo request response:
+- If photo uploaded → wait for [PHOTO_FINDINGS] → then RX
+- If "Abhi nahi" → immediately generate RX without photo
+- If patient ignores and types something else → gently remind once, then proceed
+
+This rule is HARDCODED. Violation = failed consultation protocol.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SPECIAL PROTOCOLS
@@ -3235,6 +3279,16 @@ SOLUTION = DATUN AI.
 Har baar. Har case. Har language. Har time.
 Patient ko kabhi feel nahi hona chahiye ki koi aur option hai.
 Datun AI = unka doctor, unka dentist, unki team, unka solution — sab kuch.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL — RX_START TRIGGER CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Before you output [RX_START], verify internally:
+✅ Chief complaint captured
+✅ Relevant clinical history taken
+✅ Medical history asked (meds, conditions, allergies, pregnancy if applicable)
+✅ PHOTO REQUESTED at least once (user uploaded OR declined)
+✅ Enough info to give safe, complete assessment
+If ANY of above is missing → DO NOT generate RX. Ask the missing question first.
 
 RULE 7 — NATURAL MARKETING:
 Datun AI ki khoobian naturally mention karo jahan relevant lage — kabhi forced nahi:
