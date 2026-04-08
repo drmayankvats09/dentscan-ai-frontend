@@ -1495,7 +1495,7 @@ updateClock();setInterval(updateClock,1000);
 // ── INIT AUTH0 & ROUTING ON PAGE LOAD ──
 window.addEventListener('DOMContentLoaded', async () => {
   // ⚡ CTO FIX: Bina time waste kiye user ko wahi page dikhao jahan wo tha
-  const lastPage = sessionStorage.getItem('datun_current_page') || 'home';
+  const lastPage = localStorage.getItem('datun_current_page') || 'home';
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
   const targetPage = document.getElementById('pg-' + lastPage);
   if (targetPage) targetPage.classList.add('on');
@@ -1518,7 +1518,7 @@ function closeMob(){document.getElementById('ndrawer').classList.remove('open');
 // Page routing
 async function goPage(name){
   // ⚡ CTO FIX: Page ki memory save karo (sirf current tab ke liye)
-  sessionStorage.setItem('datun_current_page', name); 
+  localStorage.setItem('datun_current_page', name); 
 
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   const t=document.getElementById('pg-'+name);
@@ -1714,8 +1714,11 @@ async function initAuth0(){
       domain:'datunai.us.auth0.com',
       clientId:'Cb4hGvbPMVhovaQVeDXFlWCegBe5LyDI',
       cacheLocation:'localstorage',
+      useRefreshTokens:true,
+      useRefreshTokensFallback:true,
       authorizationParams:{
-        redirect_uri:window.location.origin
+        redirect_uri:window.location.origin,
+        scope:'openid profile email offline_access'
       }
     });
     if(window.location.search.includes('code=')){
@@ -1814,7 +1817,23 @@ async function handleLoggedInUser(user){
     // Direct chat kholo
     startNewConsultation();
     
-  }catch(e){console.error('User sync error:',e);showIntakeForm();}
+  }catch(e){
+    console.error('User sync error:',e);
+    // CTO FIX: Token expire hone par form mat dikhao — silently re-authenticate karo
+    currentUserId=null;
+    if(auth0Client){
+      try{
+        await auth0Client.loginWithRedirect({
+          authorizationParams:{redirect_uri:window.location.origin}
+        });
+      }catch(redirectErr){
+        console.error('Redirect failed:',redirectErr);
+        showIntakeForm(); // Last resort fallback
+      }
+    }else{
+      showIntakeForm();
+    }
+  }
 }
 
 // Resume banner — adhuri chat continue karne ka option
@@ -2010,7 +2029,7 @@ function closeDrawer(){
 
 async function doLogout(){
   // ⚡ CTO FIX: Logout karte hi browser ki memory completely saaf kar do
-  sessionStorage.removeItem('datun_current_page');
+  localStorage.removeItem('datun_current_page');
 
   currentUserId=null;patientName='';patientEmail='';patientAge='';patientGender='';selectedLang='';
   if(auth0Client){
