@@ -1963,6 +1963,7 @@ async function showHistoryScreen(){
 }
 
 async function startNewConsultation(){
+  v2ClearActive();  // ← yeh add
   const hs=document.getElementById('history-screen');if(hs)hs.style.display='none';
   const is=document.getElementById('intake-screen');if(is)is.style.display='none';
   const cu=document.getElementById('chat-ui');if(cu)cu.style.display='flex';
@@ -3219,6 +3220,8 @@ function handlePhotoUpload(e){const f=e.target.files[0];if(!f)return;const r=new
 async function sendPhoto(b64,mt,du){
   const analyzeMsg={en:'📷 Photo received! Analyzing now...',hi:'📷 Photo mil gayi! Analyze kar raha hoon...',hinglish:'📷 Photo mil gayi! Analyze karta hoon...',ta:'📷 படம் வந்தது! பகுப்பாய்வு செய்கிறேன்...',bn:'📷 ছবি পেয়েছি! বিশ্লেষণ করছি...',mr:'📷 फोटो मिला! विश्लेषण करतो...',te:'📷 ఫోటో వచ్చింది! విశ్లేషిస్తున్నాను...',kn:'📷 ಫೋಟೋ ಬಂತು! ವಿಶ್ಲೇಷಿಸುತ್ತಿದ್ದೇನೆ...',gu:'📷 ફોટો મળ્યો! વિશ્લેષણ કરું છું...',pa:'📷 ਫੋਟੋ ਮਿਲੀ! ਵਿਸ਼ਲੇਸ਼ਣ ਕਰ ਰਿਹਾ ਹਾਂ...'};
   addBot(analyzeMsg[lang]||analyzeMsg.en);showTyping();
+  await v2EnsureConsultationStarted();  // ← add
+  v2AppendMessage('user', '[PHOTO]');   // ← add (or actual photo description)
   const im={role:'user',content:[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:lang==='hi'?'Yeh meri dental photo hai.':'This is my dental photo. Evaluate carefully.'}]};
   try{
     const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:buildPSP(),messages:[...conv,im]})});
@@ -3226,6 +3229,7 @@ async function sendPhoto(b64,mt,du){
     let r=d.content?.map(b=>b.text||'').join('')||'Could not analyze. Please try again.';
     let cleanR=r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
     conv.push(im);conv.push({role:'assistant',content:cleanR});
+    v2AppendMessage('assistant', cleanR);
     let rx=null,connect=false,disp=cleanR,extractedPdfData={};
 
     // Extract AI JSON data if present
@@ -3335,6 +3339,8 @@ async function sendMsg(ov){
   const text=(ov||ta.value).trim();if(!text)return;
   if(!ov){ta.value='';ta.style.height='auto';}
   addUser(text);conv.push({role:'user',content:text});
+  await v2EnsureConsultationStarted();  // ← AWAIT karo
+  v2AppendMessage('user', text);
   // V2: ensure consultation started + append user message
   v2EnsureConsultationStarted().then(()=>v2AppendMessage('user', text));
   if(!patientGender&&/^(male|female|other|पुरुष|महिला|ಪುರುಷ|ಮಹಿಳೆ|পুরুষ|মহিলা|ஆண்|பெண்|పురుషుడు|స్త్రీ|પુરુષ|સ્ત્રી|ਮਰਦ|ਔਰਤ)$/i.test(text.trim()))patientGender=text.trim();
