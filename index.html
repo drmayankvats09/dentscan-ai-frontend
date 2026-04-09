@@ -2438,7 +2438,18 @@ async function loadConsultation(id, isResume){
         conv.push({role:'assistant',content:m.content});
       }
     });
-    renderChips([]);
+    // ═══════════════════════════════════════════════
+    // CHIPS RESTORE — Agar in_progress/resume hai, last
+    // assistant message ke chips show karo taaki user
+    // directly tap kar ke continue kar sake
+    // ═══════════════════════════════════════════════
+    const lastMsg = msgArr[msgArr.length - 1];
+    if (lastMsg && lastMsg.role === 'assistant' && (isResume || c.status === 'in_progress')) {
+      const parsed = parseChips(lastMsg.content || '');
+      renderChips(parsed.chips || []);
+    } else {
+      renderChips([]);
+    }
     
     // V2: Resume mode — agar in_progress hai, active set kar do, continue kar sakte hain
     if(c.status === 'in_progress' || isResume){
