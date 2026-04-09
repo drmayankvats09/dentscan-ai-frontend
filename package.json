@@ -1,0 +1,12 @@
+{
+  "name": "datunai-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Datun AI frontend — production build with safe minification",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "html-minifier-terser": "^7.2.0"
+  }
+}
