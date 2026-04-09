@@ -75,7 +75,8 @@ const MINIFY_OPTIONS = {
         'loadConsultation', 'resumeThis', 'startFreshFromPicker',
         'openDrawer', 'closeDrawer', 'doLogout',
         'toggleLangDropdown', 'changeLang',
-        'downloadReport', 'initAuth0'
+        'downloadReport', 'initAuth0',
+        'deleteConsultation'
       ]
     },
     format: {
