@@ -532,6 +532,9 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .sd-new-btn:hover{background:var(--gd)}
 .sd-list{flex:1;overflow-y:auto;padding:0 1rem 1rem}
 .sd-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all .2s}
+.sd-card{position:relative}
+.sd-card-delete{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.25);color:#fca5a5;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;padding:0;line-height:1;z-index:2}
+.sd-card-delete:hover{background:rgba(220,38,38,.35);color:#fff;transform:scale(1.08)}
 .sd-card:hover{background:rgba(10,158,143,.15);border-color:rgba(10,158,143,.3)}
 .sd-card-date{font-size:.62rem;color:rgba(255,255,255,.4)}
 .sd-card-complaint{font-size:.8rem;font-weight:500;color:rgba(255,255,255,.9);margin:3px 0}
@@ -2332,9 +2335,65 @@ async function openDrawer(){
           title = 'New consultation';
   }
 }
-      return '<div class="sd-card" onclick="loadConsultation(' + c.id + ')"><div class="sd-card-date">' + d + '</div><div class="sd-card-complaint">' + title + '</div><div class="sd-card-diag">' + (c.diagnosis || '') + '</div><span class="sd-card-urgency ' + u + '">' + (c.urgency || '').toUpperCase() + '</span></div>';
+      return '<div class="sd-card" onclick="loadConsultation(' + c.id + ')"><button class="sd-card-delete" onclick="event.stopPropagation();deleteConsultation(' + c.id + ', this)" title="Delete">×</button><div class="sd-card-date">' + d + '</div><div class="sd-card-complaint">' + title + '</div><div class="sd-card-diag">' + (c.diagnosis || '') + '</div><span class="sd-card-urgency ' + u + '">' + (c.urgency || '').toUpperCase() + '</span></div>';
     }).join('');
   }catch(e){list.innerHTML='<div class="sd-empty">Could not load history.</div>';}
+}
+
+// ═══════════════════════════════════════════════
+// SOFT DELETE — removes from user view, stays in DB
+// ═══════════════════════════════════════════════
+async function deleteConsultation(id, btnEl) {
+  const confirmMsgs = {
+    en: 'Delete this consultation? This cannot be undone.',
+    hi: 'Kya yeh consultation delete karein? Yeh wapas nahi aayegi.',
+    hinglish: 'Delete karein yeh consultation? Wapas nahi aayegi.'
+  };
+  if (!confirm(confirmMsgs[lang] || confirmMsgs.en)) return;
+  
+  try {
+    const token = await auth0Client.getTokenSilently();
+    const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/user/consultation/' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok) {
+      console.error('[deleteConsultation] Failed:', res.status);
+      alert('Delete nahi ho paayi. Try again.');
+      return;
+    }
+    
+    // Remove card from drawer UI instantly
+    const card = btnEl.closest('.sd-card');
+    if (card) {
+      card.style.transition = 'opacity .25s, transform .25s';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(30px)';
+      setTimeout(() => card.remove(), 250);
+    }
+    
+    // CRITICAL: if user deleted the currently-active in_progress consultation,
+    // clear active state so next message creates a fresh row (not a stale UPDATE)
+    if (String(activeConsultId) === String(id)) {
+      console.log('[deleteConsultation] Active consultation deleted, resetting chat');
+      v2ClearActive();
+      conv = []; rxShown = false; connectShown = false; photoReqShown = false;
+      consultationSaved = false;
+      pendingFindings = null; pendingFindingsImg = null; pendingVFString = '';
+      const msgs = document.getElementById('msgs');
+      if (msgs) msgs.innerHTML = '';
+      renderChips([]);
+      const greetText = UI[lang] ? UI[lang].greet : UI['en'].greet;
+      const parsed = parseChips(greetText);
+      renderChips(parsed.chips);
+      addBot(parsed.text);
+    }
+    
+    console.log('[deleteConsultation] ✅ Deleted consultation', id);
+  } catch (e) {
+    console.error('[deleteConsultation] Error:', e);
+    alert('Delete mein error aayi. Try again.');
+  }
 }
 
 function closeDrawer(){
