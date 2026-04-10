@@ -1786,6 +1786,22 @@ let _lastUserSyncTime=0; // Throttle: 60 sec cooldown between syncs
 let _cachedAuthData=null; // Last successful sync response
 
 async function initAuth0(){
+  // ═══════════════════════════════════════════════
+  // ONE-TIME FORCE LOGOUT — post DB wipe (April 2026)
+  // ═══════════════════════════════════════════════
+  const FRESH_KEY = 'datun_fresh_2026_apr_10';
+  if (!localStorage.getItem(FRESH_KEY)) {
+    console.log('[Fresh Start] Clearing all cached state post-wipe...');
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch(e) { console.warn('Storage clear failed:', e); }
+    localStorage.setItem(FRESH_KEY, '1');
+    // Reload to completely fresh state
+    window.location.replace(window.location.origin);
+    return; // Halt Auth0 init — will re-run on reload with fresh state
+  }
+  
   try{
     auth0Client=await auth0.createAuth0Client({
       domain:'datunai.us.auth0.com',
