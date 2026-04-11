@@ -10,6 +10,28 @@
 
   gtag('config', 'G-4RND7LQCQB');
 </script>
+<script src="https://browser.sentry-cdn.com/7.100.1/bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    Sentry.init({
+      dsn: 'https://a5da7d699ab9952044b55e42cccddee4@o4511098843234304.ingest.de.sentry.io/4511199108071504',
+      environment: 'production',
+      release: 'datun-ai@2.0.1',
+      tracesSampleRate: 0.1,
+      replaysSessionSampleRate: 0.05,
+      replaysOnErrorSampleRate: 1.0,
+      integrations: [
+        Sentry.browserTracingIntegration(),
+        Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true })
+      ],
+      beforeSend(event, hint) {
+        // Ignore Auth0 normal redirect flows (not real errors)
+        const msg = event.message || hint?.originalException?.message || '';
+        if (typeof msg === 'string' && (msg.includes('login_required') || msg.includes('Popup closed'))) return null;
+        return event;
+      }
+    });
+    console.log('[Sentry] Frontend monitoring active');
+  </script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Datun AI — India's AI Dental Expert. 24/7.</title>
