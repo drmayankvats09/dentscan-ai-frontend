@@ -1786,22 +1786,6 @@ let _lastUserSyncTime=0; // Throttle: 60 sec cooldown between syncs
 let _cachedAuthData=null; // Last successful sync response
 
 async function initAuth0(){
-  // ═══════════════════════════════════════════════
-  // ONE-TIME FORCE LOGOUT — post DB wipe (April 2026)
-  // ═══════════════════════════════════════════════
-  const FRESH_KEY = 'datun_fresh_2026_apr_10';
-  if (!localStorage.getItem(FRESH_KEY)) {
-    console.log('[Fresh Start] Clearing all cached state post-wipe...');
-    try {
-      localStorage.clear();
-      sessionStorage.clear();
-    } catch(e) { console.warn('Storage clear failed:', e); }
-    localStorage.setItem(FRESH_KEY, '1');
-    // Reload to completely fresh state
-    window.location.replace(window.location.origin);
-    return; // Halt Auth0 init — will re-run on reload with fresh state
-  }
-  
   try{
     auth0Client=await auth0.createAuth0Client({
       domain:'datunai.us.auth0.com',
@@ -1914,14 +1898,27 @@ async function handleLoggedInUser(user){
   // Show a clean loading state while we figure out where to route
   document.body.style.background = '#0a0f1a';
   
-  try{
+try{
     // Pre-populate from Auth0 ID token (we always have this)
     patientName = user.name || (user.email ? user.email.split('@')[0] : 'User');
     patientEmail = user.email || '';
     v2LoadActive();
     
-    // Get JWT access token (now signed for our API audience)
-    const token = await auth0Client.getTokenSilently();
+    // ═══════════════════════════════════════════════════════════
+    // Token fetch with 2-tier fallback (Amazon/Google pattern)
+    // Tier 1: Cached token (fastest, works 99% of time)
+    // Tier 2: Force network refresh (for stale/expired cache)
+    // Tier 3: Throw → catch block handles clean logout
+    // ═══════════════════════════════════════════════════════════
+    let token;
+    try {
+      // Tier 1: Try cached token first
+      token = await auth0Client.getTokenSilently({ cacheMode: 'on' });
+    } catch(tokenErr) {
+      console.warn('[Auth] Cached token failed, forcing network refresh:', tokenErr.message || tokenErr);
+      // Tier 2: Force refresh from Auth0 (uses refresh token)
+      token = await auth0Client.getTokenSilently({ cacheMode: 'off' });
+    }
     try { localStorage.setItem('datun_last_token', token); } catch(e) {}
     
     // Sync with backend — send profile in body since backend won't call /userinfo anymore
@@ -1971,38 +1968,65 @@ async function handleLoggedInUser(user){
     if(data.gender) patientGender = data.gender;
     if(data.phone_number) patientPhone = data.phone_number;
     
-    // Cache for future calls within 60 sec
+// Cache for future calls within 60 sec
     _lastUserSyncTime = Date.now();
     _cachedAuthData = data;
+    
+    // Success → reset circuit breaker counter
+    try { sessionStorage.removeItem('datun_auth_fail_count'); } catch(_){}
     
     // Route to correct screen based on backend's response
     routeAfterAuth();
     
-  } catch(e) {
+} catch(e) {
     console.error('[Auth] Sync error:', e);
     
-    // CRITICAL: NEVER show form on error. Force re-authentication instead.
-    // This is the chat 14 bug fix — token expiry/sync failure should NOT
-    // show intake form to a returning user.
+    // Clear all auth state — prevents stale data from re-triggering loops
     currentUserId = null;
     _cachedAuthData = null;
+    _lastUserSyncTime = 0;
+  const LOOP_KEY = 'datun_auth_fail_count';
+  const failCount = parseInt(sessionStorage.getItem(LOOP_KEY) || '0', 10);
+    sessionStorage.setItem(LOOP_KEY, String(failCount + 1));
     
-    if(auth0Client){
-      try {
-        await auth0Client.loginWithRedirect({
-          authorizationParams: { 
-            redirect_uri: window.location.origin,
-            audience: 'https://api.datunai.com',
-            scope: 'openid profile email offline_access'
-          }
-        });
-      } catch(redirectErr) {
-        console.error('[Auth] Re-auth redirect failed:', redirectErr);
-        // Last resort fallback only after redirect itself fails
-        showIntakeForm();
+    if(failCount >= 1){
+      // 2nd failure → circuit breaker trips. Hard logout, reset, home.
+      console.error('[Auth] Circuit breaker tripped after ' + (failCount + 1) + ' failures. Hard logout.');
+      sessionStorage.removeItem(LOOP_KEY);
+      try { localStorage.removeItem('datun_last_token'); } catch(_){}
+      if(auth0Client){
+        try {
+          await auth0Client.logout({ 
+            logoutParams: { returnTo: window.location.origin } 
+          });
+        } catch(logoutErr) {
+          // Hard reset as absolute last resort
+          document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+          const homePg = document.getElementById('pg-home');
+          if(homePg) homePg.classList.add('on');
+          document.body.style.background = '';
+          document.body.style.opacity = '1';
+        }
       }
     } else {
-      showIntakeForm();
+      // 1st failure → one retry attempt via fresh login redirect
+      if(auth0Client){
+        try {
+          await auth0Client.loginWithRedirect({
+            authorizationParams: { 
+              redirect_uri: window.location.origin,
+              audience: 'https://api.datunai.com',
+              scope: 'openid profile email offline_access'
+            }
+          });
+        } catch(redirectErr) {
+          console.error('[Auth] Re-auth redirect failed:', redirectErr);
+          sessionStorage.removeItem(LOOP_KEY);
+          showIntakeForm();
+        }
+      } else {
+        showIntakeForm();
+      }
     }
   } finally {
     _userSyncInProgress = false;
