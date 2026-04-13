@@ -3551,10 +3551,182 @@ async function handlePhotoFailure(reason, b64, mt, du) {
     renderChips(['Continue', 'Tell me more', 'What next?']);
   }
 }
+
+  // ═══════════════════════════════════════════════════════════
+// SENDMSG 2-STRIKE GRACEFUL DEGRADATION
+// Mirror of sendPhoto failure handler — text chat version
+// Attempt 1 fail → silent retry once
+// Attempt 2 fail → AI verbally explains + offers alternative
+// User is NEVER dead-ended
+// ═══════════════════════════════════════════════════════════
+let _msgRetryCount = 0;
+
+async function handleSendMsgFailure(originalText, error) {
+  _msgRetryCount++;
+  console.warn('[sendMsg] Failure #' + _msgRetryCount + ' reason:', error.message);
+
+  // Detect reason from error
+  let reason = 'default';
+  const errMsg = (error.message || '').toUpperCase();
+  if (errMsg.includes('OVERLOAD') || errMsg.includes('429') || errMsg.includes('API_OVERLOAD')) reason = 'API_OVERLOAD';
+  else if (errMsg.includes('TIMEOUT') || errMsg.includes('504')) reason = 'TIMEOUT';
+  else if (errMsg.includes('NETWORK') || errMsg.includes('FETCH') || errMsg.includes('503')) reason = 'NETWORK_ERROR';
+  else if (errMsg.includes('500') || errMsg.includes('502')) reason = 'SERVER_ERROR';
+
+  // STRIKE 1 — silent retry once after 5 sec (give Anthropic time to recover)
+  if (_msgRetryCount === 1) {
+    const retryMsgs = {
+      en: '⏳ Hmm, our AI is processing slowly. Trying once more in 5 seconds...',
+      hi: '⏳ Hmm, AI thodi dheemi chal rahi hai. 5 second mein dobara try kar raha hoon...',
+      hinglish: '⏳ Hmm, AI thodi slow hai abhi. 5 second mein dobara try karta hoon...',
+      ta: '⏳ மீண்டும் 5 வினாடிகளில் முயற்சிக்கிறேன்...',
+      bn: '⏳ 5 সেকেন্ডে আবার চেষ্টা করছি...',
+      mr: '⏳ 5 सेकंदात पुन्हा प्रयत्न करत आहे...',
+      te: '⏳ 5 సెకన్లలో మళ్ళీ ప్రయత్నిస్తున్నాను...',
+      kn: '⏳ 5 ಸೆಕೆಂಡಿನಲ್ಲಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸುತ್ತಿದ್ದೇನೆ...',
+      gu: '⏳ 5 સેકન્ડમાં ફરી પ્રયાસ કરું છું...',
+      pa: '⏳ 5 ਸਕਿੰਟ ਵਿੱਚ ਫੇਰ ਕੋਸ਼ਿਸ਼ ਕਰ ਰਿਹਾ ਹਾਂ...'
+    };
+    addBot(retryMsgs[lang] || retryMsgs.en);
+    await new Promise(r => setTimeout(r, 5000));
+
+    // Remove the failed message from conv so retry can re-add it cleanly
+    // (we already pushed it before fetch — don't want duplicate)
+    // Note: user message is still in conv, we just retry the fetch
+    try {
+      showTyping();
+      const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: conv,
+          lang: lang,
+          patientName: patientName,
+          patientAge: patientAge,
+          patientGender: patientGender
+        })
+      });
+      if (!res.ok) {
+        rmTyping();
+        const errData = await res.json().catch(() => ({}));
+        return handleSendMsgFailure(originalText, new Error(errData.errorCode || `HTTP_${res.status}`));
+      }
+      const d = await res.json();
+      rmTyping();
+      if (d.error) {
+        return handleSendMsgFailure(originalText, new Error(d.errorCode || 'API_ERROR'));
+      }
+
+      // SUCCESS — process response normally
+      _msgRetryCount = 0;
+      let r = d.content?.map(b => b.text || '').join('') || '';
+      let cleanR = r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/, '').trim();
+      conv.push({ role: 'assistant', content: cleanR });
+      v2AppendMessage('assistant', cleanR);
+      const parsed = parseChips(cleanR);
+      renderChips(parsed.chips);
+      addBot(parsed.text);
+      return;
+    } catch (e) {
+      rmTyping();
+      return handleSendMsgFailure(originalText, e);
+    }
+  }
+
+  // STRIKE 2 — AI verbally explains + offers graceful alternatives
+  _msgRetryCount = 0;
+
+  const reasonText = {
+    en: {
+      API_OVERLOAD: 'our AI service is experiencing very high traffic right now',
+      TIMEOUT: 'the response took longer than expected',
+      NETWORK_ERROR: 'there was a network connection issue',
+      SERVER_ERROR: 'our servers had a temporary hiccup',
+      default: 'we had a temporary technical issue'
+    },
+    hi: {
+      API_OVERLOAD: 'hamari AI pe abhi bahut zyada traffic hai',
+      TIMEOUT: 'response aane mein der lag rahi thi',
+      NETWORK_ERROR: 'internet connection mein dikkat thi',
+      SERVER_ERROR: 'hamare servers mein thodi dikkat thi',
+      default: 'temporary technical issue tha'
+    },
+    hinglish: {
+      API_OVERLOAD: 'AI pe bahut traffic hai abhi',
+      TIMEOUT: 'response slow aa raha tha',
+      NETWORK_ERROR: 'network dikkat thi',
+      SERVER_ERROR: 'server mein temporary issue tha',
+      default: 'technical dikkat thi'
+    }
+  };
+  const rMap = reasonText[lang] || reasonText.en;
+  const whyText = rMap[reason] || rMap.default;
+
+  const explainMsgs = {
+    en: '😔 I am really sorry — I tried twice but ' + whyText + '. Here is what you can do: **Option 1:** Wait 60 seconds and type your message again — our AI usually recovers quickly. **Option 2:** If it is urgent, contact our dental team directly at +91 87960 64170 or hello@datunai.com — they will help you immediately. Your conversation is safely saved and will resume automatically.',
+    hi: '😔 Bhai maafi chahta hoon — do baar try kiya lekin ' + whyText + '. Ab aap yeh kar sakte hain: **Option 1:** 60 second ruk kar message dobara type karein — AI jaldi recover ho jati hai. **Option 2:** Agar urgent hai, seedha hamari dental team ko contact karein +91 87960 64170 ya hello@datunai.com pe — woh turant madad karenge. Aapki baat save hai, automatically continue ho jayegi.',
+    hinglish: '😔 Yaar sorry — do baar try kiya but ' + whyText + '. Ab 2 options hain: **Option 1:** 60 second ruk ke message dobara bhejo — AI jaldi recover ho jati hai. **Option 2:** Agar urgent hai, direct hamari team ko message karo +91 87960 64170 ya hello@datunai.com — turant help milegi. Aapki chat save hai, automatic continue hogi.',
+    ta: '😔 மன்னிக்கவும் — ' + whyText + '. 60 வினாடிகள் காத்திருந்து மீண்டும் முயற்சிக்கவும் அல்லது +91 87960 64170 / hello@datunai.com தொடர்பு கொள்ளவும். உங்கள் உரையாடல் பாதுகாப்பாக சேமிக்கப்பட்டுள்ளது.',
+    bn: '😔 দুঃখিত — ' + whyText + '. 60 সেকেন্ড অপেক্ষা করে আবার চেষ্টা করুন বা +91 87960 64170 / hello@datunai.com যোগাযোগ করুন। আপনার কথোপকথন নিরাপদে সংরক্ষিত।',
+    mr: '😔 माफ करा — ' + whyText + '. 60 सेकंद थांबून पुन्हा प्रयत्न करा किंवा +91 87960 64170 / hello@datunai.com ला संपर्क करा. तुमची बातचीत सुरक्षित आहे.',
+    te: '😔 క్షమించండి — ' + whyText + '. 60 సెకన్లు వేచి మళ్ళీ ప్రయత్నించండి లేదా +91 87960 64170 / hello@datunai.com సంప్రదించండి. మీ సంభాషణ సురక్షితంగా ఉంది.',
+    kn: '😔 ಕ್ಷಮಿಸಿ — ' + whyText + '. 60 ಸೆಕೆಂಡ್ ಕಾಯ್ದು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ +91 87960 64170 / hello@datunai.com ಸಂಪರ್ಕಿಸಿ. ನಿಮ್ಮ ಸಂಭಾಷಣೆ ಸುರಕ್ಷಿತವಾಗಿದೆ.',
+    gu: '😔 માફ કરજો — ' + whyText + '. 60 સેકન્ડ રાહ જોઈને ફરી પ્રયાસ કરો અથવા +91 87960 64170 / hello@datunai.com સંપર્ક કરો. તમારી વાતચીત સુરક્ષિત છે.',
+    pa: '😔 ਮਾਫ਼ ਕਰਨਾ — ' + whyText + '. 60 ਸਕਿੰਟ ਉਡੀਕ ਕੇ ਫੇਰ ਕੋਸ਼ਿਸ਼ ਕਰੋ ਜਾਂ +91 87960 64170 / hello@datunai.com ਸੰਪਰਕ ਕਰੋ। ਤੁਹਾਡੀ ਗੱਲਬਾਤ ਸੁਰੱਖਿਅਤ ਹੈ।'
+  };
+
+  addBot(explainMsgs[lang] || explainMsgs.en);
+
+  // Show "Retry" + "Contact us" chips so user has immediate action
+  const retryLabel = {
+    en: '🔄 Try Again',
+    hi: '🔄 Dobara Try',
+    hinglish: '🔄 Dobara Try',
+    ta: '🔄 மீண்டும்',
+    bn: '🔄 আবার',
+    mr: '🔄 पुन्हा',
+    te: '🔄 మళ్ళీ',
+    kn: '🔄 ಮತ್ತೆ',
+    gu: '🔄 ફરી',
+    pa: '🔄 ਫੇਰ'
+  };
+  const contactLabel = {
+    en: '💬 Contact Team',
+    hi: '💬 Team Se Baat',
+    hinglish: '💬 Team Contact',
+    ta: '💬 தொடர்பு',
+    bn: '💬 যোগাযোগ',
+    mr: '💬 संपर्क',
+    te: '💬 సంప్రదించండి',
+    kn: '💬 ಸಂಪರ್ಕಿಸಿ',
+    gu: '💬 સંપર્ક',
+    pa: '💬 ਸੰਪਰਕ'
+  };
+  renderChips([retryLabel[lang] || retryLabel.en, contactLabel[lang] || contactLabel.en]);
+}
 async function sendMsg(ov){
   const ta=document.getElementById('cta');
   const text=(ov||ta.value).trim();if(!text)return;
   if(!ov){ta.value='';ta.style.height='auto';}
+
+  // Intercept special recovery chips (retry last msg OR open WhatsApp)
+  if (text.includes('🔄') || /try again|dobara try/i.test(text)) {
+    const lastUserMsg = [...conv].reverse().find(m => m.role === 'user' && typeof m.content === 'string' && !m.content.includes('🔄') && !m.content.includes('[SYSTEM_NOTE'));
+    if (lastUserMsg) {
+      _msgRetryCount = 0;
+      return sendMsg(lastUserMsg.content);
+    }
+    return;
+  }
+  if (text.includes('💬') && /contact|team|baat|संपर्क/i.test(text)) {
+    if (typeof openWhatsAppSmart === 'function') {
+      openWhatsAppSmart('Hi, I was chatting with Datun AI but the AI had an issue. Please help me continue my dental consultation.');
+    } else {
+      window.open('https://wa.me/917018464796?text=' + encodeURIComponent('Hi, I was chatting with Datun AI but the AI had an issue. Please help me.'), '_blank');
+    }
+    return;
+  }
+
   addUser(text);conv.push({role:'user',content:text});
   
   // ═══════════════════════════════════════════════
@@ -3577,18 +3749,22 @@ async function sendMsg(ov){
   if(!patientAge&&/^\d{1,3}$/.test(text.trim())&&+text.trim()>0&&+text.trim()<120)patientAge=text.trim();
   showTyping();
   try{
-    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        messages:conv,
-        lang:lang,
-        patientName:patientName,
-        patientAge:patientAge,
-        patientGender:patientGender
-      })
-    });
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:conv,lang:lang,patientName:patientName,patientAge:patientAge,patientGender:patientGender})});
+
+    // Handle HTTP errors before parsing (429, 500, 503, etc.)
+    if (!res.ok) {
+      rmTyping();
+      const errData = await res.json().catch(() => ({}));
+      const reason = errData.errorCode || `HTTP_${res.status}`;
+      return handleSendMsgFailure(text, new Error(reason));
+    }
+
     const d=await res.json();rmTyping();
+
+    // Handle API error in response body
+    if (d.error) {
+      return handleSendMsgFailure(text, new Error(d.errorCode || 'API_ERROR'));
+    }
     let r=d.content?.map(b=>b.text||'').join('')||'Something went wrong. Please try again.';
     let cleanR=r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
     conv.push({role:'assistant',content:cleanR});
@@ -3658,16 +3834,10 @@ async function sendMsg(ov){
       .catch(e=>console.log('Save error:',e));
     }
     
-  }catch(e){
+}catch(e){
   rmTyping();
   console.error('[sendMsg] Chat error:', e);
-  // Language-aware error message
-  const errMsgs = {
-    en: '😔 Hmm, our AI is a bit busy right now. Please try again in 30 seconds — your conversation is saved.',
-    hi: '😔 Hmm, hamari AI thodi busy hai abhi. 30 second mein dobara try karein — aapki baat save ho gayi hai.',
-    hinglish: '😔 Hmm, AI thodi busy hai abhi. 30 second mein dobara try karo — aapki chat save hai.'
-  };
-  addBot(errMsgs[lang] || errMsgs.en);
+  return handleSendMsgFailure(text, e);
 }
 }
   // ── CHIPS ──
