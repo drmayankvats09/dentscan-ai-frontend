@@ -34,7 +34,7 @@
   </script>
 <meta name="facebook-domain-verification" content="kd0zq6z46dtbn7ypt24astqkptfdju" />
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
 <title>Datun AI — India's AI Dental Expert. 24/7.</title>
 <meta name="description" content="AI-powered dental triage for every Indian. Instant clinical guidance, photo analysis, personalised assessment in Hindi & English. 24/7. No appointments."/>
 <meta property="og:title" content="Datun AI — India's AI Dental Expert. 24/7."/>
@@ -659,11 +659,12 @@ footer{background:var(--dark);padding:52px 5% 28px}
 #msgs::-webkit-scrollbar{width:3px}#msgs::-webkit-scrollbar-thumb{background:rgba(10,158,143,.25);border-radius:3px}
 .ch-disc{background:linear-gradient(135deg,#fffbeb,#fef9e7);border-top:1px solid rgba(240,208,96,.3);padding:5px 12px;font-size:.63rem;color:#7a5000;text-align:center;flex-shrink:0;line-height:1.4}
 .ch-ft{padding:.75rem .9rem;border-top:1px solid rgba(0,0,0,.06);background:linear-gradient(180deg,#fafcfb,white);flex-shrink:0}
-.ch-ir{display:flex;gap:6px;align-items:flex-end}
+.ch-ir{display:flex;gap:8px;align-items:flex-end}
+.ch-btns{display:flex;gap:6px;align-items:flex-end}
 .ch-ta{flex:1;border:1.5px solid rgba(0,0,0,.08);border-radius:12px;padding:9px 12px;font-size:.85rem;font-family:var(--fb);resize:none;outline:none;transition:all .25s;line-height:1.5;min-height:40px;max-height:92px;color:var(--dark2);-webkit-appearance:none;background:rgba(255,255,255,.8);backdrop-filter:blur(4px);box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .ch-ta:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(10,158,143,.08),0 2px 8px rgba(0,0,0,.06)}.ch-ta::placeholder{color:#b0bac5}
 .ch-btns{display:flex;gap:5px;flex-shrink:0}
-.ch-bv,.ch-bp,.ch-bs{width:38px;height:38px;border:none;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .25s}
+.ch-bv,.ch-bp,.ch-bs{width:44px;height:44px;min-width:44px;border:none;border-radius:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .25s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .ch-bv{background:var(--light)}.ch-bv:hover{background:var(--gp);transform:translateY(-1px)}.ch-bv svg{width:16px;height:16px;stroke:#64748b;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}.ch-bv:hover svg{stroke:var(--g)}
 .ch-bp{background:var(--light);position:relative}.ch-bp:hover{background:var(--gp);transform:translateY(-1px)}.ch-bp svg{width:16px;height:16px;stroke:#64748b;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}.ch-bp:hover svg{stroke:var(--g)}.ch-bp input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .ch-bs{background:linear-gradient(135deg,var(--g),var(--gl));box-shadow:0 2px 8px rgba(10,158,143,.3)}.ch-bs:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(10,158,143,.4)}.ch-bs:active{transform:translateY(0)}.ch-bs svg{width:14px;height:14px;fill:white}
@@ -859,7 +860,7 @@ footer{background:var(--dark);padding:52px 5% 28px}
 button:focus-visible,a:focus-visible{outline:2px solid var(--g);outline-offset:2px;border-radius:4px}
 
 /* Chat textarea on iOS fix */
-.ch-ta{-webkit-appearance:none;border-radius:11px}
+.ch-ta{-webkit-appearance:none;border-radius:11px;font-size:16px!important}
 .if input,.if select{-webkit-appearance:none;border-radius:9px}
 
 /* Prevent double-tap zoom on buttons mobile */
@@ -1467,10 +1468,10 @@ html{scroll-behavior:smooth;scroll-padding-top:70px}
     <div class="ch-disc">⚠️ AI guidance only — not a clinical prescription. Our team is here for your next step.</div>
     <div class="ch-ft">
       <div class="ch-ir">
+        <button class="ch-bp" id="pb" title="Photo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><input type="file" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)"/></button>
         <textarea id="cta" class="ch-ta" rows="1" placeholder="Describe your dental concern..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
         <div class="ch-btns">
           <button class="ch-bv" id="vbtn" onclick="toggleVoice()" title="Voice"><svg id="vicon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-          <button class="ch-bp" id="pb" title="Photo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><input type="file" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)"/></button>
           <button class="ch-bs" onclick="sendMsg()"><svg viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
         </div>
       </div>
@@ -2807,9 +2808,14 @@ function changeLang(selectedLanguage) {
   lang = selectedLanguage;
   selectedLang = selectedLanguage;
   
-  // Update UI components
+// Update UI components
   updateLangBadgeShort();
-  document.getElementById('lang-dropdown').style.display = 'none';
+  // FIX: Remove .show class (CSS uses !important, inline style won't override)
+  const _ld = document.getElementById('lang-dropdown');
+  if (_ld) {
+    _ld.classList.remove('show');
+    _ld.style.display = '';
+  }
   
   const chatInput = document.getElementById('cta');
   if (chatInput) {
@@ -2851,14 +2857,15 @@ function changeLang(selectedLanguage) {
   resetChat(); 
 }
 
-// Close language dropdown when clicking outside
+// FIX: Close language dropdown when clicking outside (uses class, not inline style)
 document.addEventListener('click', function(event) {
   const badge = document.getElementById('ch-lang-badge');
   const dropdown = document.getElementById('lang-dropdown');
-  
-  if (dropdown && dropdown.style.display === 'block') {
+  if (!dropdown || !badge) return;
+  if (dropdown.classList.contains('show')) {
     if (!badge.contains(event.target) && !dropdown.contains(event.target)) {
-      dropdown.style.display = 'none';
+      dropdown.classList.remove('show');
+      dropdown.style.display = '';
     }
   }
 });
@@ -3017,7 +3024,7 @@ function bCN(){
   // Connect Section
   const c=document.createElement('div');
   c.style.cssText='background:linear-gradient(135deg,#e8f9f7,#f0fdf9);border:1px solid rgba(10,158,143,.18);border-radius:12px;padding:12px;';
-  c.innerHTML=`<h5 style="font-size:.8rem;font-weight:700;color:#077a6e;margin-bottom:8px">${L.connectTitle}</h5><div style="display:flex;flex-direction:column;gap:5px"><a href="https://wa.me/917018464796?text=${autoMsg}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#25d366;color:white;font-size:.77rem;font-weight:600;text-decoration:none">💬 Connect on WhatsApp</a><a href="tel:+918796064170" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a9e8f;color:white;font-size:.77rem;font-weight:600;text-decoration:none">📞 Call · +91 87960 64170</a><a href="mailto:hello@datunai.com" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:#0a0f1a;color:white;font-size:.77rem;font-weight:600;text-decoration:none">✉️ hello@datunai.com</a></div>`;
+  c.innerHTML=`<h5 style="font-size:.8rem;font-weight:700;color:#077a6e;margin-bottom:8px">${L.connectTitle}</h5><div style="display:flex;flex-direction:column;gap:5px"><button onclick="openWhatsAppSmart('${autoMsg}')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;background:#25d366;color:white;font-size:.77rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:var(--fb);width:100%;text-align:left">💬 Connect on WhatsApp</button><a href="tel:+918796064170" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;background:#0a9e8f;color:white;font-size:.77rem;font-weight:600;text-decoration:none">📞 Call · +91 87960 64170</a><a href="mailto:hello@datunai.com" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;background:#0a0f1a;color:white;font-size:.77rem;font-weight:600;text-decoration:none">✉️ hello@datunai.com</a></div>`;
 
   wrapper.appendChild(pdfBtn);
   wrapper.appendChild(c);
@@ -3173,6 +3180,62 @@ function resizeImageForClaude(file) {
     img.src = url;
   });
 }
+
+// ═══════════════════════════════════════════════════════════
+// SMART WHATSAPP OPENER — handles both WhatsApp + WhatsApp Business
+// Strategy: Native Web Share API (shows OS chooser with BOTH apps)
+// Fallback 1: Direct wa.me link
+// Fallback 2: Copy number + show instruction
+// ═══════════════════════════════════════════════════════════
+async function openWhatsAppSmart(autoMessage) {
+  const targetPhone = '917018464796';
+  const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(autoMessage || 'Hi, I just completed a consultation on Datun AI and need help.')}`;
+  const displayNumber = '+91 70184 64796';
+
+  // Strategy 1: Native Share API (Android + iOS 13+) — shows OS chooser with ALL messaging apps
+  // This is how Zomato/Swiggy handle multi-app WhatsApp situations
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Datun AI',
+        text: autoMessage || 'Hi, I completed a consultation on Datun AI and need help.',
+        url: waLink
+      });
+      return;
+    } catch (err) {
+      // User cancelled share sheet — don't fall through
+      if (err.name === 'AbortError') return;
+      console.warn('[WhatsApp] Share API failed, falling back:', err);
+    }
+  }
+
+  // Strategy 2: Direct wa.me link (opens default WhatsApp)
+  const newWindow = window.open(waLink, '_blank');
+
+  // Strategy 3: If popup blocked OR user confused about which WhatsApp — offer copy fallback
+  setTimeout(() => {
+    const msgs = {
+      en: `If WhatsApp didn't open, copy this number and message manually: ${displayNumber}`,
+      hi: `Agar WhatsApp nahi khula, yeh number copy karke manually message karein: ${displayNumber}`,
+      hinglish: `WhatsApp nahi khula? Yeh number copy karke manually message karo: ${displayNumber}`,
+      ta: `WhatsApp திறக்கவில்லை எனில், இந்த எண்ணை நகலெடுக்கவும்: ${displayNumber}`,
+      bn: `WhatsApp না খুললে এই নম্বরটি কপি করুন: ${displayNumber}`,
+      mr: `WhatsApp उघडले नाही तर हा नंबर कॉपी करा: ${displayNumber}`,
+      te: `WhatsApp తెరవలేదా? ఈ నంబర్ కాపీ చేయండి: ${displayNumber}`,
+      kn: `WhatsApp ತೆರೆಯದಿದ್ದರೆ ಈ ಸಂಖ್ಯೆಯನ್ನು ನಕಲಿಸಿ: ${displayNumber}`,
+      gu: `WhatsApp ના ખુલે તો આ નંબર કોપી કરો: ${displayNumber}`,
+      pa: `WhatsApp ਨਾ ਖੁੱਲ੍ਹੇ ਤਾਂ ਇਹ ਨੰਬਰ ਕਾਪੀ ਕਰੋ: ${displayNumber}`
+    };
+    if (!newWindow || newWindow.closed) {
+      // Copy to clipboard + show toast
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(displayNumber).catch(() => {});
+      }
+      addBot(msgs[lang] || msgs.en);
+    }
+  }, 600);
+}
+
 // ═══════════════════════════════════════════════════════════
 // SENDPHOTO with 2-STRIKE GRACEFUL DEGRADATION
 // Attempt 1 fail → silent retry once
