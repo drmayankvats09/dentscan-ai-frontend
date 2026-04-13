@@ -3032,154 +3032,461 @@ function downloadReport() {
   const backendUrl = 'https://dentscan-ai-backend-production.up.railway.app';
   window.open(`${backendUrl}/api/consultations/${currentConsultationId}/pdf`, '_blank');
 }
-function handlePhotoUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const du=ev.target.result,b=du.split(',')[1],mt=f.type||'image/jpeg';addPhoto(du);sendPhoto(b,mt,du);};r.readAsDataURL(f);e.target.value='';}
 
-async function sendPhoto(b64,mt,du){
-  const analyzeMsg={en:'📷 Photo received! Analyzing now...',hi:'📷 Photo mil gayi! Analyze kar raha hoon...',hinglish:'📷 Photo mil gayi! Analyze karta hoon...',ta:'📷 படம் வந்தது! பகுப்பாய்வு செய்கிறேன்...',bn:'📷 ছবি পেয়েছি! বিশ্লেষণ করছি...',mr:'📷 फोटो मिला! विश्लेषण करतो...',te:'📷 ఫోటో వచ్చింది! విశ్లేషిస్తున్నాను...',kn:'📷 ಫೋಟೋ ಬಂತು! ವಿಶ್ಲೇಷಿಸುತ್ತಿದ್ದೇನೆ...',gu:'📷 ફોટો મળ્યો! વિશ્લેષણ કરું છું...',pa:'📷 ਫੋਟੋ ਮਿਲੀ! ਵਿਸ਼ਲੇਸ਼ਣ ਕਰ ਰਿਹਾ ਹਾਂ...'};
-  addBot(analyzeMsg[lang]||analyzeMsg.en);showTyping();
-  
-  // Lazy-but-durable: row + photo marker PEHLE durably persist
-  try {
-    const cid = await v2EnsureConsultationStarted();
-    if (cid) {
-      v2AppendMessage('user', '[PHOTO]');
-      await v2FlushNow();
-    }
-  } catch(e) {
-    console.error('[sendPhoto] Persist failed:', e);
+async function handlePhotoUpload(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  e.target.value = ''; // Reset input
+
+  // Pre-flight: absolute max check (50 MB) — prevents browser crash on huge HEIC
+  if (f.size > 50 * 1024 * 1024) {
+    const msgs = {
+      en: '📷 Photo too large (>50 MB). Please use your camera\'s normal mode or try another photo.',
+      hi: '📷 Photo bahut badi hai (50 MB se zyada). Camera ke normal mode mein photo lein ya doosri photo try karein.',
+      hinglish: '📷 Photo bahut badi hai (>50 MB). Camera normal mode use karo ya doosri photo try karo.',
+      ta: '📷 படம் மிகவும் பெரியது (>50 MB). வேறு படம் முயற்சிக்கவும்.',
+      bn: '📷 ছবি অনেক বড় (>50 MB). অন্য ছবি চেষ্টা করুন।',
+      mr: '📷 फोटो खूप मोठा आहे (>50 MB). दुसरा फोटो वापरा.',
+      te: '📷 ఫోటో చాలా పెద్దది (>50 MB). వేరే ఫోటో ప్రయత్నించండి.',
+      kn: '📷 ಫೋಟೋ ತುಂಬಾ ದೊಡ್ಡದು (>50 MB). ಬೇರೆ ಫೋಟೋ ಪ್ರಯತ್ನಿಸಿ.',
+      gu: '📷 ફોટો ઘણો મોટો છે (>50 MB). બીજો ફોટો ટ્રાય કરો.',
+      pa: '📷 ਫੋਟੋ ਬਹੁਤ ਵੱਡੀ ਹੈ (>50 MB). ਹੋਰ ਫੋਟੋ ਟ੍ਰਾਈ ਕਰੋ।'
+    };
+    addBot(msgs[lang] || msgs.en);
+    return;
   }
-  const im={role:'user',content:[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:lang==='hi'?'Yeh meri dental photo hai.':'This is my dental photo. Evaluate carefully.'}]};
-  try{
-    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        messages:[...conv,im],
-        lang:lang,
-        patientName:patientName,
-        patientAge:patientAge,
-        patientGender:patientGender,
-        mode:'photo'
+
+  try {
+    // Show immediate feedback — user sees action
+    const procMsgs = {
+      en: '📷 Processing your photo...',
+      hi: '📷 Photo tayyar kar raha hoon...',
+      hinglish: '📷 Photo ready kar raha hoon...',
+      ta: '📷 படம் தயாராகிறது...',
+      bn: '📷 ছবি প্রস্তুত করছি...',
+      mr: '📷 फोटो तयार करत आहे...',
+      te: '📷 ఫోటో సిద్ధం చేస్తున్నాను...',
+      kn: '📷 ಫೋಟೋ ಸಿದ್ಧಪಡಿಸುತ್ತಿದ್ದೇನೆ...',
+      gu: '📷 ફોટો તૈયાર કરું છું...',
+      pa: '📷 ਫੋਟੋ ਤਿਆਰ ਕਰ ਰਿਹਾ ਹਾਂ...'
+    };
+    showTyping();
+
+    const processed = await resizeImageForClaude(f);
+    if (!processed) {
+      rmTyping();
+      addBot((procMsgs[lang] || procMsgs.en).replace('Processing', 'Could not read').replace('tayyar kar', 'read nahi kar pa').replace('ready kar', 'read nahi kar pa'));
+      return;
+    }
+    rmTyping();
+    addPhoto(processed.dataUrl);
+    sendPhoto(processed.base64, 'image/jpeg', processed.dataUrl);
+  } catch (err) {
+    rmTyping();
+    console.error('[handlePhotoUpload] Failed:', err);
+    const msgs = {
+      en: '📷 Could not prepare your photo. Please try another one.',
+      hi: '📷 Photo tayyar nahi ho payi. Doosri photo try karein.',
+      hinglish: '📷 Photo tayyar nahi ho payi. Doosri photo try karo.',
+      ta: '📷 படத்தை தயாரிக்க முடியவில்லை. வேறு படம் முயற்சிக்கவும்.',
+      bn: '📷 ছবি প্রস্তুত করা যায়নি। অন্য ছবি চেষ্টা করুন।',
+      mr: '📷 फोटो तयार होऊ शकला नाही. दुसरा फोटो वापरा.',
+      te: '📷 ఫోటో సిద్ధం కాలేదు. వేరే ఫోటో ప్రయత్నించండి.',
+      kn: '📷 ಫೋಟೋ ಸಿದ್ಧವಾಗಲಿಲ್ಲ. ಬೇರೆ ಫೋಟೋ ಪ್ರಯತ್ನಿಸಿ.',
+      gu: '📷 ફોટો તૈયાર ન થયો. બીજો ફોટો ટ્રાય કરો.',
+      pa: '📷 ਫੋਟੋ ਤਿਆਰ ਨਹੀਂ ਹੋਈ। ਹੋਰ ਫੋਟੋ ਟ੍ਰਾਈ ਕਰੋ।'
+    };
+    addBot(msgs[lang] || msgs.en);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// Resize image via Canvas API — no external library needed
+// Max 2048px on longest side, JPEG quality 0.88
+// Dental photos retain clinical detail (cavities, plaque visible)
+// ═══════════════════════════════════════════════════════════
+function resizeImageForClaude(file) {
+  return new Promise((resolve, reject) => {
+    const MAX_SIDE = 2048;
+    const QUALITY = 0.88;
+
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      try {
+        let { width, height } = img;
+
+        // Scale down if larger than MAX_SIDE
+        if (width > MAX_SIDE || height > MAX_SIDE) {
+          if (width >= height) {
+            height = Math.round((height / width) * MAX_SIDE);
+            width = MAX_SIDE;
+          } else {
+            width = Math.round((width / height) * MAX_SIDE);
+            height = MAX_SIDE;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        // White background for JPEGs (transparent PNGs otherwise go black)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Export as JPEG (ALWAYS — even if input was PNG/HEIC)
+        const dataUrl = canvas.toDataURL('image/jpeg', QUALITY);
+        const base64 = dataUrl.split(',')[1];
+
+        // Sanity check: must be under Claude's 5 MB base64 limit
+        // Base64 is ~1.37x raw bytes, so we check the encoded size
+        const sizeKB = Math.round((base64.length * 0.75) / 1024);
+        console.log(`[resizeImage] ${file.name}: ${(file.size/1024).toFixed(0)}KB → ${sizeKB}KB (${width}x${height})`);
+
+        if (base64.length > 5 * 1024 * 1024 * 1.37) {
+          // Extremely rare — only if 2048px JPEG q=0.88 is still >5 MB
+          // Retry with lower quality
+          const dataUrl2 = canvas.toDataURL('image/jpeg', 0.75);
+          const base642 = dataUrl2.split(',')[1];
+          URL.revokeObjectURL(url);
+          return resolve({ dataUrl: dataUrl2, base64: base642 });
+        }
+
+        URL.revokeObjectURL(url);
+        resolve({ dataUrl, base64 });
+      } catch (err) {
+        URL.revokeObjectURL(url);
+        reject(err);
+      }
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      // HEIC/HEIF files that browser can't decode → graceful fail
+      resolve(null);
+    };
+
+    img.src = url;
+  });
+}
+// ═══════════════════════════════════════════════════════════
+// SENDPHOTO with 2-STRIKE GRACEFUL DEGRADATION
+// Attempt 1 fail → silent retry once
+// Attempt 2 fail → AI verbally explains reason + moves to next question
+// User is NEVER dead-ended (FAANG "never hit a wall" principle)
+// ═══════════════════════════════════════════════════════════
+let _photoRetryCount = 0;
+
+async function sendPhoto(b64, mt, du, isRetry = false) {
+  const analyzeMsg = {
+    en: '📷 Photo received! Analyzing now...',
+    hi: '📷 Photo mil gayi! Analyze kar raha hoon...',
+    hinglish: '📷 Photo mil gayi! Analyze karta hoon...',
+    ta: '📷 படம் வந்தது! பகுப்பாய்வு செய்கிறேன்...',
+    bn: '📷 ছবি পেয়েছি! বিশ্লেষণ করছি...',
+    mr: '📷 फोटो मिला! विश्लेषण करतो...',
+    te: '📷 ఫోటో వచ్చింది! విశ్లేషిస్తున్నాను...',
+    kn: '📷 ಫೋಟೋ ಬಂತು! ವಿಶ್ಲೇಷಿಸುತ್ತಿದ್ದೇನೆ...',
+    gu: '📷 ફોટો મળ્યો! વિશ્લેષણ કરું છું...',
+    pa: '📷 ਫੋਟੋ ਮਿਲੀ! ਵਿਸ਼ਲੇਸ਼ਣ ਕਰ ਰਿਹਾ ਹਾਂ...'
+  };
+  if (!isRetry) addBot(analyzeMsg[lang] || analyzeMsg.en);
+  showTyping();
+
+  // Lazy-but-durable: row + photo marker PEHLE durably persist
+  if (!isRetry) {
+    try {
+      const cid = await v2EnsureConsultationStarted();
+      if (cid) {
+        v2AppendMessage('user', '[PHOTO]');
+        await v2FlushNow();
+      }
+    } catch (e) {
+      console.error('[sendPhoto] Persist failed:', e);
+    }
+  }
+
+  const im = {
+    role: 'user',
+    content: [
+      { type: 'image', source: { type: 'base64', media_type: mt, data: b64 } },
+      { type: 'text', text: lang === 'hi' ? 'Yeh meri dental photo hai.' : 'This is my dental photo. Evaluate carefully.' }
+    ]
+  };
+
+  try {
+    const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [...conv, im],
+        lang: lang,
+        patientName: patientName,
+        patientAge: patientAge,
+        patientGender: patientGender,
+        mode: 'photo'
       })
     });
-    const d=await res.json();rmTyping();
-    let r=d.content?.map(b=>b.text||'').join('')||'Could not analyze. Please try again.';
-    let cleanR=r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/,'').trim();
-    conv.push(im);conv.push({role:'assistant',content:cleanR});
+
+    // ═══════ HANDLE HTTP ERRORS BEFORE PARSING ═══════
+    if (!res.ok) {
+      rmTyping();
+      const errData = await res.json().catch(() => ({}));
+      const reason = errData.errorCode || `HTTP_${res.status}`;
+      return handlePhotoFailure(reason, b64, mt, du);
+    }
+
+    const d = await res.json();
+    rmTyping();
+
+    // Check for API error in response body
+    if (d.error) {
+      return handlePhotoFailure(d.errorCode || 'API_ERROR', b64, mt, du);
+    }
+
+    let r = d.content?.map(b => b.text || '').join('') || '';
+    if (!r.trim()) {
+      return handlePhotoFailure('EMPTY_RESPONSE', b64, mt, du);
+    }
+
+    // SUCCESS — reset retry counter
+    _photoRetryCount = 0;
+
+    let cleanR = r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/, '').trim();
+    conv.push(im);
+    conv.push({ role: 'assistant', content: cleanR });
     v2AppendMessage('assistant', cleanR);
-    let rx=null,connect=false,disp=cleanR,extractedPdfData={};
+
+    let rx = null, connect = false, disp = cleanR, extractedPdfData = {};
 
     // Extract AI JSON data if present
-    if(r.includes('[DATA_START]')&&r.includes('[DATA_END]')){
-      const m=r.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
-      if(m){try{extractedPdfData=JSON.parse(m[1].trim());}catch(e){}}
+    if (r.includes('[DATA_START]') && r.includes('[DATA_END]')) {
+      const m = r.match(/\[DATA_START\]([\s\S]*?)\[DATA_END\]/);
+      if (m) { try { extractedPdfData = JSON.parse(m[1].trim()); } catch (e) {} }
     }
 
     // PHOTO FINDINGS → STORE silently, render NAHI karna
-    if(r.includes('[PHOTO_FINDINGS_START]')&&r.includes('[PHOTO_FINDINGS_END]')){
-      const m=r.match(/\[PHOTO_FINDINGS_START\]([\s\S]*?)\[PHOTO_FINDINGS_END\]/);
-      if(m){
-        pendingFindings=pFI(m[1]);
-        pendingFindingsImg=du;
-        if(pendingFindings.fi&&pendingFindings.fi.length){
-          pendingVFString=pendingFindings.fi.map(function(f){
-            return (f.name||'Unknown')+' | '+(f.location||'—')+' | '+(f.severity||'noted');
+    if (r.includes('[PHOTO_FINDINGS_START]') && r.includes('[PHOTO_FINDINGS_END]')) {
+      const m = r.match(/\[PHOTO_FINDINGS_START\]([\s\S]*?)\[PHOTO_FINDINGS_END\]/);
+      if (m) {
+        pendingFindings = pFI(m[1]);
+        pendingFindingsImg = du;
+        if (pendingFindings.fi && pendingFindings.fi.length) {
+          pendingVFString = pendingFindings.fi.map(function(f) {
+            return (f.name || 'Unknown') + ' | ' + (f.location || '—') + ' | ' + (f.severity || 'noted');
           }).join('\n');
         }
       }
-      disp=disp.replace(/\[PHOTO_FINDINGS_START\][\s\S]*?\[PHOTO_FINDINGS_END\]/,'').trim();
+      disp = disp.replace(/\[PHOTO_FINDINGS_START\][\s\S]*?\[PHOTO_FINDINGS_END\]/, '').trim();
     }
+
     // Backward compat — old [FINDINGS_START] tag bhi handle karo
-    if(r.includes('[FINDINGS_START]')&&r.includes('[FINDINGS_END]')){
-      const m=r.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
-      if(m){
-        pendingFindings=pFI(m[1]);
-        pendingFindingsImg=du;
-        if(pendingFindings.fi&&pendingFindings.fi.length){
-          pendingVFString=pendingFindings.fi.map(function(f){
-            return (f.name||'Unknown')+' | '+(f.location||'—')+' | '+(f.severity||'noted');
+    if (r.includes('[FINDINGS_START]') && r.includes('[FINDINGS_END]')) {
+      const m = r.match(/\[FINDINGS_START\]([\s\S]*?)\[FINDINGS_END\]/);
+      if (m) {
+        pendingFindings = pFI(m[1]);
+        pendingFindingsImg = du;
+        if (pendingFindings.fi && pendingFindings.fi.length) {
+          pendingVFString = pendingFindings.fi.map(function(f) {
+            return (f.name || 'Unknown') + ' | ' + (f.location || '—') + ' | ' + (f.severity || 'noted');
           }).join('\n');
         }
       }
-      disp=disp.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/,'').trim();
+      disp = disp.replace(/\[FINDINGS_START\][\s\S]*?\[FINDINGS_END\]/, '').trim();
     }
 
     // EMERGENCY CASE — RX aaya sendPhoto mein hi (abscess/cancer)
-    if(r.includes('[RX_START]')&&r.includes('[RX_END]')&&!rxShown){
-      rxShown=true;
-      const m=r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
-      if(m)rx=pRX(m[1]);
-      disp=disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/,'').trim();
+    if (r.includes('[RX_START]') && r.includes('[RX_END]') && !rxShown) {
+      rxShown = true;
+      const m = r.match(/\[RX_START\]([\s\S]*?)\[RX_END\]/);
+      if (m) rx = pRX(m[1]);
+      disp = disp.replace(/\[RX_START\][\s\S]*?\[RX_END\]/, '').trim();
     }
-    if(r.includes('[SHOW_CONNECT]')&&!connectShown){
-      connect=true;connectShown=true;
-      disp=disp.replace('[SHOW_CONNECT]','').trim();
+    if (r.includes('[SHOW_CONNECT]') && !connectShown) {
+      connect = true;
+      connectShown = true;
+      disp = disp.replace('[SHOW_CONNECT]', '').trim();
     }
-    if(r.includes('[REQUEST_PHOTO]')){
-      disp=disp.replace('[REQUEST_PHOTO]','').trim();
+    if (r.includes('[REQUEST_PHOTO]')) {
+      disp = disp.replace('[REQUEST_PHOTO]', '').trim();
     }
 
-    const parsed=parseChips(disp);
+    const parsed = parseChips(disp);
     renderChips(parsed.chips);
 
     // NORMAL CASE: Findings stored, sirf text + question dikhao (no findings card)
     // EMERGENCY CASE: RX aaya → findings + RX dono dikhao
-    if(rx && pendingFindings){
+    if (rx && pendingFindings) {
       // Emergency — show findings + RX together
-      addBot(parsed.text,{findings:pendingFindings,imgSrc:pendingFindingsImg,rx,connect});
-      pendingFindings=null;pendingFindingsImg=null;
+      addBot(parsed.text, { findings: pendingFindings, imgSrc: pendingFindingsImg, rx, connect });
+      pendingFindings = null;
+      pendingFindingsImg = null;
     } else {
       // Normal — sirf question dikhao, findings stored for later
-      addBot(parsed.text,{rx,connect});
+      addBot(parsed.text, { rx, connect });
     }
 
     // SAVE — sirf emergency case mein (jab SHOW_CONNECT aaya sendPhoto mein)
-    if(connectShown && patientEmail && !consultationSaved){
-      consultationSaved=true;
-      var rxData=rxToPdfData(rx||{});
-      var mergedData={};
-      var keys=['provisional_diagnosis','medications','home_remedies','dos_and_donts','treatment_plan','investigations','location','pain_scale','medical_history','allergies','dental_history','red_flags','visual_findings'];
-      keys.forEach(function(k){
-        var rxVal=rxData[k]||'';
-        var aiVal=extractedPdfData[k]||'';
-        mergedData[k]=rxVal.length>aiVal.length?rxVal:aiVal;
+    if (connectShown && patientEmail && !consultationSaved) {
+      consultationSaved = true;
+      var rxData = rxToPdfData(rx || {});
+      var mergedData = {};
+      var keys = ['provisional_diagnosis', 'medications', 'home_remedies', 'dos_and_donts', 'treatment_plan', 'investigations', 'location', 'pain_scale', 'medical_history', 'allergies', 'dental_history', 'red_flags', 'visual_findings'];
+      keys.forEach(function(k) {
+        var rxVal = rxData[k] || '';
+        var aiVal = extractedPdfData[k] || '';
+        mergedData[k] = rxVal.length > aiVal.length ? rxVal : aiVal;
       });
-      if(pendingVFString&&(!mergedData.visual_findings||mergedData.visual_findings.length<pendingVFString.length)){
-        mergedData.visual_findings=pendingVFString;
+      if (pendingVFString && (!mergedData.visual_findings || mergedData.visual_findings.length < pendingVFString.length)) {
+        mergedData.visual_findings = pendingVFString;
       }
-      fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          name:patientName,age:patientAge,gender:patientGender,email:patientEmail,
-          messages:conv,sessionId:patientEmail+'_'+Date.now(),
-          userId:currentUserId||null,phoneNumber:patientPhone||'',
+      fetch('https://dentscan-ai-backend-production.up.railway.app/api/save-consultation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: patientName, age: patientAge, gender: patientGender, email: patientEmail,
+          messages: conv, sessionId: patientEmail + '_' + Date.now(),
+          userId: currentUserId || null, phoneNumber: patientPhone || '',
           activeConsultId: activeConsultId,
           ...mergedData
         })
       })
-      .then(res=>res.json())
-      .then(data=>{
-        console.log('✅ Consultation saved (photo emergency)');
-        if(data.consultationId){
-          currentConsultationId=data.consultationId;
-          var pdfBtn=document.getElementById('pdf-download-btn');
-          if(pdfBtn)pdfBtn.style.display='flex';
-        }
-      })
-      .catch(e=>console.log('Save error:',e));
+        .then(res => res.json())
+        .then(data => {
+          console.log('✅ Consultation saved (photo emergency)');
+          if (data.consultationId) {
+            currentConsultationId = data.consultationId;
+            var pdfBtn = document.getElementById('pdf-download-btn');
+            if (pdfBtn) pdfBtn.style.display = 'flex';
+          }
+        })
+        .catch(e => console.log('Save error:', e));
     }
 
-  }catch(e){
-  rmTyping();
-  console.error('[sendPhoto] Photo analysis error:', e);
-  const errMsgs = {
-    en: '📷 Photo analysis failed — please try again. Your chat is saved.',
-    hi: '📷 Photo analyze nahi ho payi — dobara try karein. Aapki chat save hai.',
-    hinglish: '📷 Photo analysis fail ho gayi — dobara try karo. Chat save hai.'
-  };
-  addBot(errMsgs[lang] || errMsgs.en);
+  } catch (e) {
+    rmTyping();
+    console.error('[sendPhoto] Network error:', e);
+    return handlePhotoFailure('NETWORK_ERROR', b64, mt, du);
+  }
 }
+
+// ═══════════════════════════════════════════════════════════
+// HANDLE PHOTO FAILURE — 2-strike graceful degradation
+// Attempt 1 fail → silent retry once
+// Attempt 2 fail → AI verbally explains + moves to next clinical question
+// User is NEVER dead-ended (FAANG "never hit a wall" principle)
+// ═══════════════════════════════════════════════════════════
+async function handlePhotoFailure(reason, b64, mt, du) {
+  _photoRetryCount++;
+  console.warn('[sendPhoto] Failure #' + _photoRetryCount + ' reason:', reason);
+
+  // STRIKE 1 — silent retry once
+  if (_photoRetryCount === 1) {
+    const retryMsgs = {
+      en: '📷 Hmm, photo analysis glitched. Trying once more...',
+      hi: '📷 Hmm, photo analyze nahi ho payi. Ek baar aur try kar raha hoon...',
+      hinglish: '📷 Hmm, photo analyze nahi hui. Ek baar aur try karta hoon...',
+      ta: '📷 மீண்டும் முயற்சிக்கிறேன்...',
+      bn: '📷 আরেকবার চেষ্টা করছি...',
+      mr: '📷 पुन्हा प्रयत्न करत आहे...',
+      te: '📷 మరోసారి ప్రయత్నిస్తున్నాను...',
+      kn: '📷 ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸುತ್ತಿದ್ದೇನೆ...',
+      gu: '📷 ફરી પ્રયાસ કરું છું...',
+      pa: '📷 ਫੇਰ ਕੋਸ਼ਿਸ਼ ਕਰ ਰਿਹਾ ਹਾਂ...'
+    };
+    addBot(retryMsgs[lang] || retryMsgs.en);
+    await new Promise(r => setTimeout(r, 1200));
+    return sendPhoto(b64, mt, du, true);
+  }
+
+  // STRIKE 2 — AI verbally explains + moves to next clinical question
+  _photoRetryCount = 0;
+  const reasonText = {
+    en: {
+      PAYLOAD_TOO_LARGE: 'the photo was too large for our analysis system',
+      INVALID_IMAGE: 'the image format could not be read',
+      API_OVERLOAD: 'our AI service is experiencing high traffic right now',
+      NETWORK_ERROR: 'there was a network connection issue',
+      EMPTY_RESPONSE: 'our analysis came back incomplete',
+      default: 'our photo analysis system had a temporary issue'
+    },
+    hi: {
+      PAYLOAD_TOO_LARGE: 'photo bahut badi thi hamare system ke liye',
+      INVALID_IMAGE: 'image format samajh nahi paya',
+      API_OVERLOAD: 'hamari AI abhi thodi busy hai',
+      NETWORK_ERROR: 'internet connection ki dikkat thi',
+      EMPTY_RESPONSE: 'analysis adhoori aayi',
+      default: 'photo analysis mein temporary dikkat thi'
+    },
+    hinglish: {
+      PAYLOAD_TOO_LARGE: 'photo kaafi badi thi system ke liye',
+      INVALID_IMAGE: 'image format read nahi ho payi',
+      API_OVERLOAD: 'AI abhi thodi busy hai',
+      NETWORK_ERROR: 'network ki dikkat thi',
+      EMPTY_RESPONSE: 'analysis incomplete aayi',
+      default: 'photo analysis mein temporary issue hua'
+    }
+  };
+  const langKey = reasonText[lang] ? lang : (lang === 'hi' ? 'hi' : 'en');
+  const rMap = reasonText[langKey] || reasonText.en;
+  const whyText = rMap[reason] || rMap.default;
+
+  const explainMsgs = {
+    en: '😔 I am really sorry — I tried twice but could not analyze your photo because ' + whyText + '. No worries at all — I can still help you thoroughly based on what you tell me. Let us continue with your questions, and we can come back to photos later if needed.',
+    hi: '😔 Bhai maafi chahta hoon — do baar try kiya lekin photo analyze nahi ho payi kyunki ' + whyText + '. Koi baat nahi — main aapki baat sunke bhi poori madad kar sakta hoon. Chaliye sawaal continue karte hain, photo baad mein try kar lenge agar zarurat padi.',
+    hinglish: '😔 Yaar sorry — do baar try kiya lekin photo analyze nahi ho payi kyunki ' + whyText + '. No tension — main aapki baat sunke bhi poori help kar sakta hoon. Chaliye sawaal continue karte hain, photo baad mein try kar lenge.',
+    ta: '😔 மன்னிக்கவும் — படத்தை பகுப்பாய்வு செய்ய முடியவில்லை (' + whyText + '). கவலை வேண்டாம், உங்கள் சொற்களை வைத்து நான் உதவ முடியும். கேள்விகளை தொடர்வோம்.',
+    bn: '😔 দুঃখিত — ছবিটি বিশ্লেষণ করা যায়নি (' + whyText + '). চিন্তা করবেন না, আপনার কথা শুনে আমি সাহায্য করতে পারি। চলুন প্রশ্ন চালিয়ে যাই।',
+    mr: '😔 माफ करा — फोटो विश्लेषण होऊ शकला नाही (' + whyText + '). काळजी करू नका, तुमच्या बोलण्यावरून मी मदत करू शकतो. प्रश्न पुढे सुरू ठेवूया.',
+    te: '😔 క్షమించండి — ఫోటో విశ్లేషణ కాలేదు (' + whyText + '). చింతించకండి, మీ మాటల ఆధారంగా నేను సహాయం చేయగలను. ప్రశ్నలు కొనసాగిద్దాం.',
+    kn: '😔 ಕ್ಷಮಿಸಿ — ಫೋಟೋ ವಿಶ್ಲೇಷಣೆ ಆಗಲಿಲ್ಲ (' + whyText + '). ಚಿಂತೆ ಮಾಡಬೇಡಿ, ನಿಮ್ಮ ಮಾತುಗಳ ಆಧಾರದ ಮೇಲೆ ನಾನು ಸಹಾಯ ಮಾಡಬಲ್ಲೆ. ಪ್ರಶ್ನೆಗಳನ್ನು ಮುಂದುವರಿಸೋಣ.',
+    gu: '😔 માફ કરજો — ફોટો વિશ્લેષણ ન થઈ શક્યું (' + whyText + '). ચિંતા ન કરો, તમારી વાતના આધારે હું મદદ કરી શકું છું. ચાલો પ્રશ્નો ચાલુ રાખીએ.',
+    pa: '😔 ਮਾਫ਼ ਕਰਨਾ — ਫੋਟੋ ਵਿਸ਼ਲੇਸ਼ਣ ਨਹੀਂ ਹੋ ਸਕੀ (' + whyText + '). ਚਿੰਤਾ ਨਾ ਕਰੋ, ਤੁਹਾਡੀ ਗੱਲ ਸੁਣ ਕੇ ਵੀ ਮੈਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ। ਚਲੋ ਸਵਾਲ ਜਾਰੀ ਰੱਖੀਏ।'
+  };
+
+  addBot(explainMsgs[lang] || explainMsgs.en);
+
+  // Push a synthetic system note so AI knows to continue clinical flow without asking for photo again
+  conv.push({
+    role: 'user',
+    content: '[SYSTEM_NOTE: Photo analysis failed after 2 attempts. Continue clinical questioning based on symptoms only. Do NOT ask for photo again. Skip to the next clinical question in your flow.]'
+  });
+
+  // Trigger AI to continue the conversation naturally
+  try {
+    showTyping();
+    const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: conv,
+        lang: lang,
+        patientName: patientName,
+        patientAge: patientAge,
+        patientGender: patientGender
+      })
+    });
+    const d = await res.json();
+    rmTyping();
+    if (d.content) {
+      const r = d.content.map(b => b.text || '').join('') || '';
+      const cleanR = r.replace(/\[DATA_START\][\s\S]*?\[DATA_END\]/, '').trim();
+      conv.push({ role: 'assistant', content: cleanR });
+      v2AppendMessage('assistant', cleanR);
+      const parsed = parseChips(cleanR);
+      renderChips(parsed.chips);
+      addBot(parsed.text);
+    }
+  } catch (e) {
+    rmTyping();
+    console.error('[sendPhoto fallback] Continue flow failed:', e);
+    // Even this failed — give user at least a chip to tap so they are never stuck
+    renderChips(['Continue', 'Tell me more', 'What next?']);
+  }
 }
 async function sendMsg(ov){
   const ta=document.getElementById('cta');
