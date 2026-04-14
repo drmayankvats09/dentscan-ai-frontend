@@ -668,6 +668,10 @@ footer{background:var(--dark);padding:52px 5% 28px}
 .ch-bv{background:var(--light)}.ch-bv:hover{background:var(--gp);transform:translateY(-1px)}.ch-bv svg{width:16px;height:16px;stroke:#64748b;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}.ch-bv:hover svg{stroke:var(--g)}
 .ch-bp{background:var(--light);position:relative}.ch-bp:hover{background:var(--gp);transform:translateY(-1px)}.ch-bp svg{width:16px;height:16px;stroke:#64748b;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}.ch-bp:hover svg{stroke:var(--g)}.ch-bp input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .ch-bs{background:linear-gradient(135deg,var(--g),var(--gl));box-shadow:0 2px 8px rgba(10,158,143,.3)}.ch-bs:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(10,158,143,.4)}.ch-bs:active{transform:translateY(0)}.ch-bs svg{width:14px;height:14px;fill:white}
+.ch-bs.stopping{background:linear-gradient(135deg,#dc2626,#ef4444);box-shadow:0 2px 12px rgba(220,38,38,.4);animation:stopPulse 1.4s ease-in-out infinite}
+.ch-bs.stopping:hover{background:linear-gradient(135deg,#b91c1c,#dc2626);transform:translateY(-1px)}
+@keyframes stopPulse{0%,100%{box-shadow:0 2px 12px rgba(220,38,38,.4)}50%{box-shadow:0 2px 20px rgba(220,38,38,.7)}}
+#cta:disabled{background:rgba(0,0,0,.02)}
 .ch-hint{font-size:.61rem;color:#b0bac5;margin-top:5px;text-align:center}
 
 /* ═══ LEGAL ═══ */
@@ -1545,21 +1549,48 @@ updateClock();setInterval(updateClock,1000);
 
 // ── INIT AUTH0 & ROUTING ON PAGE LOAD ──
 window.addEventListener('DOMContentLoaded', async () => {
-  // Hash-based routing — blog/legal pages persist on refresh
+// Hash-based routing — blog/legal pages + chat/:id persist on refresh
   const hash = window.location.hash.replace('#', '');
   const validPages = ['blog1','blog2','blog3','privacy','terms'];
-  
+  const chatMatch = hash.match(/^chat\/(\d+)$/);
+
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-  
-  if(hash && validPages.includes(hash)){
+
+  if (chatMatch) {
+    // Chat deep-link (e.g., #chat/10042) — show chat screen, load after auth
+    document.getElementById('pg-chat').classList.add('on');
+    window._pendingChatLoad = parseInt(chatMatch[1]);
+  } else if (hash && validPages.includes(hash)) {
     // Restore blog/legal page on refresh
     document.getElementById('pg-' + hash).classList.add('on');
   } else {
     // Default: homepage. Chat only opens via explicit click.
     document.getElementById('pg-home').classList.add('on');
   }
-  
+
   await initAuth0();
+
+  // After Auth0 resolves, if there's a pending chat deep-link, load it
+  if (window._pendingChatLoad) {
+    const targetId = window._pendingChatLoad;
+    window._pendingChatLoad = null;
+    try {
+      const isAuth = await auth0Client.isAuthenticated();
+      if (isAuth) {
+        const user = await auth0Client.getUser();
+        await handleLoggedInUser(user);
+        // Give handleLoggedInUser time to set currentUserId etc., then load
+        setTimeout(() => { loadConsultation(targetId, true); }, 300);
+      } else {
+        // Not authenticated — save target and redirect to login
+        sessionStorage.setItem('datun_pending_chat', String(targetId));
+        auth0Client.loginWithRedirect({authorizationParams:{redirect_uri:window.location.origin}});
+      }
+    } catch (e) {
+      console.error('[route] Pending chat load failed:', e);
+      goPage('home');
+    }
+  }
 });
 // Nav scroll — change hamburger color too
 window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('s',window.scrollY>20);});
@@ -1610,7 +1641,11 @@ async function goPage(name){
     }
   }
 }
-function goHome(){goPage('home');}
+function goHome(){
+  // Clear chat URL hash on navigation away
+  try { if(window.location.hash.startsWith('#chat/')) history.replaceState(null, '', window.location.pathname); } catch(e) {}
+  goPage('home');
+}
 // GSAP hero
 const tl=gsap.timeline({delay:.1});
 tl.from('#heroH',{y:50,opacity:0,duration:.9,ease:'power3.out'})
@@ -1640,6 +1675,99 @@ let lang='en',conv=[],rxShown=false,connectShown=false,photoReqShown=false,consu
   // ═══════════════════════════════════════════════
 // V2 STATE — incremental consultation tracking
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// CHATGPT/CLAUDE-STYLE MESSAGE LOCK + STOP BUTTON
+// Industry standard: one AI reply at a time, interruptible
+// Prevents: race conditions, stale chips, context corruption
+// ═══════════════════════════════════════════════════════════
+let _aiIsReplying = false;
+let _currentAbortController = null;
+
+function setAIReplying(on) {
+  _aiIsReplying = on;
+  const sendBtn = document.querySelector('.ch-bs');
+  const textarea = document.getElementById('cta');
+  const photoBtn = document.getElementById('pb');
+  const voiceBtn = document.getElementById('vbtn');
+  if (!sendBtn || !textarea) return;
+
+  if (on) {
+    // AI is replying → transform send button into STOP button
+    sendBtn.classList.add('stopping');
+    sendBtn.setAttribute('title', 'Stop generating');
+    sendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+    sendBtn.onclick = stopAIReply;
+    textarea.disabled = true;
+    textarea.style.opacity = '0.55';
+    textarea.style.cursor = 'not-allowed';
+    const placeholders = {
+      en: '⏳ Datun is replying... tap ■ to stop',
+      hi: '⏳ Datun jawab de raha hai... rokne ke liye ■ dabao',
+      hinglish: '⏳ Datun reply kar raha hai... stop ke liye ■ dabao',
+      ta: '⏳ Datun பதிலளிக்கிறது... நிறுத்த ■ தட்டவும்',
+      bn: '⏳ Datun উত্তর দিচ্ছে... থামাতে ■ চাপুন',
+      mr: '⏳ Datun उत्तर देत आहे... थांबवण्यासाठी ■ दाबा',
+      te: '⏳ Datun సమాధానం ఇస్తోంది... ఆపడానికి ■ నొక్కండి',
+      kn: '⏳ Datun ಉತ್ತರಿಸುತ್ತಿದೆ... ನಿಲ್ಲಿಸಲು ■ ಒತ್ತಿರಿ',
+      gu: '⏳ Datun જવાબ આપી રહ્યું છે... રોકવા ■ દબાવો',
+      pa: '⏳ Datun ਜਵਾਬ ਦੇ ਰਿਹਾ ਹੈ... ਰੋਕਣ ਲਈ ■ ਦਬਾਓ'
+    };
+    textarea.placeholder = placeholders[lang] || placeholders.en;
+    if (photoBtn) { photoBtn.style.opacity = '0.45'; photoBtn.style.pointerEvents = 'none'; }
+    if (voiceBtn) { voiceBtn.style.opacity = '0.45'; voiceBtn.style.pointerEvents = 'none'; }
+  } else {
+    // AI done → restore send button
+    sendBtn.classList.remove('stopping');
+    sendBtn.setAttribute('title', 'Send');
+    sendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>';
+    sendBtn.onclick = function() { sendMsg(); };
+    textarea.disabled = false;
+    textarea.style.opacity = '';
+    textarea.style.cursor = '';
+    textarea.placeholder = (UI[lang] && UI[lang].ph) || 'Describe your dental concern...';
+    if (photoBtn) { photoBtn.style.opacity = ''; photoBtn.style.pointerEvents = ''; }
+    if (voiceBtn) { voiceBtn.style.opacity = ''; voiceBtn.style.pointerEvents = ''; }
+  }
+}
+
+function stopAIReply() {
+  console.log('[stopAIReply] User requested stop');
+  if (_currentAbortController) {
+    try { _currentAbortController.abort(); } catch(e) {}
+  }
+  _currentAbortController = null;
+  rmTyping();
+  setAIReplying(false);
+
+  // Show retry chip — Claude-style
+  const stopMsgs = {
+    en: '⏸ Stopped. Tap "Retry" to continue from where we left off, or type a new message.',
+    hi: '⏸ Ruk gaya. "Retry" dabao wahi se continue karne ke liye, ya naya message likhein.',
+    hinglish: '⏸ Stopped. "Retry" dabao ya naya message type karo.',
+    ta: '⏸ நிறுத்தப்பட்டது. "மீண்டும்" தட்டவும் அல்லது புதிய செய்தி.',
+    bn: '⏸ থেমেছে। "পুনরায়" চাপুন বা নতুন বার্তা।',
+    mr: '⏸ थांबले. "पुन्हा" दाबा किंवा नवीन संदेश.',
+    te: '⏸ ఆగింది. "మళ్ళీ" నొక్కండి లేదా కొత్త సందేశం.',
+    kn: '⏸ ನಿಂತಿದೆ. "ಮತ್ತೆ" ಒತ್ತಿರಿ ಅಥವಾ ಹೊಸ ಸಂದೇಶ.',
+    gu: '⏸ અટક્યું. "ફરી" દબાવો અથવા નવો સંદેશ.',
+    pa: '⏸ ਰੁਕਿਆ। "ਫੇਰ" ਦਬਾਓ ਜਾਂ ਨਵਾਂ ਸੁਨੇਹਾ।'
+  };
+  addBot(stopMsgs[lang] || stopMsgs.en);
+
+  const retryChips = {
+    en: ['🔄 Retry', '✏️ New message'],
+    hi: ['🔄 Dobara', '✏️ Naya message'],
+    hinglish: ['🔄 Retry', '✏️ Naya message'],
+    ta: ['🔄 மீண்டும்', '✏️ புதியது'],
+    bn: ['🔄 পুনরায়', '✏️ নতুন'],
+    mr: ['🔄 पुन्हा', '✏️ नवीन'],
+    te: ['🔄 మళ్ళీ', '✏️ కొత్త'],
+    kn: ['🔄 ಮತ್ತೆ', '✏️ ಹೊಸದು'],
+    gu: ['🔄 ફરી', '✏️ નવું'],
+    pa: ['🔄 ਫੇਰ', '✏️ ਨਵਾਂ']
+  };
+  renderChips(retryChips[lang] || retryChips.en);
+}
 let activeConsultId = null;
 let activeClientUuid = null;
 let v2MessageQueue = [];
@@ -1693,14 +1821,16 @@ async function v2GetToken() {
     if (d.consultationId) {
       v2SaveActive(d.consultationId, uuid);
       console.log('[v2Start] ✅ Consultation created:', d.consultationId);
+      // Update URL so refresh resumes this exact chat
+      try { history.replaceState(null, '', '#chat/' + d.consultationId); } catch(e) {}
       return d.consultationId;
     }
     console.error('[v2Start] ❌ Backend did not return consultationId:', d);
   } catch(e) { 
     console.error('[v2Start] ❌ Exception:', e); 
   }
-  return null;
-}
+    return null;
+  }
 
 // Har message ko queue mein daal, background mein flush
 function v2AppendMessage(role, content) {
@@ -1829,7 +1959,15 @@ async function initAuth0(){
       const errDesc = params.get('error_description') || params.get('error');
       console.error('[Auth0 Error]:', errDesc);
   // Clean the URL immediately
-  window.history.replaceState({}, document.title, window.location.pathname);
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+  // Restore pending chat deep-link after login redirect
+  const pendingChat = sessionStorage.getItem('datun_pending_chat');
+  if (pendingChat) {
+    sessionStorage.removeItem('datun_pending_chat');
+    history.replaceState(null, '', '#chat/' + pendingChat);
+    window._pendingChatLoad = parseInt(pendingChat);
+  }
   // Reset to home and show error
   localStorage.removeItem('datun_current_page');
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
@@ -2289,6 +2427,8 @@ async function showHistoryScreen(){
 }
 
 async function startNewConsultation(){
+  // Clear URL so fresh chat doesn't inherit old deep-link
+  try { if (window.location.hash.startsWith('#chat/')) history.replaceState(null, '', window.location.pathname); } catch(e) {}
     // Guard: Auth0 client ready hona chahiye
   if(!auth0Client){
     console.warn('[startNewConsultation] auth0Client null — initializing');
@@ -2509,6 +2649,8 @@ async function loadConsultation(id, isResume){
     msgs.innerHTML='';
     conv=[];rxShown=false;connectShown=false;photoReqShown=false;
     currentConsultationId=c.id;
+    // Update URL — refresh will reload this exact consultation
+    try { history.replaceState(null, '', '#chat/' + c.id); } catch(e) {}
     
     // V2: Try messages_json first (naya format), fallback to full_conversation (purana format)
     let msgArr = [];
@@ -3245,6 +3387,11 @@ async function openWhatsAppSmart(autoMessage) {
 let _photoRetryCount = 0;
 
 async function sendPhoto(b64, mt, du, isRetry = false) {
+  // Message lock — block photo upload if AI already replying
+  if (_aiIsReplying && !isRetry) {
+    console.warn('[sendPhoto] Blocked — AI still replying');
+    return;
+  }
   const analyzeMsg = {
     en: '📷 Photo received! Analyzing now...',
     hi: '📷 Photo mil gayi! Analyze kar raha hoon...',
@@ -3281,6 +3428,7 @@ async function sendPhoto(b64, mt, du, isRetry = false) {
     ]
   };
 
+if (!isRetry) { setAIReplying(true); _currentAbortController = new AbortController(); }
   try {
     const res = await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat', {
       method: 'POST',
@@ -3292,7 +3440,8 @@ async function sendPhoto(b64, mt, du, isRetry = false) {
         patientAge: patientAge,
         patientGender: patientGender,
         mode: 'photo'
-      })
+      }),
+      signal: _currentAbortController ? _currentAbortController.signal : undefined
     });
 
     // ═══════ HANDLE HTTP ERRORS BEFORE PARSING ═══════
@@ -3430,10 +3579,20 @@ async function sendPhoto(b64, mt, du, isRetry = false) {
         .catch(e => console.log('Save error:', e));
     }
 
-  } catch (e) {
+} catch (e) {
     rmTyping();
+    if (e.name === 'AbortError') {
+      console.log('[sendPhoto] Aborted by user');
+      return;
+    }
     console.error('[sendPhoto] Network error:', e);
+    setAIReplying(false);
     return handlePhotoFailure('NETWORK_ERROR', b64, mt, du);
+  } finally {
+    if (_aiIsReplying && !_currentAbortController?.signal.aborted && !isRetry) {
+      setAIReplying(false);
+    }
+    if (!isRetry) _currentAbortController = null;
   }
 }
 
@@ -3710,7 +3869,7 @@ async function sendMsg(ov){
   if(!ov){ta.value='';ta.style.height='auto';}
 
   // Intercept special recovery chips (retry last msg OR open WhatsApp)
-  if (text.includes('🔄') || /try again|dobara try/i.test(text)) {
+  if (text.includes('🔄') || /try again|dobara|retry|again|ਫੇਰ|ફરી|ಮತ್ತೆ|మళ్ళీ|पुन्हा|পুনরায়|மீண்டும்/i.test(text)) {
     const lastUserMsg = [...conv].reverse().find(m => m.role === 'user' && typeof m.content === 'string' && !m.content.includes('🔄') && !m.content.includes('[SYSTEM_NOTE'));
     if (lastUserMsg) {
       _msgRetryCount = 0;
@@ -3718,11 +3877,29 @@ async function sendMsg(ov){
     }
     return;
   }
+  if (text.includes('✏️') || /new message|naya message|naya|புதியது|নতুন|नवीन|కొత్త|ಹೊಸದು|નવું|ਨਵਾਂ/i.test(text)) {
+    // Clear chips, refocus textarea — user will type fresh
+    renderChips([]);
+    const ta = document.getElementById('cta');
+    if (ta) { ta.value = ''; ta.focus(); }
+    return;
+  }
   if (text.includes('💬') && /contact|team|baat|संपर्क/i.test(text)) {
     if (typeof openWhatsAppSmart === 'function') {
       openWhatsAppSmart('Hi, I was chatting with Datun AI but the AI had an issue. Please help me continue my dental consultation.');
     } else {
       window.open('https://wa.me/917018464796?text=' + encodeURIComponent('Hi, I was chatting with Datun AI but the AI had an issue. Please help me.'), '_blank');
+    }
+    return;
+  }
+
+  // ═══════ MESSAGE LOCK — Block if AI already replying (ChatGPT/Claude pattern) ═══════
+  if (_aiIsReplying) {
+    console.warn('[sendMsg] Blocked — AI still replying. User must wait or tap stop.');
+    // Restore textarea so user doesn't lose what they typed
+    if (!ov) {
+      const ta=document.getElementById('cta');
+      if (ta) { ta.value = text; ta.focus(); }
     }
     return;
   }
@@ -3748,8 +3925,15 @@ async function sendMsg(ov){
   if(!patientGender&&/^(male|female|other|पुरुष|महिला|ಪುರುಷ|ಮಹಿಳೆ|পুরুষ|মহিলা|ஆண்|பெண்|పురుషుడు|స్త్రీ|પુરુષ|સ્ત્રી|ਮਰਦ|ਔਰਤ)$/i.test(text.trim()))patientGender=text.trim();
   if(!patientAge&&/^\d{1,3}$/.test(text.trim())&&+text.trim()>0&&+text.trim()<120)patientAge=text.trim();
   showTyping();
+  setAIReplying(true);
+  _currentAbortController = new AbortController();
   try{
-    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:conv,lang:lang,patientName:patientName,patientAge:patientAge,patientGender:patientGender})});
+    const res=await fetch('https://dentscan-ai-backend-production.up.railway.app/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:conv,lang:lang,patientName:patientName,patientAge:patientAge,patientGender:patientGender}),
+      signal: _currentAbortController.signal
+    });
 
     // Handle HTTP errors before parsing (429, 500, 503, etc.)
     if (!res.ok) {
@@ -3836,8 +4020,20 @@ async function sendMsg(ov){
     
 }catch(e){
   rmTyping();
+  // If user hit Stop button, abort throws — don't treat as error
+  if (e.name === 'AbortError') {
+    console.log('[sendMsg] Aborted by user');
+    return;
+  }
   console.error('[sendMsg] Chat error:', e);
+  setAIReplying(false);
   return handleSendMsgFailure(text, e);
+} finally {
+  // Always release lock on success/error (but not on abort — stopAIReply already did)
+  if (_aiIsReplying && !_currentAbortController?.signal.aborted) {
+    setAIReplying(false);
+  }
+  _currentAbortController = null;
 }
 }
   // ── CHIPS ──
